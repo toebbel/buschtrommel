@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd">
+<rfc ipr="none">
+    <front>
+        <title>APS3</title>
+        <author initials='S.H.' surname='Heiss' fullname='Simon Heiss'>
+            <organization>Universität Karlsruhe</organization>
+            <address>
+                <email>simonheiss87@gmail.com</email>
+            </address>
+        </author>
+        <author initials='P.W.' surname='Wolf' fullname='Peter Wolf'>
+            <organization>Universität Karlsruhe</organization>
+            <address>
+                <email>pwolf2310@gmail.com</email>
+            </address>
+        </author>
+        <author initials='G.B.' surname='Brückner' fullname='Guido Brückner'>
+            <organization>Universität Karlsruhe</organization>
+            <address>
+                <email>guido.brueckner@gmail.com</email>
+            </address>
+        </author>
+        <date />
+	<area>Applications</area>
+        <workgroup>Telematics project 12/13, Group 3</workgroup>
+        <abstract>
+            <t>This document is a draft for the official specification of the APS3 protocol. APS3 is used to find and transfer files between hosts in the same network domain without the need for a central server.</t>
+        </abstract>
+    </front>
+    <middle>
+        <section title="Introduction">
+            <t>This document specifies the APS3 protocol, which is used for ad-hoc file transfer between hosts in the same network domain.</t>
+            <t>This specificiation defines package formats and required client behavior to enable such file transfers between conforming, well-behaved clients.</t>
+            <t>This document describes the mechanisms required for completion of the following tasks:
+                <list style="symbols">
+                    <t>peer discovery</t>
+                    <t>file discovery</t>
+                    <t>file transfer</t>
+                </list>
+            </t>
+            <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119.</t>
+        </section>
+  
+        <section title="High Level Overview">
+	    <t>The protocol features can be roughly split into two groups:
+                <list style="symbols">
+                    <t>management</t>
+                    <t>file transfers</t>
+                </list>
+            </t>
+            <t>
+                Management features are implemented with UPD and multicast groups.
+                File transfers use TCP peer-to-peer connections.
+            </t>
+        </section>
+
+        <section title="General Notes">
+            <t>The APS3 protocol extensively uses the magic number 0x71 (113 in decimal) to faciliate distinguishing APS3's messages from other protocols and applications.</t>
+            <t>Throughout this document, commands are explained with diagrams. Command fields are identified with capital letters, e.g. LEN. The corresponding decimal values specify the number of octets reserved for the field. Hexadecimal numbers written as 0xXX have a size of one octet. All multi-octet values are expected to be in network byte order.</t>
+        </section>
+  
+        <section title="Host Discovery">
+            <t>
+                When a peer first becomes active, it SHOULD join a multicast group used for APS3's management features.
+                Conventially, this multicast group is:
+                <list style="symbols">
+                    <t>239.255.0.113 for IPv4</t>
+                    <t>ff02::7171 for IPv6</t>
+                </list>
+		All management communication takes place over UDP on port 1113.
+            </t>
+            <t>
+                Upon joining the group, the peer SHOULD send a HELLOREQ message to the group:
+                <figure align='center'>
+                    <artwork>
++------+------+-----+----------+
+| MAG  |  OP  | LEN |   NAME   |
++------+------+-----+----------+
+| 0x71 | 0x00 |  1  | 1 to 255 |
++------+------+-----+----------+
+                    </artwork>
+                </figure>
+                The LEN field specifies the length of the NAME field in octets. It can be set to 0x00. The NAME field can consist of any octet string and MAY be used for peer identification.
+            </t>
+            <t>
+                When another peer receives a HELLOREQ message, it SHOULD respond by sending a HELLORSP message directly to the sender of the HELLOREQ message:
+                <figure align='center'>
+                    <artwork>
++------+------+-----+----------+
+| MAG  |  OP  | LEN |   NAME   |
++------+------+-----+----------+
+| 0x71 | 0x01 |  1  | 1 to 255 |
++------+------+-----+----------+
+                    </artwork>
+                </figure>
+                The LEN field specifies the length of the NAME field in octets. It can be set to 0x00. The NAME field can consist of any octet string and MAY be used for peer identification.
+            </t>
+            <t>
+                When a peer decides to become inactive, it SHOULD send a BYEMSG to the multicast group:
+                <figure align='center'>
+                    <artwork>
++------+------+
+| MAG  |  OP  |
++------+------+
+| 0x71 | 0x02 |
++------+------+
+                    </artwork>
+                </figure>
+                The peer can then leave the multicast group.
+            </t>
+        </section>
+  
+        <section title="File Discovery">
+            <t>
+                Files are discovered through the means of file lists. File lists have the following XML-like format:
+                <figure>
+                    <artwork><![CDATA[
+<directory name="DirectoryName">
+    <file name="FileName" size=113 hash="..." id=42 />
+    <directory name="AnotherDirectoryName">
+        <file name="AnotherFileName size=71 hash="..." id=43 />
+        ...
+    </directory>
+    ...
+</directory>
+                    ]]></artwork>
+                </figure>
+                The values of "name" should be human-readable strings, the size parameter specificies the file size in octets.
+                The hash parameter specifies the MD5 checksum.
+                The id parameter MUST be a integer in the range [1, 2^32 - 1] and serves as a unique identifier for this file in this peer's file list.
+                The id parameter MUST NOT be 0, as the id 0 is reserved for the file list itself.
+                The file list is retrieved from a peer by requesting the file with id 0. Otherwise, the file list is treated like every other file.
+            </t>
+    </section>  
+    <section title="File Transfer">
+        <t>
+            When a peer requests a file, it MUST send a FILEREQ message:
+            <figure align='center'>
+                <artwork>
++------+------+----+------+-----+-----+
+| MAG  |  OP  | ID | PORT | OFF | LEN |
++------+------+----+------+-----+-----+
+| 0x71 | 0x10 | 4  |  2   |  8  |  8  |
++------+------+----+------+-----+-----+
+                </artwork>
+            </figure>
+            Here, ID specifies the requested file's ID (as defined in the file list).
+            The port number specifies the port on which the client MUST listen for connections from the peer it requests the file from.
+            The offset specifies the index of the first octet to be sent. The first octet has offset 0.
+            The length specifies the number of bytes to be sent.
+            All values MUST be in network byte order.
+            The message shall be sent via TCP directly to the peer, who is expected to listen for connections on port 1114.
+        </t>
+        <t>
+            Upon receiving such a message, a peer SHOULD respond with a FILERSP message:
+            <figure align='center'>
+                <artwork>
++------+------+--------+
+| MAG  |  OP  | STATUS |
++------+------+--------+
+| 0x71 | 0x11 |   1    |
++------+------+--------+
+                </artwork>
+            </figure>
+            The status octet can either be 0x0, indicating a failure, or 0x1, indicating success.
+            If the request was successful, the peer who initially sent the FILEREQ message will respond by sending a FILEACK message.
+            If the request was not successful, both peers SHOULD close the connection.
+        </t>
+        <t>
+            In the case of FILERSP message indicating a success, the peer who initially sent the FILEREQ message responds to the FILERSP message by sending a FILEACK message:
+            <figure align='center'>
+                <artwork>
++------+------+
+| MAG  |  OP  |
++------+------+
+| 0x71 | 0x12 |
++------+------+
+                </artwork>
+            </figure>
+            By sending the FILEACK message, the peer guarantees that it is listening for TCP connections on the port specified in the FILEREQ message.
+            After sending or receiving the FILEACK message, the connection SHOULD be closed by both peers.
+            The peer offering the file will proceed by opening a connection to the peer requesting the file and sending a data message.
+        </t>
+        <t>
+            A data message has the following format:
+            <figure align='center'>
+                <artwork>
++------+------+----+------+
+| MAG  |  OP  | ID | DATA |
++------+------+----+------+
+| 0x71 | 0x13 | 4  |  X   |
++------+------+----+------+
+                </artwork>
+            </figure>
+            The ID - as in the request command - is the requested file's ID. The ID is followed by X octets of the file's data, where X = LEN - OFFSET + 1 (from the FILEREQ message).
+            This message should be sent by the peer who received the FILEREQ message to the peer it received said message from, to the port specified in the FILEREQ message.
+            After receiving a file, the client may wish to ensure data integrity by comparing the file's hashsum to the hashsum provided in the file list.
+        </t>
+    </section>
+</middle>
+</rfc>

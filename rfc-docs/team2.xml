@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd">
+<!-- TODO none of the possible values for ipr really fits the section from
+  the wiki -->
+<rfc ipr="none">
+
+<!-- TODO in the long run, we may have to split this file into
+  several smaller ones to ease managing requests for changes and automatic
+  diff creation. Includes are suppored by xml2rfc. -->
+<front>
+  <title>Ad-hoc File Transfer </title>
+
+  <author>
+    <!-- TODO -->
+  </author>
+
+  <date />
+
+  <area><!-- TODO --></area>
+  <workgroup>Telematics project winter 2012/2013, KIT</workgroup>
+  <keyword>Downloads</keyword>
+  <keyword>File Transfer</keyword>
+  <keyword>Ad-hoc</keyword>
+  <abstract>
+    <t>This document is a draft for the official specification of the Ad-Hoc File
+      Transfer (AFTP)
+      protocol. The protocol is used to find files on and transfer files
+      between different hosts domain without the need for a central server
+      instance.</t>
+  </abstract>
+</front>
+
+
+<middle>
+  <section title="Introduction">
+    <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+      "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+        document are to be interpreted as described in [RFC 2119].</t>
+
+    <t>This document specifies a protocol for the ad-hoc transfer of files
+      between different hosts.</t>
+
+    <t>This specification defines packet formats and required client behavior
+      to enable such file transfers between conforming clients.</t>
+
+    <t>This document describes the interaction required for the following
+      tasks:
+      <list style="numbers">
+        <t>Discovery of other clients</t>
+        <t>Discovery of files offered by those clients</t>
+        <t>Request of transfer and transfer of files between clients</t>
+      </list>
+    </t>
+  </section>
+
+  <section title="Design Objectives">
+    <section title="Problem Description">
+    </section>
+    <section title="Intended Use Cases">
+      <t>In this section, we describe the major use cases of our protocol.
+        Please note that these are merely the use cases we kept in mind when
+        designing it.
+        Implementations may provide additional functionality within the limits
+        of the protocol definitions.</t>
+
+      <section title="Usecase LAN-Party">
+        <t>In this use case, multiple users meet for a LAN-Party or Hackathon.
+          Not every user may have a proper SDK or operating system required
+          for the task on the computer they brought while other users may
+          have proper images or whole virtual machines suiting the
+          requirements.
+          In this context, someone lacking a proper tool becomes a demander,
+          while someone having a setup file or image becomes a provider.</t>
+
+        <t>A demander may talk to a provider and find out that the provider
+          has a better tool available for a certain task. In this case, the
+          provider may want to share a file containing a setup or image of
+          the better tool with the demander.
+          The provider must then enable sharing for the discussed file in
+          his local client, telling the demander the name of the file.
+          The demander must then enter that filename in his local client.
+          The local client must then show a list of files matching the given
+          filename, without requiring the demander to enter the adress of
+          the provider's local client.
+          The demander must be able to download the file to his local
+          computer.</t>
+
+        <t>The downloaded files in this use case may be rather large; in case
+          of a lost connection, a demander may want to recover as much of the
+          already downloaded data as possible. For this, the protocol must
+          support resuming downloads from arbitrary positions in the
+          bit-stream represented by the file.</t>
+      </section>
+
+      <section title="Usecase Lecture">
+        <t>In this use case, a lecturer and multiple listeners are connected
+          via Wireless Local Area Network. In this scenario, the lecturer is
+          considered a provider, while the listeners can be both providers
+          and demanders.</t>
+
+        <t>The lecturer may want to distribute presentation slides, the script
+          or example files to all listeners. While waiting for the lecture to
+          start, listeners may want to list and download the available files
+          without priorly knowing their name.</t>
+
+        <t>Listeners may also type notes in their computers and distribute
+          them to other listeners.</t>
+      </section>
+    </section>
+    <section title="General Requirements">
+      <!-- Diese Sektion entspricht größtenteils der Mail zum Thema "Features"
+        von Tobias Sturm am 04.09.2012 -->
+      <t><list style="numbers">
+        <t>In the context of a single provider and a single demander, there
+          can be multiple files downloaded at the same time.</t>
+        <t>A demander can download files from multiple providers at the same
+          time.</t>
+        <t>A provider can supply files to multiple demanders at the same
+          time.</t>
+        <t>If a download did not complete successfully, then the demander can
+          resume downloading from the same provider without restarting it.</t>
+        <t>A demander must verify the integrity of a completed download by
+          calculating its hash. The hash is automatically transmitted to the
+          demander via this protocol.</t>
+        </list></t>
+    </section>
+  </section>
+
+  <section title="Security Considerations">
+    <t>The dangers of an untrusted network are not taken into consideration in
+      this protocol. In untrusted networks, users should ensure connection
+      integrety by using external tools, e.g. routing messages through a
+      Virtual Private Network.</t>
+  </section>
+
+  <section title="High Level Overview">
+    <section title="Notes About Mode of Communication">
+     <t>When Host Request or Host Reply packets are broadcast, it in the form of an
+        UDP port 14500 packet sent to the local networks broadcast address, in the
+        format specified in the Packet Format section of this document.</t>
+        <t>When Host Reply packets are sent as a direct reply, it is in the form of an UDP datagram
+        sent to the adress that is being replied to.</t>
+        <t>For all other packets, sending a request packet directly to a host is done via an establishing a new
+        connection on TCP port 14500 with that host and then sending the packet. Sending a
+        Reply packet is done via the TCP connection established
+        for the corresponding request packet. Both participants MUST close the TCP connection after the
+        entirety of the reply - either a packet or a packet followed by data - has been received.
+        </t>
+  </section>
+
+      <section title="Packet Format">
+        <t>Packets are sent using a text format, with all text given in UTF-8 with a
+        single Line Feed (LF) character separating fields. Fields MUST NOT contain the
+        LF character. A packet always starts with
+        a Magic field given as a string set to "AFTP", followed by an an LF separator,
+        followed by a Packet Type field given as a string not exceeding 6 bytes, followed by a
+        n LF separator, followed by a variable number of fields depending on the packet type, followed
+        by two LF characters to indicate the end of the packet.</t>
+      </section>
+
+      <section title="Protocol Flow">
+        <t>To download a file using our protocol, a demander would first have to
+        locate possible providers. To this end, it would broadcast a Host Request
+        packet, to which providers MUST respond with a Host Response packet. TODO FIXME The format
+        for these packets is specified in the Host Discovery section of this document.</t>
+
+        <t>Having located possible hosts, the demander then needs to determine the files
+        available on each of the hosts it is interested in. It can do so by sending a
+        File List Request packet to the host it is interested in. The host MUST, on the same
+        connection, respond with a File List Reply packet for each offered file containing a
+        hexadecimal representation SHA-256 hash of the file data, a file name and a file size for each file it is
+        offering, and then close the connection. The exact format for these packets is
+        specified in the File Discovery section of this document.
+        </t>
+
+        <t>To initiate a file transfer, the demander sends a File Request packet containing the
+        SHA-256 hash of the request file and a start offset to the
+        provider. Upon receiving this packet, the provider MUST begin sending either a File Offer packet followed by
+        the requested files contents until the file has been transferred or the transfer aborted, or a File Not Found
+        packet. The demander MAY abort the file transfer at any time by closing the file transfer connection. The provider
+        MAY, but SHOULD NOT abort the file transfer.
+        </t>
+    </section>
+  </section>
+
+  <section title="Host Discovery">
+  <t>This section specifies the packet formats and behavior for host discovery. </t>
+  <section title="Host Request">
+  <t>A Host Request packet uses the format given in the Packet Format section of this document, with the Packet Type field set to "HREQ". Host Request packets are broadcast to the entire network. The Host Request packet contains no fields.</t>
+  <t>Host Request packets are used for discovering other clients offering files in the network. A client MAY broadcast a Host Request at any given time, however, a client MUST NOT automatically (i.e. not as the direct result of user input) broadcast Host Request packets more than once every 60 seconds.</t>
+  <t>Upon receiving a Host Request packet, a provider offering files MUST respond with a Host Reply packet. A client MUST NOT assume that the sender of a Host Request packet is offering files itself.</t>
+  </section>
+  <section title="Host Reply">
+  <t>A Host Reply packet uses the format given in the Packet Format section of this document, with the Packet Type field set to "HREP". Host Reply packets are sent as a direct response upon receiving a Host Request or broadcast upon first entering the network. A  The Host Reply packet contains no fields.</t>
+  <t>Host Reply packets are sent as response to Host Request packets. A client MUST NOT directly send a Host Reply packet unless requested via Host Request. A client MAY choose to broadcast a Host Reply packet upon first entering the network. A client MUST NOT send Host Reply packets to the same client twice within 60 seconds.</t>
+  </section>
+  </section>
+
+  <section title="File Discovery">
+    <t>This section specifies the packet formats and behavior for file discovery. </t>
+   <section title="File List Request">
+  <t>A File List Request packet uses the format given in the Packet Format section of this document, with the Packet Type field set to "FLREQ". File List Request packets are sent to the host that a client wishes to get the file list of. The File List Request packet contains no fields.</t>
+  <t>File List Request packets are used to request file list information from a host. Upon receiving a File List Request packet, a client MUST reply with a File List Reply packet followed by the file list unless it has previously begun sending file information to the requesting client in the last 60 seconds. A client MUST NOT automatically (i.e. not as the direct result of user input) send File List Request packets to the same host more than once every 60 seconds.</t>
+  </section>
+    <section title="File List Reply">
+  <t>A File List Reply packet uses the format given in the Packet Format section of this document, with the Packet Type field set to "FLREP". Host Reply packets are sent directly to the address given in the File List Request packet that triggered the File List Reply, once for every offered file. The File List Reply packet contains the following fields:</t>
+  <t><list style="hanging">
+      <t hangText="Number of Files">A textual representation of the number of files in the following file list. This field MUST NOT exceed 32 bytes in length.</t>
+      </list></t>
+  <t>File List Reply packets are sent as response to File List Request packets. A client MUST NOT send a File List Reply packet unless requested via File List Request. A client MUST NOT send an identical File List Reply packet to the same client twice within 60 seconds.</t>
+  <t>The File List Reply packet MUST be followed by a File List Entry for every offered file. File List Entries are separated by two LF characters. The File List is terminated by two LF characters. File List Entries contain the following fields:</t>
+  <t><list style="hanging">
+      <t hangText="Hash">A lower-case hexadecimal string representation of the SHA-256 hash of the offered file. This field MUST NOT exceed 64 bytes in length.</t>
+      <t hangText="File Name">The file name of the offered file, with the slash (/) character acting as a path separator. This field MUST NOT exceed 2048 bytes in length. A client MAY start the file name with a double slash (//) to mean the path part - the part up to the rightmost slash character - of the previous file, including a trailing slash character.</t>
+      <t hangText="File Size">A textual representation of the size of the offered file in bytes as a decimal number. This field MUST NOT exceed 32 bytes in length.</t>
+      </list></t>
+  </section>
+  </section>
+
+  <section title="File Transfer">
+  <t>This section specifies the packet formats and behavior for initiating and stopping file transfers, and the protocol for the actual transfer of files. </t>
+<section title="File Request">
+  <t>A File Request packet uses the format given in the Packet Format section of this document, with the Packet Type field set to "FREQ". File Request packets are sent directly to the address given in the File List Reply packet associated with the file being requested. The File Request packet contains the following fields:</t>
+  <t><list style="hanging">
+      <t hangText="Hash">A ower-case hexadecimal string representation of the SHA-256 hash of the requested file. This field MUST NOT exceed 64 bytes in length.</t>
+      <t hangText="File Offset">A textual representation of an offset into the of the requested file in bytes as a decimal number. This field MUST NOT exceed 32 bytes in length.</t>
+      </list></t>
+  <t>File Request packets are sent to initiate a file transfer. A client SHOULD NOT send a File Request packet for files it has previously requested within the last 60 seconds or files it is already downloading. Upon receiving a File Request packet, the offering client MUST reply with either a File Offer packet followed by file data, or a File Not Found packet.</t>
+  </section>
+  <section title="File Offer">
+  <t>A File Offer packet uses the format given in the Packet Format section of this document, with the Packet Type field set to "FOFF". File Offer packets are sent directly to the address given in the File Request packet of the demander that requested the file. The File Offer packet contains no fields.</t>
+  <t>File Offer packets are sent to confirm initiation of a file transfer. A client MUST NOT send File Offer packets unless requested with a File Request packet. Upon sending a File Offer packet, the client sending the packet MUST follow the packet up with all the data of the requested file starting from the requested offset. The demander MAY abort the file transfer at any time by closing the file transfer connection. The provider MAY, but SHOULD NOT abort the file transfer.</t>
+  </section>
+  <section title="File Not Found">
+  <t>A File Not Found packet uses the format given in the Packet Format section of this document, with the Packet Type field set to "FNF". File Offer packets are sent directly to the address given in the File Request packet of the demander that requested the file. The File Offer packet contains no fields.</t>
+  <t>File Not Found packets are sent to indicate that a request for a file cannot be fulfilled. The requesting client SHOULD remove the file from any local lists upon receiving a File Not Found packet.</t>
+  </section>
+  </section>
+</middle>
+<back>
+<section title="Error Handling">
+  <t>A client MUST NOT reply to or send any packets that do not conform to the formats specified in this document.</t>
+  <t>If a file transfer connection unexpectedly closes at any time, provider MUST NOT take any action except for freeing ressources associated with the transfer. A client MAY try to re-request a file transfer with a new File Request packet after confirming that the file transfer connection is not open anymore.</t>
+  </section>
+  <section title="Glossary">
+    <t><list style="hanging">
+      <t hangText="provider">A provider is a user that offers a file to be
+        downloaded by a demander.</t>
+      <t hangText="demander">A demander is a user that downloads a file from
+        a provider.</t>
+      </list></t>
+  </section>
+</back>
+
+</rfc>
