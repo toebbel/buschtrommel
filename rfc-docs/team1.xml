@@ -122,6 +122,7 @@
                                 </t>
         </section>
         
+
                 <section title="Directed File Announcement">
 					<t>
 						Clients can request others to send file announcements via unicast:
@@ -147,6 +148,7 @@
         <t>
             When a peer requests a file from a single peer, it MUST open a TCP-Socket with a chosen port and send a FILEREQ message to a peer, that offers the file:
             <figure align='center'>
+
                 <artwork>
 +------+------+------+-------+------+------+
 | MAG  |  OP  | HASH | PORT  |  OFF | LEN  |
