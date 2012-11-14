@@ -58,89 +58,54 @@
         </section>
 
         <section title="General Notes">
-            <t>Throughout this document, commands are explained with diagrams. Command fields are identified with capital letters, e.g. LEN. The corresponding decimal values specify the number of octets reserved for the field. Hexadecimal numbers written as 0xXX have a size of one octet. All multi-octet values are expected to be in network byte order.</t>
-        </section>
-
-        <section title="Peer and File Announcement via Group">
-          <t>
-            There are no mechanisms like file list requests, or hello messages. Every peer announces himself and all offered files from time to time with so-called announcement messages. These messages have a TTL.
-            A client, has to join a defined multicast group, if he wants to announce his presence (including his files), or wants to receive other clients' announcement messages. A client SHOULD be in the multicast group as long as it is running.
-            Conventially, this multicast group is:
-			<list style="symbols">
-				<t>239.255.0.113 for IPv4</t>
-				<t>ff02::7171 for IPv6</t>
-			</list>
-			All announcement communication, and directed file announcement takes place over UDP on port 7171. File Transfers are requested to TCP port 7171 as well.
+            <t>
+                Buschtrommel uses the following multicast addresses to address all participating peers:
+                <list style="symbols">
+                    <t>239.255.0.113 for IPv4</t>
+                    <t>ff02::7171 for IPv6</t>
+                </list>
+                <t>File Availability Announcements as well as File Solicitations are encapsulated in a UDP packet with the Destination Port set to XXXX. All clients SHOULD listen for incoming File Availability Announcements or File Solicitations on at least one of the multicast addresses listed above. Clients MUST use the UDP checksum header field for all UDP packets. Clients SHOULD ignore incoming UDP packets that have an invalid checksum.</t>
             </t>
-			
-            <t>
-                Upon joining the group, the peer SHOULD send his first announement message to the group:
-                <figure align='center'>
-                    <artwork>
-+------+------+----------+-----+----------+
-|  OP  |  LEN |   NAME   | TTL |  FILES   |
-+------+------+----------+-----+----------+
-| 0x0  |  13  |    23    |  7  | 0 - 8166 |
-+------+------+----------+-----+----------+
-//TODO check if total length still fits into UDP
-                  </artwork>
-                </figure>
-                The LEN field specifies the length of the data in bytes that follows after the TTL field (unsigned integer ranging from 0 to 2^13-1). The maximum value for LEN is 8166.
-                The NAME field MAY contains a human readable name of the client (represented in ASCII chars). The name can contain all ASCII chars from 32 to 126. Names, that are shorter than 23 characters can be truncated with ASCII ETX code (003). Clients without a human-readable name are accepted. If the Name field is used, the Client SHOULD NOT change it's name. Other peers MUST NOT use the name for peer identification, because the name is necessarily not unique in the network.
-                The TTL field indicates the valid duration of all the information that are contained in the message. The TTL is to interpret as unsigned int, ranging from 0 to 2^6-1. The TTL in seconds results from the formula seconds = (TTL * 10). TTLs range from 0 - 1280 seconds.
-
-
-                The FILES field contains no, one, or multiple triples of file information, as described as follows:
-                <figure align='center'>
-                    <artwork>
-+-----------+------+--------------+
-| FILE-HASH | SIZE | DISPLAY-NAME |
-+-----------+------+--------------+
-|    8      |  64  |   1 - 512    |
-+-----------+------+--------------+
-| ...
-					</artwork>
-                </figure>
-                FILE-HASH is the SHA-256 over the content of the file.
-                SIZE represents the number of bytes of the file.
-                DISPLAY-NAME is a human readable name for the file. It can contain out of the ASCII chars 32 to 126. Names can be truncated with the ASCII
-				ETX code (003). Empty names are allowed and are represented woth the ETX code only.
-                After a truncated name or a name with the length of 512 chars, either the next file tripe begins, or the LEN and therefor the end of the message is reached.
-			</t>
-            <t>
-				Consider the following restrictions:
-				<list>
-				<t>Clients MAY include a folder structure in the display name. If clients do so, '/' (ASCII 057) MUST be used as path seperator.</t>
-						<t>Clients MUST NOT send the very same announcement message over the group, before it's TTL(which is a minimum of 60 seconds) is near to expiring (which is 30 seconds).</t>
-						<t>Clients SHOULD send announcement messages, as soon as they provide a new file.</t>
-						<t>Clients SHOULD NOT send a single message per file, but accumulate whenever possible.</t>
-						<t>Clients MAY send multiple announcement messages, containing disjunct file sets, if they need more than 8164 bytes to announce all files.</t>
-						<t>Clients SHOULD send an announcement with TTL = 0 before going offline to signal, that the files won't be avaliable. Clients MUS NOT send an announcement with TTL = 0 for other purposes.</t>
-						<t>Clients MUST use the UDP checksum header field</t>
-						<t>Clients SHOULD ignore incoming UDP packages that do have an invalid checksum</t>
-				</list>
-			</t>
         </section>
 
-		<section title="Directed File Announcement">
-			<t>
-				Clients can request others to send file announcements via unicast:
-			<figure align='center'>
-				<artwork>
-+------+
-|  OP  |
-+------+
-| 0x2  |
-+------+
-				</artwork>
-			</figure>
-			This is called a solicitation packet.
-			</t>
-			<t>
-				Clients SHOULD react to all solicitation packets by sending a announcement packet to this client via unicast.
-				Clients SHOULD NOT send a direct announcement if a group announcement is outstanding in the near future. It SHOULD instead prepone its group announcement.
-			</t>
-			<t>The directed file announcements have the same format as group announcements.</t>                    
+        <section title="File Availability Announcement">
+            <t>
+                <t>A File Availability Announcement MUST contain a single JSON serialized object. This object has the following members:</t>
+                <list style="symbols">
+                    <t>A member named "display-name" containing a human-readable name of peer sending the message. All Unicode characters may be used. This member is OPTIONAL.</t>
+                    <t>An array member named "files". This array contains a collection of objects, each representing a file available for transfer. These objects have the following members:
+                        <list>
+                            <t>A string member named "sha-256" containing a SHA-256 checksum of the contents of the file. This member is REQUIRED.</t>
+                            <t>A member named "length" specifying the length of the file in bytes. The value of this member MUST be an integer number. This member is REQUIRED.</t>
+                            <t>A member named "ttl" that specifies the expected temporal validity in seconds of the information given about the file, which includes the information that the file is available for transfer. Therefore, a TTL of 0 means that a file is no longer available. The value of the member MUST be an integer number. This member is REQUIRED.</t>
+                            <t>A member named "display-name" that contains a human-readable name for the file. All Unicode characters may be used. A directory structure MAY be encoded in the value of this member. If this is the case, the '/' character MUST be used as a path separator. This member is OPTIONAL.</t>
+                        </list>
+                    </t>
+                    <t>The values of the "sha-256" and the "display-name" members uniquely identify a file. Client MUST NOT include multiple file objects with identical values for "sha-256" and "display-name" in a single File Availability Announcement message.</t>
+
+                    <t>This member is REQUIRED.</t>
+                </list>
+
+                <t>As soon as a file becomes available for transfer, clients SHOULD send a File Availability Announcement to all participating peers containing information about the file. Commonly, this is the case immediately after startup of a client.</t>
+
+                <t>As soon as a file is no longer available for transfer, clients MUST send a File Availability Announcement to all participating peers containing updated information about the file. This mechanism SHOULD also be used before shutdown of a client.</t>
+
+                <t>Clients SHOULD accumulate information about multiple files in a single message whenever possible.</t>
+
+                <t>Clients MUST NOT send information about a file available for transfer to all participating peers if the information does not update previous information about the file. Updated information about the temporal validity of the information given about a file should only be sent if previous information expires in less than 30 seconds or if the expected validity is reduced due changed conditions (e.g. a change in network connectivity).</t>
+            </t>
+        </section>
+
+        <section title="File Solicitation">
+            <t>
+                <t>A client may solicit File Availability Announcements from other peers by sending a File Solicitation message to all participating peers.</t>
+
+                <t>A File Solicitation message MUST contain a single JSON serialized object. This object MUST have a member named "file-solicitation" with the boolean value "true".</t>
+
+                <t>Clients SHOULD react to all File Solicitation messages by sending a File Availability Announcement message to the soliciting peer.</t>
+
+                <t>.If a File Solicitation message is received by a client and a File Availability Announcement to all participating peers is outstanding in the near future (e.g. because the previously-sent availability information is about to expire), the client SHOULD prepone this announcement and SHOULD NOT send an announcement to the soliciting peer.</t>
+            </t>
 		</section>
 
 	   <section title="File Transfer">
