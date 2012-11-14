@@ -78,17 +78,18 @@
                 Upon joining the group, the peer SHOULD send his first announement message to the group:
                 <figure align='center'>
                     <artwork>
-+------+------+------+----------+------+-----+----------+
-| MAG  |  OP  |  LEN |   NAME   | FLAG | TTL |  FILES   |
-+------+------+------+----------+------+-----+----------+
-| 0x71 | 0x0  |  13  |    23    |  1   |  6  | 0 - 8164 |
-+------+------+------+----------+------+-----+----------+
++------+------+------+----------+-----+----------+
+| MAG  |  OP  |  LEN |   NAME   | TTL |  FILES   |
++------+------+------+----------+-----+----------+
+| 0x71 | 0x0  |  13  |    23    |  7  | 0 - 8164 |
++------+------+------+----------+-----+----------+
+//TODO check if total length still fits into UDP
                   </artwork>
                 </figure>
-                The LEN field specifies the length of the data in bytes that follows after the TTL field (unsigned integer ranging from 0 to 2^13-1). The maximum value for LEN is 8150.
+                The LEN field specifies the length of the data in bytes that follows after the TTL field (unsigned integer ranging from 0 to 2^13-1). The maximum value for LEN is 8164.
                 The NAME field MAY contains a human readable name of the client (represented in ASCII chars). The name can contain all ASCII chars from 32 to 126. Names, that are shorter than 23 characters can be truncated with ASCII ETX code (003). Clients without a human-readable name are accepted. If the Name field is used, the Client SHOULD NOT change it's name. Other peers MUST NOT use the name for peer identification, because the name is necessarily not unique in the network.
-                The FLAG is set to 0x0 by default. For more details see below.
-                The TTL field indicates the valid duration of all the information that are contained in the message. The TTL is to interpret as unsigned int, ranging from 0 to 2^6-1. The TTL in seconds results from the formula seconds = (TTL * 10) + 60s. TTLs range from 60 - 660 seconds.
+                The TTL field indicates the valid duration of all the information that are contained in the message. The TTL is to interpret as unsigned int, ranging from 0 to 2^6-1. The TTL in seconds results from the formula seconds = (TTL * 10). TTLs range from 0 - 1280 seconds.
+
 
                 The FILES field contains no, one, or multiple triples of file information, as described as follows:
                 <figure align='center'>
@@ -114,21 +115,30 @@
                                                 <t>Clients SHOULD send announcement messages, as soon as they provide a new file.</t>
                                                 <t>Clients SHOULD NOT send a single message per file, but accumulate whenever possible.</t>
                                                 <t>Clients MAY send multiple announcement messages, containing disjunct file sets, if they need more than 8164 bytes to announce all files.</t>
-                                                <t>When a client decides to become inactive, it SHOULD stop sending announcement messages and SHOULD stay online until the longest lasting TTL is expired.</t>
-                                                <t>Clients MUST use the UDP checksum head field</t>
+                                                <t>Clients SHOULD send an announcement with TTL = 0 before going offline to signal, that the files won't be avaliable. Clients MUS NOT send an announcement with TTL = 0 for other purposes.</t>
+                                                <t>Clients MUST use the UDP checksum header field</t>
                                                 <t>Clients SHOULD ignore incoming UDP packages that do have an invalid checksum</t>
                                         </list>
                                 </t>
         </section>
         
-                <section title="Directed File Announcement and Flag handling">
+                <section title="Directed File Announcement">
+					<t>
+						Clients can request others to send file announcements via unicast:
+					<figure align='center'>
+						<artwork>
++------+------+
+| MAG  |  OP  |
++------+------+
+| 0x71 | 0x2  |
++------+------+
+						</artwork>
+					</figure>
+					This is called a solicitation packet.
+					</t>
                     <t>
-                        A client MAY send a FLAG, set to 0x01 to request direct announcements from all other clients. Clients SHOULD use this flag only if they recently connected to the multicast group.
-                        A FLAG, set to 0x02 indicates that the sender will go offline. Other clients SHOULD set all TTLs of this client to 0.
-                        The remaining  0x03 - 0xFF are reserved for future purposes.
-                        Clients SHOULD react to all announcement messages, where the flag is set to 0x01 of every client by sending a direct announcement to this client.
-                        Clients MAY NOT send a direct announcement, if a group announcement is outstanding in the near future.
-                        Clients SHOULD send the 0x02 flag, when they are shutting down.
+                        Clients SHOULD react to all solicitation packets by sending a announcement packet to this client via unicast.
+                        Clients SHOULD NOT send a direct announcement if a group announcement is outstanding in the near future. It SHOULD instead prepone its group announcement.
                     </t>
                     <t>The directed file announcements have the same format as group announcements.</t>                    
                 </section>
@@ -137,7 +147,6 @@
         <t>
             When a peer requests a file from a single peer, it MUST open a TCP-Socket with a chosen port and send a FILEREQ message to a peer, that offers the file:
             <figure align='center'>
-
                 <artwork>
 +------+------+------+-------+------+------+
 | MAG  |  OP  | HASH | PORT  |  OFF | LEN  |
