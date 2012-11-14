@@ -75,7 +75,7 @@
                     <t>A member named "display-name" containing a human-readable name of peer sending the message. All Unicode characters may be used. This member is OPTIONAL.</t>
                     <t>An array member named "files". This array contains a collection of objects, each representing a file available for transfer. These objects have the following members:
                         <list>
-                            <t>A string member named "sha-256" containing a SHA-256 checksum of the contents of the file. This member is REQUIRED.</t>
+                            <t>A string member named "sha-256" containing a SHA-256 checksum of the contents of the file as hex representation. This member is REQUIRED.</t>
                             <t>A member named "length" specifying the length of the file in bytes. The value of this member MUST be an integer number. This member is REQUIRED.</t>
                             <t>A member named "ttl" that specifies the expected temporal validity in seconds of the information given about the file, which includes the information that the file is available for transfer. Therefore, a TTL of 0 means that a file is no longer available. The value of the member MUST be an integer number. This member is REQUIRED.</t>
                             <t>A member named "display-name" that contains a human-readable name for the file. All Unicode characters may be used. A directory structure MAY be encoded in the value of this member. If this is the case, the '/' character MUST be used as a path separator. This member is OPTIONAL.</t>
@@ -99,7 +99,7 @@
 
         <section title="File Solicitation">
             <t>
-                <t>A client may solicit File Availability Announcements from other peers by sending a File Solicitation message to all participating peers.</t>
+                <t>A client may solicit file availability announcements from other peers by sending a file solicitation message to all participating peers.</t>
 
                 <t>A File Solicitation message MUST contain a single JSON serialized object. This object MUST have a member named "file-solicitation" with the boolean value "true".</t>
 
@@ -142,6 +142,60 @@
 	</middle>
 
 	<back>
+		<section title="Appendix">
+		<t>This is an example of a file announcement with no display name.</t>
+		<figure align='center'>
+             <artwork>
+{
+	"files": [
+		{
+			"sha-256": "0xd7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592",
+			"length": "102312",
+			"ttl": "120"
+		},
+		{
+			"sha-256": "0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+			"length": "1012",
+			"ttl": "120"
+			"display-name": "movies/alice/dubbed.mp4"
+		}
+	]
+}
+			</artwork>
+		</figure>
+		
+		<t>This is an example of an empty file announcement message</t>
+		<figure align='center'>
+             <artwork>
+{
+	"disyplay-name": "HelloWorld",
+	"files": null
+}
+			</artwork>
+		</figure>
+		
+		<t>This is an example of an file request message, that requests a complete file from a single peer</t>
+		<figure align='center'>
+             <artwork>
+{
+	"sha-256" : "0xd7a8fbb307d7809469ca9abcb0082e4f8d5651e46d3cdb762d02d0bf37c9e592",
+	"offset" : 0,
+	"length" : null
+}
+			</artwork>
+		</figure>
+
+		<t>This is an file solicitation message.</t>
+		<figure align='center'>
+             <artwork>
+{ 
+	"file-solicitation" : true
+}
+			</artwork>
+		</figure>
+	
+		</section>
+		
 		<references>
 			<reference anchor="refs.RFC768">
 					<front>
