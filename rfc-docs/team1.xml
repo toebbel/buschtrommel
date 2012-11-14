@@ -143,40 +143,40 @@
                     <t>The directed file announcements have the same format as group announcements.</t>                    
                 </section>
 
-                <section title="File Transfer">
+               <section title="File Transfer">
         <t>
-            When a peer requests a file from a single peer, it MUST open a TCP-Socket with a chosen port and send a FILEREQ message to a peer, that offers the file:
+            To request a file an client opens a new TCP Connection to the remote peer. Called FILEREQ.
+            Every remote host listens at port 7171 for incoming TCP sessions. 
             <figure align='center'>
 
                 <artwork>
-+------+------+-------+------+------+
-|  OP  | HASH | PORT  |  OFF | LEN  |
-+------+------+-------+------+------+
-| 0x1  |   8  |  32   |  64  |  64  |
-+------+------+-------+------+------+
++------+------+------+
+| HASH |  OFF | LEN  |
++------+------+------+
+|   8  |  64  |  64  |
++------+------+------+
                 </artwork>
             </figure>
             HASH contains the SAH-256 hash of a file, that has been announced before. Clients SHOULD request only files, that are contained in a announcement message, that has not been expired.
-            The PORT has to be a used by a fresh socket, that awaits an incoming TCP connection from the other peer. The socket MUST be attached to the same ip address, from witch the FILEREQ was sent.
             OFF indicates the offset, from which on the other peer should send from. It addresses the bytes inside the file.
-            LEN indicates the number of bytes, that shall be sent. This field can be set to 0, if the peer requests all bytes from the given offset untill the end
+            LEN indicates the number of bytes, that shall be sent. This field can be set to 0, if the peer requests all bytes from the given offset until the end
         </t>
+        <t>After receiving a file request the remote peer SHOULD immediately start sendng the requested data over this TCP-connection.
+	The peer MAY abort the connection if it is busy or the request is invalid.
+	As soon as all bytes are transmitted, the TCP connection MUST be closed by the sender and the receiver.
+            A receiver SHOULD close the TCP connection, if more bytes than requested are received.
+            If the TCP connection gets aborted the receiver MAY reestablish a new transfer via a new FILEREQ.
+            The requester MAY assume, that the host is not avaliable, if the TCP connection fails to establish with the default TCP timeout.</t>
         <t>
                         If the receiving peer wants to continue an aborted file transfer, it sends a new FILEREQ, with OFF indicating the first byte, that has not been received.
                 </t>
                 <t>
-            If a peer wants to request one file from multiple hosts, it sends multiple FILEREQ to these hosts. Each FILEREQ MUST contains a different port, different OFF and different LEN.
+            If a peer wants to request one file from multiple hosts, it sends multiple FILEREQ to these hosts. Each FILEREQ MUST contain a different OFF and different LEN.
             The OFFs and LENs SHOULD describe a partition of the whole file.
         </t>
-        <t>
-            Upon receiving such a message, a peer (a.k.a host) SHOULD begin with the file transfer.
-            The file transfer begins by opening the TCP connection on the desired port to the requester. AS soon as the TCP connection is established, the FILEREQ is replayed. The receiver MAY check if all information are correct to ensure, that the correct file and filesegment will be transmitted.
-            The host sends all requested data via the TCP socket, that is used exclusively for the requested file and segment. As soon as all bytes are transmitted, the TCP connection MUST be closed by the sender and the receiver.
-            A receiver SHOULD close the TCP connection, if more bytes than requested are received.
-            If the TCP connection gets aborted the sender MUST NOT try to reconnect. The receiver MAY reestablish a new transfer via a new FILEREQ.
-            The requester MAY assume, that the host is not avaliable, if he registers no incoming TCP connection on the desired port within 30 seconds.
-        </t>
     </section>
+
+
 </middle>
 
 <back>
