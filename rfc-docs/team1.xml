@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE rfc SYSTEM "rfc2629.dtd">
+<!DOCTYPE rfc SYSTEM "rfc.dtd">
 <rfc ipr="none">
     <front>
         <title>Buschtrommel</title>
@@ -99,128 +99,126 @@
 |    8      |  64  |   1 - 512    |
 +-----------+------+--------------+
 | ...
-                    </artwork>
-                  </figure>
-                  FILE-HASH is the SHA-256 over the content of the file.
-                  SIZE represents the number of bytes of the file.
-                  DISPLAY-NAME is a human readable name for the file. It can contain out of the ASCII chars 32 to 126. Names can be truncated with the ASCII ETX code (003). Empty names are allowed and are represented woth the ETX code only.
-                  After a truncated name or a name with the length of 512 chars, either the next file tripe begins, or the LEN and therefor the end of the message is reached.
-                </t>
-                                <t>
-                                        Consider the following restrictions:
-                                        <list>
-                                        <t>Clients MAY include a folder structure in the display name. If clients do so, '/' (ASCII 057) MUST be used as path seperator.</t>
-                                                <t>Clients MUST NOT send the very same announcement message over the group, before it's TTL(which is a minimum of 60 seconds) is near to expiring (which is 30 seconds).</t>
-                                                <t>Clients SHOULD send announcement messages, as soon as they provide a new file.</t>
-                                                <t>Clients SHOULD NOT send a single message per file, but accumulate whenever possible.</t>
-                                                <t>Clients MAY send multiple announcement messages, containing disjunct file sets, if they need more than 8164 bytes to announce all files.</t>
-                                                <t>Clients SHOULD send an announcement with TTL = 0 before going offline to signal, that the files won't be avaliable. Clients MUS NOT send an announcement with TTL = 0 for other purposes.</t>
-                                                <t>Clients MUST use the UDP checksum header field</t>
-                                                <t>Clients SHOULD ignore incoming UDP packages that do have an invalid checksum</t>
-                                        </list>
-                                </t>
+					</artwork>
+                </figure>
+                FILE-HASH is the SHA-256 over the content of the file.
+                SIZE represents the number of bytes of the file.
+                DISPLAY-NAME is a human readable name for the file. It can contain out of the ASCII chars 32 to 126. Names can be truncated with the ASCII
+				ETX code (003). Empty names are allowed and are represented woth the ETX code only.
+                After a truncated name or a name with the length of 512 chars, either the next file tripe begins, or the LEN and therefor the end of the message is reached.
+			</t>
+            <t>
+				Consider the following restrictions:
+				<list>
+				<t>Clients MAY include a folder structure in the display name. If clients do so, '/' (ASCII 057) MUST be used as path seperator.</t>
+						<t>Clients MUST NOT send the very same announcement message over the group, before it's TTL(which is a minimum of 60 seconds) is near to expiring (which is 30 seconds).</t>
+						<t>Clients SHOULD send announcement messages, as soon as they provide a new file.</t>
+						<t>Clients SHOULD NOT send a single message per file, but accumulate whenever possible.</t>
+						<t>Clients MAY send multiple announcement messages, containing disjunct file sets, if they need more than 8164 bytes to announce all files.</t>
+						<t>Clients SHOULD send an announcement with TTL = 0 before going offline to signal, that the files won't be avaliable. Clients MUS NOT send an announcement with TTL = 0 for other purposes.</t>
+						<t>Clients MUST use the UDP checksum header field</t>
+						<t>Clients SHOULD ignore incoming UDP packages that do have an invalid checksum</t>
+				</list>
+			</t>
         </section>
-        
 
-                <section title="Directed File Announcement">
-					<t>
-						Clients can request others to send file announcements via unicast:
-					<figure align='center'>
-						<artwork>
+		<section title="Directed File Announcement">
+			<t>
+				Clients can request others to send file announcements via unicast:
+			<figure align='center'>
+				<artwork>
 +------+
 |  OP  |
 +------+
 | 0x2  |
 +------+
-						</artwork>
-					</figure>
-					This is called a solicitation packet.
-					</t>
-                    <t>
-                        Clients SHOULD react to all solicitation packets by sending a announcement packet to this client via unicast.
-                        Clients SHOULD NOT send a direct announcement if a group announcement is outstanding in the near future. It SHOULD instead prepone its group announcement.
-                    </t>
-                    <t>The directed file announcements have the same format as group announcements.</t>                    
-                </section>
+				</artwork>
+			</figure>
+			This is called a solicitation packet.
+			</t>
+			<t>
+				Clients SHOULD react to all solicitation packets by sending a announcement packet to this client via unicast.
+				Clients SHOULD NOT send a direct announcement if a group announcement is outstanding in the near future. It SHOULD instead prepone its group announcement.
+			</t>
+			<t>The directed file announcements have the same format as group announcements.</t>                    
+		</section>
 
-               <section title="File Transfer">
-        <t>
-            To request a file an client opens a new TCP Connection to the remote peer. Called FILEREQ.
-            Every remote host listens at port 7171 for incoming TCP sessions. 
-            <figure align='center'>
-
-                <artwork>
+	   <section title="File Transfer">
+			<t>
+				To request a file an client opens a new TCP Connection to the remote peer. Called FILEREQ.
+				Every remote host listens at port 7171 for incoming TCP sessions. 
+				<figure align='center'>
+					<artwork>
 +------+------+------+
 | HASH |  OFF | LEN  |
 +------+------+------+
 |   8  |  64  |  64  |
 +------+------+------+
-                </artwork>
-            </figure>
-            HASH contains the SAH-256 hash of a file, that has been announced before. Clients SHOULD request only files, that are contained in a announcement message, that has not been expired.
-            OFF indicates the offset, from which on the other peer should send from. It addresses the bytes inside the file.
-            LEN indicates the number of bytes, that shall be sent. This field can be set to 0, if the peer requests all bytes from the given offset until the end
-        </t>
-        <t>After receiving a file request the remote peer SHOULD immediately start sendng the requested data over this TCP-connection.
-	The peer MAY abort the connection if it is busy or the request is invalid.
-	As soon as all bytes are transmitted, the TCP connection MUST be closed by the sender and the receiver.
-            A receiver SHOULD close the TCP connection, if more bytes than requested are received.
-            If the TCP connection gets aborted the receiver MAY reestablish a new transfer via a new FILEREQ.
-            The requester MAY assume, that the host is not avaliable, if the TCP connection fails to establish with the default TCP timeout.</t>
-        <t>
-                        If the receiving peer wants to continue an aborted file transfer, it sends a new FILEREQ, with OFF indicating the first byte, that has not been received.
-                </t>
-                <t>
-            If a peer wants to request one file from multiple hosts, it sends multiple FILEREQ to these hosts. Each FILEREQ MUST contain a different OFF and different LEN.
-            The OFFs and LENs SHOULD describe a partition of the whole file.
-        </t>
-    </section>
+					</artwork>
+				</figure>
+				HASH contains the SAH-256 hash of a file, that has been announced before. Clients SHOULD request only files, that are contained in a announcement message, that has not been expired.
+				OFF indicates the offset, from which on the other peer should send from. It addresses the bytes inside the file.
+				LEN indicates the number of bytes, that shall be sent. This field can be set to 0, if the peer requests all bytes from the given offset until the end
+			</t>
+			<t>
+				After receiving a file request the remote peer SHOULD immediately start sendng the requested data over this TCP-connection.
+				The peer MAY abort the connection if it is busy or the request is invalid.
+				As soon as all bytes are transmitted, the TCP connection MUST be closed by the sender and the receiver.
+				A receiver SHOULD close the TCP connection, if more bytes than requested are received.
+				If the TCP connection gets aborted the receiver MAY reestablish a new transfer via a new FILEREQ.
+				The requester MAY assume, that the host is not avaliable, if the TCP connection fails to establish with the default TCP timeout.</t>
+			<t>
+				If the receiving peer wants to continue an aborted file transfer, it sends a new FILEREQ, with OFF indicating the first byte, that has not been received.
+			</t>
+			<t>
+				If a peer wants to request one file from multiple hosts, it sends multiple FILEREQ to these hosts. Each FILEREQ MUST contain a different OFF and different LEN.
+				The OFFs and LENs SHOULD describe a partition of the whole file.
+			</t>
+		</section>
+	</middle>
 
-
-</middle>
-
-<back>
-    <references>
-        <reference anchor="refs.RFC768">
-                <front>
-                               <title>User Datagram Protocol</title>
-                        <author initials="J." surname="Postel" fullname="Jon Postel">
-                                <organization abbrev="ISI">USC/Information Sciences Institute</organization>
-                        </author>
-                        <date month="August" year="1980" />
-                </front>
-                <seriesInfo name="RFC" value="768" />
-                <seriesInfo name="STD" value="6" />
-        </reference>
-        <reference anchor="refs.RFC793">
-                <front>
-                               <title>Transmission Control Protocol</title>
-                        <author initials="J." surname="Postel" fullname="Jon Postel">
-                                <organization abbrev="ISI">USC/Information Sciences Institute</organization>
-                        </author>
-                        <date month="September" year="1981" />
-                </front>
-                <seriesInfo name="RFC" value="793" />
-                <seriesInfo name="STD" value="7" />
-        </reference>
-        <reference anchor="refs.RFC791">
-                <front>
-                               <title>Internet Protocol</title>
-                        <author initials="J." surname="Postel" fullname="Jon Postel">
-                                <organization abbrev="ISI">USC/Information Sciences Institute</organization>
-                        </author>
-                        <date month="September" year="1981" />
-                </front>
-                <seriesInfo name="RFC" value="791" />
-                <seriesInfo name="STD" value="5" />
-        </reference>
-    </references>
-        
-        <section title="Glossar">
-                <list>
+	<back>
+		<references>
+			<reference anchor="refs.RFC768">
+					<front>
+						<title>User Datagram Protocol</title>
+						<author initials="J." surname="Postel" fullname="Jon Postel">
+							<organization abbrev="ISI">USC/Information Sciences Institute</organization>
+						</author>
+						<date month="August" year="1980" />
+					</front>
+					<seriesInfo name="RFC" value="768" />
+					<seriesInfo name="STD" value="6" />
+			</reference>
+			<reference anchor="refs.RFC793">
+					<front>
+					   <title>Transmission Control Protocol</title>
+						<author initials="J." surname="Postel" fullname="Jon Postel">
+								<organization abbrev="ISI">USC/Information Sciences Institute</organization>
+						</author>
+						<date month="September" year="1981" />
+				</front>
+				<seriesInfo name="RFC" value="793" />
+				<seriesInfo name="STD" value="7" />
+			</reference>
+			<reference anchor="refs.RFC791">
+				<front>
+					<title>Internet Protocol</title>
+					<author initials="J." surname="Postel" fullname="Jon Postel">
+						<organization abbrev="ISI">USC/Information Sciences Institute</organization>
+					</author>
+					<date month="September" year="1981" />
+				</front>
+				<seriesInfo name="RFC" value="791" />
+				<seriesInfo name="STD" value="5" />
+			</reference>
+		</references>
+			
+		<section title="Glossar">
+				<list>
 					<t>Peer - a client in general </t>
 					<t>Host - an client, which offers a file to others</t>
 				</list>
-        </section>
-  </back>
+		</section>
+	</back>
 </rfc>
