@@ -137,7 +137,7 @@
 				The offsets and lengths SHOULD describe a partition of the whole file.
 			</t>
 		</section>
-        <section title="File Transfer">
+        <section title="File Transfer of a File that has not been announced">
             <t>As every remote host within the multicast-group ignores unknown messages, a client MAY also send a FILEREQ to the group.
                 A Host MAY answer with a single-cast Availability Announcement to this client, who then MAY initiate a file-transfer.</t>
         </section>
