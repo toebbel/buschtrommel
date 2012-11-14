@@ -70,7 +70,7 @@
 				<t>239.255.0.113 for IPv4</t>
 				<t>ff02::7171 for IPv6</t>
 			</list>
-			All announcement communication, and directed file announcement takes place over UDP on port 1113. File Transfers are requested to TCP port 1113 as well.
+			All announcement communication, and directed file announcement takes place over UDP on port 7171. File Transfers are requested to TCP port 7171 as well.
             </t>
 			
             <t>
