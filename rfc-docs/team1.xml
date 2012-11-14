@@ -22,7 +22,7 @@
             </address>
         </author>
         <date />
-	<area>Applications</area>
+        <area>Applications</area>
         <workgroup>Telematics project 12/13, Group 1</workgroup>
         <abstract>
           <t>This document is a draft for the official specification of the Buschtrommel protocol. Buschtrommel is used to find and transfer files between clients in the same network domain without the need for a central server.</t>
@@ -58,34 +58,36 @@
         </section>
 
         <section title="General Notes">
-			<t>The Buschtrommel protocol extensively uses the magic number 0x71 (113 in decimal) to faciliate distinguishing Buschtrommel's messages from other protocols and applications.</t>
-			<t>Throughout this document, commands are explained with diagrams. Command fields are identified with capital letters, e.g. LEN. The corresponding decimal values specify the number of octets reserved for the field. Hexadecimal numbers written as 0xXX have a size of one octet. All multi-octet values are expected to be in network byte order.</t>
+            <t>The Buschtrommel protocol extensively uses the magic number 0x71 (113 in decimal) to faciliate distinguishing Buschtrommel's messages from other protocols and applications.</t>
+            <t>Throughout this document, commands are explained with diagrams. Command fields are identified with capital letters, e.g. LEN. The corresponding decimal values specify the number of octets reserved for the field. Hexadecimal numbers written as 0xXX have a size of one octet. All multi-octet values are expected to be in network byte order.</t>
         </section>
 
-        <section title="Peer and File Announcement">
+        <section title="Peer and File Announcement via Group">
           <t>
-              There are no mechanisms like file list requests, or hello messages. Every peer announces himself and all offered files from time to time with so-called announcement messages. These messages have a TTL.
-              A client, has to join a defined multicast group, if he wants to announce his presence (including his files), or wants to receive other clients' announcement messages. A client SHOULD be in the multicast group as long as it is running.
-              Conventially, this multicast group is:
-              <list style="symbols">
-                  <t>239.255.0.113 for IPv4</t>
-                  <t>ff02::7171 for IPv6</t>
-              </list>
-          		All announcement communication takes place over UDP on port 1113.
+            There are no mechanisms like file list requests, or hello messages. Every peer announces himself and all offered files from time to time with so-called announcement messages. These messages have a TTL.
+            A client, has to join a defined multicast group, if he wants to announce his presence (including his files), or wants to receive other clients' announcement messages. A client SHOULD be in the multicast group as long as it is running.
+            Conventially, this multicast group is:
+			<list style="symbols">
+				<t>239.255.0.113 for IPv4</t>
+				<t>ff02::7171 for IPv6</t>
+			</list>
+			All announcement communication takes place over UDP on port 1113.
             </t>
+			
             <t>
                 Upon joining the group, the peer SHOULD send his first announement message to the group:
                 <figure align='center'>
                     <artwork>
-+------+------+------+----------+-----+----------+
-| MAG  |  OP  |  LEN |   NAME   | TTL |  FILES   |
-+------+------+------+----------+-----+----------+
-| 0x71 | 0x0  |  13  |    24    |  6  | 0 - 8164 |
-+------+------+------+----------+-----+----------+
++------+------+------+----------+------+-----+----------+
+| MAG  |  OP  |  LEN |   NAME   | FLAG | TTL |  FILES   |
++------+------+------+----------+------+-----+----------+
+| 0x71 | 0x0  |  13  |    23    |  1   |  6  | 0 - 8164 |
++------+------+------+----------+------+-----+----------+
                   </artwork>
                 </figure>
-                The LEN field specifies the length of the data in bytes that follows after the TTL field (unsigned int ranging from 0 to 2^13-1). The maximum value for LEN is 8150.
-                The NAME field MAY contains a human readable name of the client (represented in ASCII chars). The name can contain all ASCII chars from 32 to 126. Names, that are shorter than 24 characters can be truncated with ASCII ETX code (003). Clients without a human-readable name are accepted. If the Name field is used, the Client SHOULD NOT change it's name. Other peers MUST NOT use the name for peer identification, because the name is necessarily not unique in the network.
+                The LEN field specifies the length of the data in bytes that follows after the TTL field (unsigned integer ranging from 0 to 2^13-1). The maximum value for LEN is 8150.
+                The NAME field MAY contains a human readable name of the client (represented in ASCII chars). The name can contain all ASCII chars from 32 to 126. Names, that are shorter than 23 characters can be truncated with ASCII ETX code (003). Clients without a human-readable name are accepted. If the Name field is used, the Client SHOULD NOT change it's name. Other peers MUST NOT use the name for peer identification, because the name is necessarily not unique in the network.
+                The FLAG is set to 0x0 by default. For more details see below.
                 The TTL field indicates the valid duration of all the information that are contained in the message. The TTL is to interpret as unsigned int, ranging from 0 to 2^6-1. The TTL in seconds results from the formula seconds = (TTL * 10) + 60s. TTLs range from 60 - 660 seconds.
 
                 The FILES field contains no, one, or multiple triples of file information, as described as follows:
@@ -104,24 +106,38 @@
                   DISPLAY-NAME is a human readable name for the file. It can contain out of the ASCII chars 32 to 126. Names can be truncated with the ASCII ETX code (003). Empty names are allowed and are represented woth the ETX code only.
                   After a truncated name or a name with the length of 512 chars, either the next file tripe begins, or the LEN and therefor the end of the message is reached.
                 </t>
-				<t>
-					Consider the following restrictions:
-					<list>
-					<t>Clients MAY include a folder structure in the display name. If clients do so, '/' (ASCII 057) MUST be used as path seperator.</t>
-						<t>Clients MUST NOT send the very same announcement message, before it's TTL is expired (which is a minimum of 60 seconds).</t>
-						<t>Clients SHOULD send announcement messages, as soon as they provide a new file.</t>
-						<t>Clients MAY send multiple announcement messages, containing disjunct file sets, if they need more than 8164 bytes to announce all files.</t>
-						<t>When a client decides to become inactive, it SHOULD stop sending announcement messages and SHOULD stay online until the longest lasting TTL is expired.</t>
-						<t>Clients MUST use the UDP checksum head field</t>
-						<t>Clients SHOULD ignore incoming UDP packages that do have an invalid checksum</t>
-					</list>
-				</t>
+                                <t>
+                                        Consider the following restrictions:
+                                        <list>
+                                        <t>Clients MAY include a folder structure in the display name. If clients do so, '/' (ASCII 057) MUST be used as path seperator.</t>
+                                                <t>Clients MUST NOT send the very same announcement message over the group, before it's TTL(which is a minimum of 60 seconds) is near to expiring (which is 30 seconds).</t>
+                                                <t>Clients SHOULD send announcement messages, as soon as they provide a new file.</t>
+                                                <t>Clients SHOULD NOT send a single message per file, but accumulate whenever possible.</t>
+                                                <t>Clients MAY send multiple announcement messages, containing disjunct file sets, if they need more than 8164 bytes to announce all files.</t>
+                                                <t>When a client decides to become inactive, it SHOULD stop sending announcement messages and SHOULD stay online until the longest lasting TTL is expired.</t>
+                                                <t>Clients MUST use the UDP checksum head field</t>
+                                                <t>Clients SHOULD ignore incoming UDP packages that do have an invalid checksum</t>
+                                        </list>
+                                </t>
         </section>
+        
+                <section title="Directed File Announcement and Flag handling">
+                    <t>
+                        A client MAY send a FLAG, set to 0x01 to request direct announcements from all other clients. Clients SHOULD use this flag only if they recently connected to the multicast group.
+                        A FLAG, set to 0x02 indicates that the sender will go offline. Other clients SHOULD set all TTLs of this client to 0.
+                        The remaining  0x03 - 0xFF are reserved for future purposes.
+                        Clients SHOULD react to all announcement messages, where the flag is set to 0x01 of every client by sending a direct announcement to this client.
+                        Clients MAY NOT send a direct announcement, if a group announcement is outstanding in the near future.
+                        Clients SHOULD send the 0x02 flag, when they are shutting down.
+                    </t>
+                    <t>The directed file announcements have the same format as group announcements.</t>                    
+                </section>
 
-		<section title="File Transfer">
+                <section title="File Transfer">
         <t>
-            When a peer requests a file from a single peer, it MUST open a TCP-Socket with a chosen port and send a FILEREQ message to one peer, that offers the file:
+            When a peer requests a file from a single peer, it MUST open a TCP-Socket with a chosen port and send a FILEREQ message to a peer, that offers the file:
             <figure align='center'>
+
                 <artwork>
 +------+------+------+-------+------+------+
 | MAG  |  OP  | HASH | PORT  |  OFF | LEN  |
@@ -136,9 +152,9 @@
             LEN indicates the number of bytes, that shall be sent. This field can be set to 0, if the peer requests all bytes from the given offset untill the end
         </t>
         <t>
-			If the receiving peer wants to continue an aborted file transfer, it sends a new FILEREQ, with OFF indicating the first byte, that has not been received.
-		</t>
-		<t>
+                        If the receiving peer wants to continue an aborted file transfer, it sends a new FILEREQ, with OFF indicating the first byte, that has not been received.
+                </t>
+                <t>
             If a peer wants to request one file from multiple hosts, it sends multiple FILEREQ to these hosts. Each FILEREQ MUST contains a different port, different OFF and different LEN.
             The OFFs and LENs SHOULD describe a partition of the whole file.
         </t>
@@ -155,46 +171,46 @@
 
 <back>
     <references>
-	<reference anchor="refs.RFC768">
-		<front>
-	       		<title>User Datagram Protocol</title>
-			<author initials="J." surname="Postel" fullname="Jon Postel">
-		 	       <organization abbrev="ISI">USC/Information Sciences Institute</organization>
-		        </author>
-		        <date month="August" year="1980" />
-		</front>
-		<seriesInfo name="RFC" value="768" />
-		<seriesInfo name="STD" value="6" />
-	</reference>
-	<reference anchor="refs.RFC793">
-		<front>
-	       		<title>Transmission Control Protocol</title>
-			<author initials="J." surname="Postel" fullname="Jon Postel">
-		 	       <organization abbrev="ISI">USC/Information Sciences Institute</organization>
-		        </author>
-		        <date month="September" year="1981" />
-		</front>
-		<seriesInfo name="RFC" value="793" />
-		<seriesInfo name="STD" value="7" />
-	</reference>
-	<reference anchor="refs.RFC791">
-		<front>
-	       		<title>Internet Protocol</title>
-			<author initials="J." surname="Postel" fullname="Jon Postel">
-		 	       <organization abbrev="ISI">USC/Information Sciences Institute</organization>
-		        </author>
-		        <date month="September" year="1981" />
-		</front>
-		<seriesInfo name="RFC" value="791" />
-		<seriesInfo name="STD" value="5" />
-	</reference>
+        <reference anchor="refs.RFC768">
+                <front>
+                               <title>User Datagram Protocol</title>
+                        <author initials="J." surname="Postel" fullname="Jon Postel">
+                                <organization abbrev="ISI">USC/Information Sciences Institute</organization>
+                        </author>
+                        <date month="August" year="1980" />
+                </front>
+                <seriesInfo name="RFC" value="768" />
+                <seriesInfo name="STD" value="6" />
+        </reference>
+        <reference anchor="refs.RFC793">
+                <front>
+                               <title>Transmission Control Protocol</title>
+                        <author initials="J." surname="Postel" fullname="Jon Postel">
+                                <organization abbrev="ISI">USC/Information Sciences Institute</organization>
+                        </author>
+                        <date month="September" year="1981" />
+                </front>
+                <seriesInfo name="RFC" value="793" />
+                <seriesInfo name="STD" value="7" />
+        </reference>
+        <reference anchor="refs.RFC791">
+                <front>
+                               <title>Internet Protocol</title>
+                        <author initials="J." surname="Postel" fullname="Jon Postel">
+                                <organization abbrev="ISI">USC/Information Sciences Institute</organization>
+                        </author>
+                        <date month="September" year="1981" />
+                </front>
+                <seriesInfo name="RFC" value="791" />
+                <seriesInfo name="STD" value="5" />
+        </reference>
     </references>
-	
-	<section title="Glossar">
-		<t>
-			Peer - a client in general
-			Host - an client, which offers a file to others
-		</t>
-	</section>
+        
+        <section title="Glossar">
+                <list>
+					<t>Peer - a client in general </t>
+					<t>Host - an client, which offers a file to others</t>
+				</list>
+        </section>
   </back>
 </rfc>
