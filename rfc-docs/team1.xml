@@ -174,6 +174,17 @@
 				<seriesInfo name="RFC" value="791" />
 				<seriesInfo name="STD" value="5" />
 			</reference>
+			<reference anchor="refs.RFC4627">
+				<front>
+					<title>The application/json Media Type for JavaScript Object Notation (JSON)</title>
+					<author initials="D." surname="Crockford" fullname="Douglas  Crockford">
+						<organization abbrev="JSON.org">JSON.org</organization>
+					</author>
+					<date month="July" year="2006" />
+				</front>
+				<seriesInfo name="RFC" value="791" />
+				<seriesInfo name="STD" value="5" />
+			</reference>
 		</references>
 			
 		<section title="Glossar">
