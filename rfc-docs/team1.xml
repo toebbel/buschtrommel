@@ -73,7 +73,7 @@
                 <t>A File Availability Announcement MUST contain a single JSON serialized object. This object has the following members:</t>
                 <list style="symbols">
                     <t>A member named "display-name" containing a human-readable name of peer sending the message. All Unicode characters may be used. This member is OPTIONAL.</t>
-                    <t>An array member named "files". This array contains a collection of objects, each representing a file available for transfer. These objects have the following members:
+                    <t>An array member named "files". This member is REQUIRED. The array contains a collection of objects, each representing a file available for transfer. The values of the "sha-256" and the "display-name" members together uniquely identify a file. A client MUST NOT include multiple file objects with identical values for the tuple "sha-256" and "display-name" in a single File Availability Announcement message. The file objects have the following members:
                         <list>
                             <t>A string member named "sha-256" containing a SHA-256 checksum of the contents of the file as hex representation. This member is REQUIRED.</t>
                             <t>A member named "length" specifying the length of the file in bytes. The value of this member MUST be an integer number. This member is REQUIRED.</t>
@@ -81,10 +81,7 @@
                             <t>A member named "display-name" that contains a human-readable name for the file. All Unicode characters may be used. A directory structure MAY be encoded in the value of this member. If this is the case, the '/' character MUST be used as a path separator. This member is OPTIONAL.</t>
                         </list>
                     </t>
-                    <t>The values of the "sha-256" and the "display-name" members together uniquely identify a file. Client MUST NOT include multiple file objects with identical values for the tuple "sha-256" and "display-name" in a single File Availability Announcement message.</t>
 					<t>An announcement MUST fit into one UDP packet (65,527 bytes)</t>
-
-                    <t>This files member is REQUIRED.</t>
                 </list>
 
                 <t>As soon as a file becomes available for transfer, clients SHOULD send a File Availability Announcement to all participating peers containing information about the file. Commonly, this is the case immediately after startup of a client.</t>
