@@ -81,9 +81,9 @@
                             <t>A member named "display-name" that contains a human-readable name for the file. All Unicode characters may be used. A directory structure MAY be encoded in the value of this member. If this is the case, the '/' character MUST be used as a path separator. This member is OPTIONAL.</t>
                         </list>
                     </t>
-                    <t>The values of the "sha-256" and the "display-name" members uniquely identify a file. Client MUST NOT include multiple file objects with identical values for "sha-256" and "display-name" in a single File Availability Announcement message.</t>
+                    <t>The values of the "sha-256" and the "display-name" members together uniquely identify a file. Client MUST NOT include multiple file objects with identical values for the tuple "sha-256" and "display-name" in a single File Availability Announcement message.</t>
 
-                    <t>This member is REQUIRED.</t>
+                    <t>This files member is REQUIRED.</t>
                 </list>
 
                 <t>As soon as a file becomes available for transfer, clients SHOULD send a File Availability Announcement to all participating peers containing information about the file. Commonly, this is the case immediately after startup of a client.</t>
@@ -104,7 +104,7 @@
 
                 <t>Clients SHOULD react to all File Solicitation messages by sending a File Availability Announcement message to the soliciting peer.</t>
 
-                <t>.If a File Solicitation message is received by a client and a File Availability Announcement to all participating peers is outstanding in the near future (e.g. because the previously-sent availability information is about to expire), the client SHOULD prepone this announcement and SHOULD NOT send an announcement to the soliciting peer.</t>
+                <t>If a File Solicitation message is received by a client and a File Availability Announcement to all participating peers is outstanding in the near future (e.g. because the previously-sent availability information is about to expire), the client SHOULD prepone this announcement and SHOULD NOT send an announcement to the soliciting peer.</t>
             </t>
 		</section>
 
