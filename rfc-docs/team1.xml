@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE rfc SYSTEM "rfc.dtd">
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd">
 <rfc ipr="none">
     <front>
         <title>Buschtrommel</title>
@@ -114,13 +114,12 @@
 				Every remote host listens at port 7171 for incoming TCP sessions. 
 				
 				<t>A FILEREQ MUST contain a single JSON serialized object. This object has the following members:</t>
-					<list style="symbols">
-						<t>A string member named "sha-256" containing a SHA-256 checksum of the contents of the file. This member is REQUIRED.</t>
-						<t>A member named "offset" specifying the byte address inside the file from wich on the host shall start the transmission from. This member is REQUIRED.</t>
-						<t>A member named "length" specifying the number of bytes the host shall send. The field can contain the json null value to indicate, that the host shall send all bytes from offset until the end of the file. This member is REQUIRED.</t>
-					</list>
-                </t>
-				
+				<list style="symbols">
+					<t>A string member named "sha-256" containing a SHA-256 checksum of the contents of the file. This member is REQUIRED.</t>
+					<t>A member named "offset" specifying the byte address inside the file from wich on the host shall start the transmission from. This member is REQUIRED.</t>
+					<t>A member named "length" specifying the number of bytes the host shall send. The field can contain the json null value to indicate, that the host shall send all bytes from offset until the end of the file. This member is REQUIRED.</t>
+				</list>
+							
 				Clients SHOULD request only those files, that are contained in a announcement message, that has not been expired.
 			</t>
 			<t>
