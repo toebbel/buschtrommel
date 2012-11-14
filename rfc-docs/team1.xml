@@ -64,7 +64,7 @@
                     <t>239.255.0.113 for IPv4</t>
                     <t>ff02::7171 for IPv6</t>
                 </list>
-                <t>File Availability Announcements as well as File Solicitations are encapsulated in a UDP packet with the Destination Port set to XXXX. All clients SHOULD listen for incoming File Availability Announcements or File Solicitations on at least one of the multicast addresses listed above. Clients MUST use the UDP checksum header field for all UDP packets. Clients SHOULD ignore incoming UDP packets that have an invalid checksum.</t>
+                <t>File Availability Announcements as well as File Solicitations are encapsulated in a UDP packet with the Destination Port set to XXXX. All clients SHOULD listen for incoming File Availability Announcements or File Solicitations on at least one of the multicast addresses listed above. All messages sent using UDP MUST fit into one UDP packet. Clients MUST use the UDP checksum header field for all UDP packets. Clients SHOULD ignore incoming UDP packets that have an invalid checksum.</t>
             </t>
         </section>
 
@@ -82,7 +82,6 @@
                         </list>
                     </t>
                     <t>The values of the "sha-256" and the "display-name" members together uniquely identify a file. Client MUST NOT include multiple file objects with identical values for the tuple "sha-256" and "display-name" in a single File Availability Announcement message.</t>
-					<t>An announcement MUST fit into one UDP packet (65,527 bytes)</t>
 
                     <t>This files member is REQUIRED.</t>
                 </list>
@@ -120,8 +119,6 @@
 					<t>A member named "offset" specifying the byte address inside the file from wich on the host shall start the transmission from. This member is REQUIRED.</t>
 					<t>A member named "length" specifying the number of bytes the host shall send. The field can contain the json null value to indicate, that the host shall send all bytes from offset until the end of the file. This member is REQUIRED.</t>
 				</list>
-				<t>A FILEREQ MUST fit into one UDP packet (65,527 bytes)</t>
-							
 				Clients SHOULD request only those files, that are contained in a announcement message, that has not been expired.
 			</t>
 			<t>
