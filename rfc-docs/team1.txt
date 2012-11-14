@@ -1,6 +1,3 @@
-
-
-
 Telematics project 12/13, Group 1                               T. Sturm
 Internet-Draft                                               B. Halbrock
 Expires: May 18, 2013                                          M. Winter
@@ -16,8 +13,8 @@ Abstract
 
    This document is a draft for the official specification of the
    Buschtrommel protocol.  Buschtrommel is used to find and transfer
-   files between hosts in the same network domain without the need for a
-   central server.
+   files between clients in the same network domain without the need for
+   a central server.
 
 Status of this Memo
 
@@ -61,7 +58,7 @@ Status of this Memo
 
 2.  High Level Overview
 
-   Buschtrommel is focused on scenarios, where clients (a.k.a peers) don
+   Buschtrommel is focused on scenarios, where clients (a.k.a peers) do
    not share files for a long time.  Files are announced in a short-
    termed fashion.  Clients will not be connected for more than a few
    hours.  The fast announcement of new clients and files is one of the
@@ -73,7 +70,7 @@ Status of this Memo
 
    o  file transfers
 
-   Propagation features are implemented on top of UPD and multicast
+   Announcement features are implemented on top of UPD and multicast
    groups.  File transfers uses TCP peer-to-peer connections.
 
 
@@ -91,9 +88,9 @@ Status of this Memo
    order.
 
 
-4.  Peer and File Announcement
+4.  Peer and File Announcement via Group
 
-   There are no mechanisms like file list requests or hello messages.
+   There are no mechanisms like file list requests, or hello messages.
    Every peer announces himself and all offered files from time to time
    with so-called announcement messages.  These messages have a TTL.  A
    client, has to join a defined multicast group, if he wants to
@@ -111,23 +108,29 @@ Status of this Memo
    Upon joining the group, the peer SHOULD send his first announement
    message to the group:
 
-             +------+------+------+----------+-----+----------+
-             | MAG  |  OP  |  LEN |   NAME   | TTL |  FILES   |
-             +------+------+------+----------+-----+----------+
-             | 0x71 | 0x0  |  13  |    24    |  6  | 0 - 8164 |
-             +------+------+------+----------+-----+----------+
+         +------+------+------+----------+------+-----+----------+
+         | MAG  |  OP  |  LEN |   NAME   | FLAG | TTL |  FILES   |
+         +------+------+------+----------+------+-----+----------+
+         | 0x71 | 0x0  |  13  |    23    |  1   |  6  | 0 - 8164 |
+         +------+------+------+----------+------+-----+----------+
 
-   The LEN field specifies the length of the data that follows after the
-   NAME field (unsigned int ranging from 0 to 2^13-1).  The maximum
-   value for LEN is 8150.  The NAME field contains a human readable name
-   of the client (represented in ASCII chars).  The name can contain all
-   ASCII chars from 32 to 126.  Names, that are shorter than 24
-   characters can be truncated with ASCII ETX code (003).  The TTL field
-   indicates the valid duration of all the information that are
-   contained in the message.  The TTL is to interpret as unsigned int,
-   ranging from 0 to 2^6-1.  The TTL in seconds results from the formula
-   seconds = (TTL * 10) + 60s.  The FILES field contains no, one, or
-   multiple triples of file information, as described as follows
+   The LEN field specifies the length of the data in bytes that follows
+   after the TTL field (unsigned integer ranging from 0 to 2^13-1).  The
+   maximum value for LEN is 8150.  The NAME field MAY contains a human
+   readable name of the client (represented in ASCII chars).  The name
+   can contain all ASCII chars from 32 to 126.  Names, that are shorter
+   than 23 characters can be truncated with ASCII ETX code (003).
+   Clients without a human-readable name are accepted.  If the Name
+   field is used, the Client SHOULD NOT change it's name.  Other peers
+   MUST NOT use the name for peer identification, because the name is
+   necessarily not unique in the network.  The FLAG is set to 0x0 by
+   default.  For more details see below.  The TTL field indicates the
+   valid duration of all the information that are contained in the
+   message.  The TTL is to interpret as unsigned int, ranging from 0 to
+   2^6-1.  The TTL in seconds results from the formula seconds = (TTL *
+   10) + 60s.  TTLs range from 60 - 660 seconds.  The FILES field
+   contains no, one, or multiple triples of file information, as
+   described as follows:
 
                     +-----------+------+--------------+
                     | FILE-HASH | SIZE | DISPLAY-NAME |
@@ -150,15 +153,19 @@ Status of this Memo
       Clients MAY include a folder structure in the display name.  If
       clients do so, '/' (ASCII 057) MUST be used as path seperator.
 
-      Clients MUST NOT send the very same announcement message, before
-      it's TTL is expired (which is a minimum of 60 seconds).
+      Clients MUST NOT send the very same announcement message over the
+      group, before it's TTL(which is a minimum of 60 seconds) is near
+      to expiring (which is 30 seconds).
 
-      Clients SHALL send announcement messages, as soon as they provide
+      Clients SHOULD send announcement messages, as soon as they provide
       a new file.
 
+      Clients SHOULD NOT send a single message per file, but accumulate
+      whenever possible.
+
       Clients MAY send multiple announcement messages, containing
-      disjunct files, if they need more than 8164 bytes to announce all
-      files.
+      disjunct file sets, if they need more than 8164 bytes to announce
+      all files.
 
       When a client decides to become inactive, it SHOULD stop sending
       announcement messages and SHOULD stay online until the longest
@@ -170,11 +177,29 @@ Status of this Memo
       invalid checksum
 
 
-5.  File Transfer
+5.  Directed File Announcement and Flag handling
+
+   A client MAY send a FLAG, set to 0x01 to request direct announcements
+   from all other clients.  Clients SHOULD use this flag only if they
+   recently connected to the multicast group.  A FLAG, set to 0x02
+   indicates that the sender will go offline.  Other clients SHOULD set
+   all TTLs of this client to 0.  The remaining 0x03 - 0xFF are reserved
+   for future purposes.  Clients SHOULD react to all announcement
+   messages, where the flag is set to 0x01 of every client by sending a
+   direct announcement to this client.  Clients MAY NOT send a direct
+   announcement, if a group announcement is outstanding in the near
+   future.  Clients SHOULD send the 0x02 flag, when they are shutting
+   down.
+
+   The directed file announcements have the same format as group
+   announcements.
+
+
+6.  File Transfer
 
    When a peer requests a file from a single peer, it MUST open a TCP-
-   Socket with a chosen port and send a FILEREQ message to one peer,
-   that offers the file:
+   Socket with a chosen port and send a FILEREQ message to a peer, that
+   offers the file:
 
                 +------+------+------+-------+------+------+
                 | MAG  |  OP  | HASH | PORT  |  OFF | LEN  |
@@ -193,12 +218,12 @@ Status of this Memo
    sent.  This field can be set to 0, if the peer requests all bytes
    from the given offset untill the end
 
-   When a peer wants to continue an aborted file transfer, it sends a
-   new FILEREQ, with OFF indicating the first byte, that has not been
-   received.
+   If the receiving peer wants to continue an aborted file transfer, it
+   sends a new FILEREQ, with OFF indicating the first byte, that has not
+   been received.
 
-   When a peer wants to request one file from multiple hosts, it sends
-   multiple FILEREQ to these hosts.  Each FILEREQ MUST contain a
+   If a peer wants to request one file from multiple hosts, it sends
+   multiple FILEREQ to these hosts.  Each FILEREQ MUST contains a
    different port, different OFF and different LEN.  The OFFs and LENs
    SHOULD describe a partition of the whole file.
 
@@ -219,7 +244,7 @@ Status of this Memo
    30 seconds.
 
 
-6.  References
+7.  References
 
    [refs.RFC768]
               Postel, J., "User Datagram Protocol", RFC 768, STD 6,
@@ -232,6 +257,12 @@ Status of this Memo
    [refs.RFC791]
               Postel, J., "Internet Protocol", RFC 791, STD 5,
               September 1981.
+
+
+Appendix A.  Glossar
+
+   Peer - a client in general Host - an client, which offers a file to
+   others
 
 
 Authors' Addresses
@@ -252,4 +283,3 @@ Authors' Addresses
    Karlsruhe Institute of Technology
 
    Email: moritz.winter@student.kit.edu
-
