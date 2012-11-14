@@ -82,6 +82,7 @@
                         </list>
                     </t>
                     <t>The values of the "sha-256" and the "display-name" members together uniquely identify a file. Client MUST NOT include multiple file objects with identical values for the tuple "sha-256" and "display-name" in a single File Availability Announcement message.</t>
+					<t>An announcement MUST fit into one UDP packet (65,527 bytes)</t>
 
                     <t>This files member is REQUIRED.</t>
                 </list>
@@ -119,6 +120,7 @@
 					<t>A member named "offset" specifying the byte address inside the file from wich on the host shall start the transmission from. This member is REQUIRED.</t>
 					<t>A member named "length" specifying the number of bytes the host shall send. The field can contain the json null value to indicate, that the host shall send all bytes from offset until the end of the file. This member is REQUIRED.</t>
 				</list>
+				<t>A FILEREQ MUST fit into one UDP packet (65,527 bytes)</t>
 							
 				Clients SHOULD request only those files, that are contained in a announcement message, that has not been expired.
 			</t>
