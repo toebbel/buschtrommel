@@ -58,7 +58,6 @@
         </section>
 
         <section title="General Notes">
-            <t>The Buschtrommel protocol extensively uses the magic number 0x71 (113 in decimal) to faciliate distinguishing Buschtrommel's messages from other protocols and applications.</t>
             <t>Throughout this document, commands are explained with diagrams. Command fields are identified with capital letters, e.g. LEN. The corresponding decimal values specify the number of octets reserved for the field. Hexadecimal numbers written as 0xXX have a size of one octet. All multi-octet values are expected to be in network byte order.</t>
         </section>
 
@@ -71,22 +70,22 @@
 				<t>239.255.0.113 for IPv4</t>
 				<t>ff02::7171 for IPv6</t>
 			</list>
-			All announcement communication takes place over UDP on port 1113.
+			All announcement communication, and directed file announcement takes place over UDP on port 1113. File Transfers are requested to TCP port 1113 as well.
             </t>
 			
             <t>
                 Upon joining the group, the peer SHOULD send his first announement message to the group:
                 <figure align='center'>
                     <artwork>
-+------+------+------+----------+-----+----------+
-| MAG  |  OP  |  LEN |   NAME   | TTL |  FILES   |
-+------+------+------+----------+-----+----------+
-| 0x71 | 0x0  |  13  |    23    |  7  | 0 - 8164 |
-+------+------+------+----------+-----+----------+
++------+------+----------+-----+----------+
+|  OP  |  LEN |   NAME   | TTL |  FILES   |
++------+------+----------+-----+----------+
+| 0x0  |  13  |    23    |  7  | 0 - 8166 |
++------+------+----------+-----+----------+
 //TODO check if total length still fits into UDP
                   </artwork>
                 </figure>
-                The LEN field specifies the length of the data in bytes that follows after the TTL field (unsigned integer ranging from 0 to 2^13-1). The maximum value for LEN is 8164.
+                The LEN field specifies the length of the data in bytes that follows after the TTL field (unsigned integer ranging from 0 to 2^13-1). The maximum value for LEN is 8166.
                 The NAME field MAY contains a human readable name of the client (represented in ASCII chars). The name can contain all ASCII chars from 32 to 126. Names, that are shorter than 23 characters can be truncated with ASCII ETX code (003). Clients without a human-readable name are accepted. If the Name field is used, the Client SHOULD NOT change it's name. Other peers MUST NOT use the name for peer identification, because the name is necessarily not unique in the network.
                 The TTL field indicates the valid duration of all the information that are contained in the message. The TTL is to interpret as unsigned int, ranging from 0 to 2^6-1. The TTL in seconds results from the formula seconds = (TTL * 10). TTLs range from 0 - 1280 seconds.
 
@@ -128,11 +127,11 @@
 						Clients can request others to send file announcements via unicast:
 					<figure align='center'>
 						<artwork>
-+------+------+
-| MAG  |  OP  |
-+------+------+
-| 0x71 | 0x2  |
-+------+------+
++------+
+|  OP  |
++------+
+| 0x2  |
++------+
 						</artwork>
 					</figure>
 					This is called a solicitation packet.
@@ -150,11 +149,11 @@
             <figure align='center'>
 
                 <artwork>
-+------+------+------+-------+------+------+
-| MAG  |  OP  | HASH | PORT  |  OFF | LEN  |
-+------+------+------+-------+------+------+
-| 0x71 | 0x1  |   8  |  32   |  64  |  64  |
-+------+------+------+-------+------+------+
++------+------+-------+------+------+
+|  OP  | HASH | PORT  |  OFF | LEN  |
++------+------+-------+------+------+
+| 0x1  |   8  |  32   |  64  |  64  |
++------+------+-------+------+------+
                 </artwork>
             </figure>
             HASH contains the SAH-256 hash of a file, that has been announced before. Clients SHOULD request only files, that are contained in a announcement message, that has not been expired.
