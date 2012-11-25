@@ -3,8 +3,8 @@
 <!-- vim: set noexpandtab : -->
 <rfc ipr="none">
 	<front>
-        <title>Buschtrommel</title>
-        <author />
+		<title>Buschtrommel</title>
+		<author />
 		<date />
 		<area>Applications</area>
 		<workgroup>Telematics project 12/13</workgroup>
@@ -31,9 +31,9 @@
 			</t>
 			<t>The protocol features can be roughly split into four tasks:
 				<list style="symbols">
-                    <t>announcements of peers</t>
-                    <t>exploration of offered files</t>
-                    <t>updates of offered files</t>
+					<t>announcements of peers</t>
+					<t>exploration of offered files</t>
+					<t>updates of offered files</t>
 					<t>file transfers</t>
 				</list>
 			</t>
@@ -43,121 +43,121 @@
 			</t>
 		</section>
 
-        <section title="General Notes">
-            <t>
-                Buschtrommel uses the following multicast addresses to address all participating peers:
-                <list style="symbols">
-                    <t>239.255.0.113 for IPv4</t>
-                    <t>ff02::7171 for IPv6</t>
-                </list>
-                Clients have to listen on UDP Port XXX in order to participate in the network
-                
-                Messages are encoded as UTF-8 strings and contain of multiple fields. 
-                | represents a field seperator and is encoded with the ascii control character 31 (unit seperator)
-                \ represents an entry seperator and is encoded with the ascii control character 30 (record seperator) //TODO reference to rfc
-                Integers are represented as UTF-8 integegers as well.
-                Hashes are represented as UTF-8 hex strings.
-            </t>
-        </section>
+		<section title="General Notes">
+			<t>
+				Buschtrommel uses the following multicast addresses to address all participating peers:
+				<list style="symbols">
+					<t>239.255.0.113 for IPv4</t>
+					<t>ff02::7171 for IPv6</t>
+				</list>
+				Clients have to listen on UDP Port XXX in order to participate in the network
 
-        <section title="Announcements of peers">
-            <section title="HI message">
-            <t>
-                Clients send a HI message, after joining the multicast group:
-                <figure>
-                    <artwork>
-HI|Port|Alias\
-                    </artwork>
-                </figure>
-
-                The port represents an open TCP port at the sender, which is used for TCP communication.
-                The port is XXX by default, but can be choosen freely by the sender. The given port MUST fit into a 64bit Integer //TODO 32bit?
-                The alias is a human readable name of the peer. It can may be empty
-                The HI message MUST NOT exceed a total length of 512 Byte due restrictions of UDP.
-                There are no spaces between fields and their seperatos
-            </t>
-            </section>
-            <section title="JO message">
-                <t>
-                <figure>
-                    <artwork>
-                        JO|Port|Alias\
-                    </artwork>
-                </figure>
-                    Clients may respond to a HI message by sending a JO message. The answer can be sent via unicast to the sender of the HI message, or via mutlicast. 
-                    Other clients SHOULD handle such multicast JO messages as alive-messages.
-                    Clients MUST NOT sent JO messages in response to JO messages.
-                    There are no spaces between fields and their seperators.
-                </t>
-            </section>
+				Messages are encoded as UTF-8 strings and contain of multiple fields.
+				| represents a field seperator and is encoded with the ascii control character 31 (unit seperator)
+				\ represents an entry seperator and is encoded with the ascii control character 30 (record seperator) //TODO reference to rfc
+				Integers are represented as UTF-8 integegers as well.
+				Hashes are represented as UTF-8 hex strings.
+			</t>
 		</section>
 
-        <section title="Exploration of offered files">
-            <t>
-                Initial exploration of file lists is done via TCP unicast: Client A opens a TCP connection to the open port of client B and writes "GETFILELIST\" into the stream
-                Client B answers with a Response code and the expected transfer volume like in "File Transfer" //TODO ref, followed by a string that represents the filelist.
-                The filelist contains multiple entries, each one formated as follows:
-                <figure>
-                    <artwork>
-hash|TTL|length|virtual path|meta-info\
-                    </artwork>
-                </figure>
-                <list style="symbols">
-                    <t>TTL in seconds, limited by unsigend int 32</t>
-                    <t>virtual path uses / as path seperator only. The virtual path may be changed and MUST NOT be used for file identification.</t>
-                    <t>The Meta field can contain any human readable description of the file</t>
-                    <t>One FileList entry must not exceed the length of 512 Bytes</t>
-                    <t>There are no spaces between the content of a field and their seperators</t>
-                </list>
-                An empty file list has a length of 0. the response of client B would look like the following:
-                <figure>
-                    <artwork>
-OK|0\
-                    </artwork>
-                </figure>
-            </t>
-        </section>
+		<section title="Announcements of peers">
+			<section title="HI message">
+				<t>
+					Clients send a HI message, after joining the multicast group:
+					<figure>
+						<artwork>
+							HI|Port|Alias\
+						</artwork>
+					</figure>
 
-        <section title="Updates of offered files">
-            <t>
-                Thos updates are sent via UDP multicast and repesent updates of a filelist of a client.
-                A client SHOULD NOT sent updates of offered files, instead of offering his file list to other clients.
-                One UDP datagram contains exactly one file update, which is the same as one file entry of the file list (with all it's limitations):
-                <figure>
-                    <artwork>
-hash|TTL|length|virtual path|meta-info\
-                    </artwork>
-                </figure>
-                //TODO ref Exploration of offered files
+					The port represents an open TCP port at the sender, which is used for TCP communication.
+					The port is XXX by default, but can be choosen freely by the sender. The given port MUST fit into a 64bit Integer //TODO 32bit?
+					The alias is a human readable name of the peer. It can may be empty
+					The HI message MUST NOT exceed a total length of 512 Byte due restrictions of UDP.
+					There are no spaces between fields and their seperatos
+				</t>
+			</section>
+			<section title="JO message">
+				<t>
+					<figure>
+						<artwork>
+							JO|Port|Alias\
+						</artwork>
+					</figure>
+					Clients may respond to a HI message by sending a JO message. The answer can be sent via unicast to the sender of the HI message, or via mutlicast. 
+					Other clients SHOULD handle such multicast JO messages as alive-messages.
+					Clients MUST NOT sent JO messages in response to JO messages.
+					There are no spaces between fields and their seperators.
+				</t>
+			</section>
+		</section>
+
+		<section title="Exploration of offered files">
+			<t>
+				Initial exploration of file lists is done via TCP unicast: Client A opens a TCP connection to the open port of client B and writes "GETFILELIST\" into the stream
+				Client B answers with a Response code and the expected transfer volume like in "File Transfer" //TODO ref, followed by a string that represents the filelist.
+				The filelist contains multiple entries, each one formated as follows:
+				<figure>
+					<artwork>
+						hash|TTL|length|virtual path|meta-info\
+					</artwork>
+				</figure>
+				<list style="symbols">
+					<t>TTL in seconds, limited by unsigend int 32</t>
+					<t>virtual path uses / as path seperator only. The virtual path may be changed and MUST NOT be used for file identification.</t>
+					<t>The Meta field can contain any human readable description of the file</t>
+					<t>One FileList entry must not exceed the length of 512 Bytes</t>
+					<t>There are no spaces between the content of a field and their seperators</t>
+				</list>
+				An empty file list has a length of 0. the response of client B would look like the following:
+				<figure>
+					<artwork>
+						OK|0\
+					</artwork>
+				</figure>
+			</t>
+		</section>
+
+		<section title="Updates of offered files">
+			<t>
+				Thos updates are sent via UDP multicast and repesent updates of a filelist of a client.
+				A client SHOULD NOT sent updates of offered files, instead of offering his file list to other clients.
+				One UDP datagram contains exactly one file update, which is the same as one file entry of the file list (with all it's limitations):
+				<figure>
+					<artwork>
+						hash|TTL|length|virtual path|meta-info\
+					</artwork>
+				</figure>
+				//TODO ref Exploration of offered files
 			</t>
 		</section>
 
 		<section title="File Transfer">
 			<t>
-                To request a file an client opens a TCP Connection to the open port of the remote peer and writes
-                <figure>
-                    <artwork>
-GET|hash|offset|length\
-                    </artwork>
-                </figure>
-                To request a file. 
-                
-                The hash field contains the hash of a file, that is requested. A client SHOULD requst only thos file, that have been announced before via file list or file updates and have a valid TTL.
-                The offet defines the byte in the file, from wich on the sender sends.
-                The length defines the number of bytes to transfer, from the offset on.
+				To request a file an client opens a TCP Connection to the open port of the remote peer and writes
+				<figure>
+					<artwork>
+						GET|hash|offset|length\
+					</artwork>
+				</figure>
+				To request a file.
+
+				The hash field contains the hash of a file, that is requested. A client SHOULD requst only thos file, that have been announced before via file list or file updates and have a valid TTL.
+				The offet defines the byte in the file, from wich on the sender sends.
+				The length defines the number of bytes to transfer, from the offset on.
 			</t>
-            <t>
-                The client, that received such a request MUST response in the following format via the same TCP connection:
-                <figure>
-                    <artwork>
-status code|expected transfer volume\
-                    </artwork>
-                </figure>
-                Expected transfer volume is the amount of bytes, that will follow.
-                Valid status Codes are "ok", "try again, later", try again, never" //TODO find good names
-                If the status code is "ok", the the clients sends the file after the \ seperator.
-                The receiving, as well as the sending peer MAY terminate the TCP connection at any given time.
-            </t>
+			<t>
+				The client, that received such a request MUST response in the following format via the same TCP connection:
+				<figure>
+					<artwork>
+						status code|expected transfer volume\
+					</artwork>
+				</figure>
+				Expected transfer volume is the amount of bytes, that will follow.
+				Valid status Codes are "ok", "try again, later", try again, never" //TODO find good names
+				If the status code is "ok", the the clients sends the file after the \ seperator.
+				The receiving, as well as the sending peer MAY terminate the TCP connection at any given time.
+			</t>
 		</section>
 	</middle>
 
@@ -196,26 +196,26 @@ status code|expected transfer volume\
 				</front>
 				<seriesInfo name="RFC" value="791" />
 				<seriesInfo name="STD" value="5" />
-            </reference>
-            <reference anchor="refs.RFC20">
-                <front>
-                    <title>ASCII format for network interchange</title>
-                    <author initials="C." surname="Cerf" fullname="Vint Cerf">
-                        <organization abbrev="UCLA">UCLA</organization>
-                    </author>
-                    <date month="October" year="1969" />
-                </front>
-                <seriesInfo name="RFC" value="20" />
-            </reference>
-        </references>
+			</reference>
+			<reference anchor="refs.RFC20">
+				<front>
+					<title>ASCII format for network interchange</title>
+					<author initials="C." surname="Cerf" fullname="Vint Cerf">
+						<organization abbrev="UCLA">UCLA</organization>
+					</author>
+					<date month="October" year="1969" />
+				</front>
+				<seriesInfo name="RFC" value="20" />
+			</reference>
+		</references>
 
-        <section title="Glossar">
-            <t>
-                <list>
-				    <t>Peer - a client in general </t>
-    				<t>Host - an client, which offers a file to others</t>
-                </list>
-            </t>
+		<section title="Glossar">
+			<t>
+				<list>
+					<t>Peer - a client in general </t>
+					<t>Host - an client, which offers a file to others</t>
+				</list>
+			</t>
 		</section>
 	</back>
 </rfc>
