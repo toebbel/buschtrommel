@@ -98,7 +98,7 @@
 				<list>
 					<t>The Type field, set to "File".</t>
 					<t>A Hash field, containing a hexadecimal representation of the SHA-1 hash of the file.</t>
-					<t>A TTL field, indicating the expected remaining time that this file will be made available for transfer. A value of -1 SHALL be used to indicate an indefinite amount of time. A value of 0 may be used to indicate that a file is no longer available for transfer. The integer must be in the range of a 64-bit signed integer datatype.</t>
+					<t>A TTL field, indicating the expected remaining time that this file will be made available for transfer in seconds. A value of -1 SHALL be used to indicate an indefinite amount of time. A value of 0 may be used to indicate that a file is no longer available for transfer. The integer must be in the range of a 64-bit signed integer datatype.</t>
 					<t>A Length field, indicating the length of the file offered in octets</t>
 					<t>A Display Name field, containing a human-readable name for the file. All Unicode characters (expect those excluded above) may be used. A directory structure MAY be encoded in the value of this member. If this is the case, the '/' character MUST be used as a path separator.</t>
 					<t>A Meta Information field, containing additional information about a file. The information encoded in this field SHOULD be human-readable.</t>
