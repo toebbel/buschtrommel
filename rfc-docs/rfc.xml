@@ -49,7 +49,7 @@
 			<t>All UDP packets sent SHALL have a Destination Port of TODO set. In order to participate in the network, a client must listen on this port.</t>
 			<t>Messages sent using UDP MUST NOT exceed 512 octets length.</t>
 
-			<t>Messages are strings encoded as UTF-8. Messages contain several field which are seperated by a field separator. Each message is terminated by a message separator. ASCII control caracter 31 (Unit Separator, U+001F) is used as a field separator, ASCII control character 30 (Record Separator, U+001E) is used as a message separator. //TODO reference ASCII Standard. In this document, "|" is used to visualize a field separator and "\" is used to visualize a message separator.</t>
+			<t>Messages are strings encoded as UTF-8. Messages contain several field which are seperated by a field separator. Each message is terminated by a message separator. ASCII control caracter 31 (Unit Separator, U+001F) is used as a field separator, ASCII control character 30 (Record Separator, U+001E) is used as a message separator (according to <xref target="refs.RFC20">RFC 20</xref>). In this document, "|" is used to visualize a field separator and "\" is used to visualize a message separator.</t>
 			<t>Integers are represented in their decimal form, encoded as UTF-8 strings.</t>
 			<t>All control messages are of the following format:
 				<figure>
