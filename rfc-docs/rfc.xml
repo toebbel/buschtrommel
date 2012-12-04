@@ -12,147 +12,148 @@
 			<t>This document is a draft for the official specification of the Buschtrommel protocol. Buschtrommel is used to find and transfer files between clients in the same network domain without the need for a central server.</t>
 		</abstract>
 	</front>
-	<section title="Introduction">
-		<t>This document specifies the Buschtrommel protocol, which is used for ad-hoc file transfer between peers in the same network domain.</t>
-		<t>This specification defines package formats and required client behaviour to enable such file transfers between conforming, well-behaved clients.</t>
-		<t>This document describes the mechanisms required for completion of the following tasks:
-			<list style="symbols">
-				<t>peer discovery</t>
-				<t>file announcement</t>
-				<t>file transfer</t>
-			</list>
-		</t>
-		<t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and "OPTIONAL" in this document are to be interpreted as described in <xref target="RFC2119"/>.</t>
-	</section>
-
-	<section title="High Level Overview">
-		<t>
-			Buschtrommel is focused on scenarios, where the set of shared files is changed frequently. Files are announced in a short-termed fashion. Clients will not be connected for more than a few hours. The fast announcement of new clients and files is one of the main focuses.
-		</t>
-		<t>The protocol features can be roughly split into four tasks:
-			<list style="symbols">
-				<t>announcements of peers</t>
-				<t>exploration of offered files</t>
-				<t>updates of offered files</t>
-				<t>file transfers</t>
-			</list>
-		</t>
-	</section>
-
-	<section title="General Notes">
-		<t>
-			Buschtrommel uses the following multicast addresses to address all participating peers:
-			<list style="symbols">
-				<t>239.255.0.113 for IPv4</t>
-				<t>ff02::7171 for IPv6</t>
-			</list>
-			<t>All UDP packets sent SHALL have a Destination Port of TODO set. In order to participate in the network, a client must listen on this port.</t>
-			<t>Messages sent using UDP MUST NOT exceed 512 octets length.</t>
-
-			<t>Messages are strings encoded as UTF-8. Messages contain several field which are seperated by a field separator. Each message is terminated by a message separator. ASCII control caracter 31 (Unit Separator, U+001F) is used as a field separator, ASCII control character 30 (Record Separator, U+001E) is used as a message separator. In this document, "|" is used to visualize a field separator and "\" is used to visualize a message separator.</t>
-			<t>Integers are represented in their decimal form, encoded as UTF-8 strings.</t>
-			<t>All control messages are of the following format:
-				<figure>
-					<artwork>
-						Type|Field1|Field2|[...]|Fieldn\
-					</artwork>
-				</figure>
-				The "Type" field identifies the message type while all remaining fields carry information as specified in the message type specification. Fields MUST NOT contain any of the field or message separator characters.
-
-			</t>
-
-		</t>
-	</section>
-
-	<section title="Peer Discovery">
-		<section title="Hi Messages">
-			<t>
-				A peer MAY send a Hi message at any time to inform other peers of its presence and to request a reply from all peers in form of a Yo message. Usually, a Hi message is send immediately after joining the network.
-
-				A Hi message is sent using UDP and contains the following fields in the following order:
-				<list>
-					<t>The Type field, set to "Hi".</t>
-					<t>A Port field containing an integer identifying a valid TCP port that the peer sending the message uses for Buschtrommel TCP communication. The peer MUST listen for incoming connections from other peers on this port.</t>
-					<t>A human-readable name that is to be displayed by a client as an alias for the peer sending the message. The field may be empty, but MUST NOT be omitted.</t>
+	<middle>
+		<section title="Introduction">
+			<t>This document specifies the Buschtrommel protocol, which is used for ad-hoc file transfer between peers in the same network domain.</t>
+			<t>This specification defines package formats and required client behaviour to enable such file transfers between conforming, well-behaved clients.</t>
+			<t>This document describes the mechanisms required for completion of the following tasks:
+				<list style="symbols">
+					<t>peer discovery</t>
+					<t>file announcement</t>
+					<t>file transfer</t>
 				</list>
-				<t>A client SHOULD only send as many Hi messages as are required for its operation.</t>
 			</t>
+			<t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and "OPTIONAL" in this document are to be interpreted as described in <xref target="RFC2119"/>.</t>
 		</section>
-		<section title="Yo Messages">
-			<t>
-				<t>Yo messages are sent as replies to HI messages. Every HI message SHOULD be replied to with a Yo message. Yo messages are sent either directly to the unicast address of the sender of the HI message that is being replied to or to the multicast address of all participating peers.</t>
-				<t>A Yo message is sent using UDP and has its Type field set to "Yo". All other fields are identical to those of a HI message.</t>
 
-				<t>Clients MAY use Yo messages they receive to update their internal state concerning the availability of other peers.</t>
+		<section title="High Level Overview">
+			<t>
+				Buschtrommel is focused on scenarios, where the set of shared files is changed frequently. Files are announced in a short-termed fashion. Clients will not be connected for more than a few hours. The fast announcement of new clients and files is one of the main focuses.
 			</t>
-        </section>
-		<section title="Bye Messages">
-			<t>
-				<t>Bye Messages are used to inform all network participants that a peer is going to leave the network.</t>
-				<t>Bye Messages are sent using UDP and contain only a type field, set to "Bye".</t>
-				<t>Clients SHOULD send a Bye Message to all participating peers before leaving the network. Clients receiving a Bye Message SHOULD assume that the sending peer as well as all files previously offered for transfer by this peer are no longer available.</t>
-			</t>
-		</section>
-    </section>
-
-	<section title="File Discovery">
-		<section title="File Announcement Messages">
-			<t>
-				File Announcement Messages are used to inform other clients about files offered for transfer by oneself.
-
-				A File Announcement Message is contains the following fields in the following order:
-
-				<list>
-					<t>The Type field, set to "File".</t>
-					<t>A Hash field, containing a hexadecimal representation of the SHA-1 hash of the file.</t>
-					<t>A TTL field, indicating the expected remaining time that this file will be made available for transfer in seconds. A value of -1 SHALL be used to indicate an indefinite amount of time. A value of 0 may be used to indicate that a file is no longer available for transfer. The integer must be in the range of a 64-bit signed integer datatype.</t>
-					<t>A Length field, indicating the length of the file offered in octets</t>
-					<t>A Display Name field, containing a human-readable name for the file. All Unicode characters (expect those excluded above) may be used. A directory structure MAY be encoded in the value of this member. If this is the case, the '/' character (U+002F) MUST be used as a path separator.</t>
-					<t>A Meta Information field, containing additional information about a file. The information encoded in this field SHOULD be human-readable.</t>
+			<t>The protocol features can be roughly split into four tasks:
+				<list style="symbols">
+					<t>announcements of peers</t>
+					<t>exploration of offered files</t>
+					<t>updates of offered files</t>
+					<t>file transfers</t>
 				</list>
 			</t>
 		</section>
-		<section title="Accumulated File Announcement Messages using TCP">
-			<t>A "Get Filelist" Message is a message which has its Type field set to "Get Filelist". This message type has no other fields.</t>
-			<t>To request a complete announcement of all files offered for transfer by a peer, a client may open a connection to the other peer using the peers's announced TCP port and send a "Get Filelist" Message. The other peer MUST reply with exactly one File Announcement Message for each file offered for transfer. After all messages have been sent, the other peer MUST close the connection.</t>
-		</section>
-		<section title="Updating File Announcement Messages using UDP">
-			<t>A peer may at any time send a File Announcement Message encapsulated in a single UDP packet to the multicast address of all participating peers. Other peers MUST use these messages to update their internal state concerning the availability of files for transfer from other peers. This mechanism MUST be used to announce if a file will no longer be available for transfer, e.g. if it has been deleted or the peer is about to leave the network.</t>
-		</section>
-	</section>
 
-	<section title="File Transfer">
-		<t>To request the transfer of a file, a client may open a connection to the peer offering the file using the peer's announced TCP port an send a "Get File" Message.</t>
-		<section title='"Get File" Messages'>
-			<t>"Get File" messages are used to request the transfer of a file from another peer.</t>
-
-			<t>A "Get File" message contains the following fields in the following order:
-				<list>
-					<t>The Type field, set to "Get File".</t>
-					<t>A Hash field, set to the SHA-1 hash in hexadecimal representation of the requested file. A client SHOULD request only files that have been announced as available for transfer from that host.</t>
-					<t>An Offset field, indicating the number of octets from the beginning of the file that the sending host should skip. This value MUST be in the range of a 64-bit unsigned integer datatype.</t>
-					<t>A Length field, indicating the number of octets of the file that the receiving host wishes to receive from the offset onward. This value MUST be in the range of a 64-bit unsigned integer datatype.</t>
-				</list>
-			</t>
-		</section>
-		<t>The peer receiving the "Get File" message MUST reply with a File Transfer Response message. If appropriate according to the status communicated in the File Transfer Response Message, it MUST then send the requested data and close the connection. The Length and Offset fields of the "Get File" message MUST be respected.</t>
-
-		<section title="File Transfer Response Messages">
+		<section title="General Notes">
 			<t>
-				File Transfer Response Messages are used to confirm or indicate an error concerning a request for transfer using a "Get File" message.
-
-				A File Transfer Response Message contains the following fields in the following order:
-				<list>
-					<t>The Type field, set to "File Transfer Response".</t>
-					<t>A Status Code field, indicating if the file request can be served. Valid values are "OK" if the sending peer is ready to send the file, "Try Again Later" if the file cannot currently be served but the problem is expected to be resolved in the future or "Never Try Again" if the file cannot currently be served and the problem is not expected to be resolved in the future (e.g. if the file does not exist).</t>
-					<t>An Expected Transfer Volume field, indicating the number of octets of the file that the peer expects to send. This MAY be less than the amount requested in the "Get File" message.</t>
+				Buschtrommel uses the following multicast addresses to address all participating peers:
+				<list style="symbols">
+					<t>239.255.0.113 for IPv4</t>
+					<t>ff02::7171 for IPv6</t>
 				</list>
+				<t>All UDP packets sent SHALL have a Destination Port of TODO set. In order to participate in the network, a client must listen on this port.</t>
+				<t>Messages sent using UDP MUST NOT exceed 512 octets length.</t>
+
+				<t>Messages are strings encoded as UTF-8. Messages contain several field which are seperated by a field separator. Each message is terminated by a message separator. ASCII control caracter 31 (Unit Separator, U+001F) is used as a field separator, ASCII control character 30 (Record Separator, U+001E) is used as a message separator. In this document, "|" is used to visualize a field separator and "\" is used to visualize a message separator.</t>
+				<t>Integers are represented in their decimal form, encoded as UTF-8 strings.</t>
+				<t>All control messages are of the following format:
+					<figure>
+						<artwork>
+							Type|Field1|Field2|[...]|Fieldn\
+						</artwork>
+					</figure>
+					The "Type" field identifies the message type while all remaining fields carry information as specified in the message type specification. Fields MUST NOT contain any of the field or message separator characters.
+
+				</t>
+
 			</t>
 		</section>
-	</section>
+
+		<section title="Peer Discovery">
+			<section title="Hi Messages">
+				<t>
+					A peer MAY send a Hi message at any time to inform other peers of its presence and to request a reply from all peers in form of a Yo message. Usually, a Hi message is send immediately after joining the network.
+
+					A Hi message is sent using UDP and contains the following fields in the following order:
+					<list>
+						<t>The Type field, set to "Hi".</t>
+						<t>A Port field containing an integer identifying a valid TCP port that the peer sending the message uses for Buschtrommel TCP communication. The peer MUST listen for incoming connections from other peers on this port.</t>
+						<t>A human-readable name that is to be displayed by a client as an alias for the peer sending the message. The field may be empty, but MUST NOT be omitted.</t>
+					</list>
+					<t>A client SHOULD only send as many Hi messages as are required for its operation.</t>
+				</t>
+			</section>
+			<section title="Yo Messages">
+				<t>
+					<t>Yo messages are sent as replies to HI messages. Every HI message SHOULD be replied to with a Yo message. Yo messages are sent either directly to the unicast address of the sender of the HI message that is being replied to or to the multicast address of all participating peers.</t>
+					<t>A Yo message is sent using UDP and has its Type field set to "Yo". All other fields are identical to those of a HI message.</t>
+
+					<t>Clients MAY use Yo messages they receive to update their internal state concerning the availability of other peers.</t>
+				</t>
+			</section>
+			<section title="Bye Messages">
+				<t>
+					<t>Bye Messages are used to inform all network participants that a peer is going to leave the network.</t>
+					<t>Bye Messages are sent using UDP and contain only a type field, set to "Bye".</t>
+					<t>Clients SHOULD send a Bye Message to all participating peers before leaving the network. Clients receiving a Bye Message SHOULD assume that the sending peer as well as all files previously offered for transfer by this peer are no longer available.</t>
+				</t>
+			</section>
+		</section>
+
+		<section title="File Discovery">
+			<section title="File Announcement Messages">
+				<t>
+					File Announcement Messages are used to inform other clients about files offered for transfer by oneself.
+
+					A File Announcement Message is contains the following fields in the following order:
+
+					<list>
+						<t>The Type field, set to "File".</t>
+						<t>A Hash field, containing a hexadecimal representation of the SHA-1 hash of the file.</t>
+						<t>A TTL field, indicating the expected remaining time that this file will be made available for transfer in seconds. A value of -1 SHALL be used to indicate an indefinite amount of time. A value of 0 may be used to indicate that a file is no longer available for transfer. The integer must be in the range of a 64-bit signed integer datatype.</t>
+						<t>A Length field, indicating the length of the file offered in octets</t>
+						<t>A Display Name field, containing a human-readable name for the file. All Unicode characters (expect those excluded above) may be used. A directory structure MAY be encoded in the value of this member. If this is the case, the '/' character (U+002F) MUST be used as a path separator.</t>
+						<t>A Meta Information field, containing additional information about a file. The information encoded in this field SHOULD be human-readable.</t>
+					</list>
+				</t>
+			</section>
+			<section title="Accumulated File Announcement Messages using TCP">
+				<t>A "Get Filelist" Message is a message which has its Type field set to "Get Filelist". This message type has no other fields.</t>
+				<t>To request a complete announcement of all files offered for transfer by a peer, a client may open a connection to the other peer using the peers's announced TCP port and send a "Get Filelist" Message. The other peer MUST reply with exactly one File Announcement Message for each file offered for transfer. After all messages have been sent, the other peer MUST close the connection.</t>
+			</section>
+			<section title="Updating File Announcement Messages using UDP">
+				<t>A peer may at any time send a File Announcement Message encapsulated in a single UDP packet to the multicast address of all participating peers. Other peers MUST use these messages to update their internal state concerning the availability of files for transfer from other peers. This mechanism MUST be used to announce if a file will no longer be available for transfer, e.g. if it has been deleted or the peer is about to leave the network.</t>
+			</section>
+		</section>
+
+		<section title="File Transfer">
+			<t>To request the transfer of a file, a client may open a connection to the peer offering the file using the peer's announced TCP port an send a "Get File" Message.</t>
+			<section title='"Get File" Messages'>
+				<t>"Get File" messages are used to request the transfer of a file from another peer.</t>
+
+				<t>A "Get File" message contains the following fields in the following order:
+					<list>
+						<t>The Type field, set to "Get File".</t>
+						<t>A Hash field, set to the SHA-1 hash in hexadecimal representation of the requested file. A client SHOULD request only files that have been announced as available for transfer from that host.</t>
+						<t>An Offset field, indicating the number of octets from the beginning of the file that the sending host should skip. This value MUST be in the range of a 64-bit unsigned integer datatype.</t>
+						<t>A Length field, indicating the number of octets of the file that the receiving host wishes to receive from the offset onward. This value MUST be in the range of a 64-bit unsigned integer datatype.</t>
+					</list>
+				</t>
+			</section>
+			<t>The peer receiving the "Get File" message MUST reply with a File Transfer Response message. If appropriate according to the status communicated in the File Transfer Response Message, it MUST then send the requested data and close the connection. The Length and Offset fields of the "Get File" message MUST be respected.</t>
+
+			<section title="File Transfer Response Messages">
+				<t>
+					File Transfer Response Messages are used to confirm or indicate an error concerning a request for transfer using a "Get File" message.
+
+					A File Transfer Response Message contains the following fields in the following order:
+					<list>
+						<t>The Type field, set to "File Transfer Response".</t>
+						<t>A Status Code field, indicating if the file request can be served. Valid values are "OK" if the sending peer is ready to send the file, "Try Again Later" if the file cannot currently be served but the problem is expected to be resolved in the future or "Never Try Again" if the file cannot currently be served and the problem is not expected to be resolved in the future (e.g. if the file does not exist).</t>
+						<t>An Expected Transfer Volume field, indicating the number of octets of the file that the peer expects to send. This MAY be less than the amount requested in the "Get File" message.</t>
+					</list>
+				</t>
+			</section>
+		</section>
+	</middle>
 
 	<back>
-
 		<references>
 			<reference anchor="RFC2119">
 				<front>
