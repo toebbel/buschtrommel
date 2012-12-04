@@ -28,7 +28,7 @@
 
 		<section title="High Level Overview">
 			<t>
-				Buschtrommel is focused on scenarios, where the set of shared files is changed frequently. Files are announced in a short-termed fashion. Clients will not be connected for more than a few hours. The fast announcement of new clients and files is one of the main focuses.
+				Buschtrommel is focused on scenarios where the set of shared files is changed frequently. Files are announced in a short-termed fashion. Clients will not be connected for more than a few hours. The fast announcement of new clients and files is one of the main focuses.
 			</t>
 			<t>The protocol features can be roughly split into four tasks:
 				<list style="symbols">
