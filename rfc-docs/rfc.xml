@@ -86,18 +86,13 @@
 				<t>Clients MAY use Yo messages they receive to update their internal state concerning the availability of other peers.</t>
 			</t>
         </section>
-        <section title="Bye Messages">
-            <t>
-            <figure>
-                <artwork>
-Bye|Port\
-                </artwork>
-            </figure>
-                <t>Bye messages SHOULD be sent when a peer wants to leave the network to inform other peers that the previously announced TCP port will be closed and no filerequest will be handled.</t>
-                <t>A Bye message is sent using UDP and has its Type field set to "Bye", followed by the port, that was previously announced within the HI message</t>
-                <t>Clients that receive such a Bye message SHOULD set all TTLs of assiciated files to 0.</t>
-            </t>
-        </section>
+		<section title="Bye Messages">
+			<t>
+				<t>Bye Messages are used to inform all network participants that a peer is going to leave the network.</t>
+				<t>Bye Messages are sent using UDP and contain only a type field, set to "Bye".</t>
+				<t>Clients SHOULD send a Bye Message to all participating peers before leaving the network. Clients receiving a Bye Message SHOULD assume that the sending peer as well as all files previously offered for transfer by this peer are no longer available.</t>
+			</t>
+		</section>
     </section>
 
 	<section title="File Discovery">
