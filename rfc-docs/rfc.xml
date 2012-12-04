@@ -22,7 +22,7 @@
 				<t>file transfer</t>
 			</list>
 		</t>
-		<t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119.</t>
+		<t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and "OPTIONAL" in this document are to be interpreted as described in <xref target="RFC2119"/>.</t>
 	</section>
 
 	<section title="High Level Overview">
@@ -49,7 +49,7 @@
 			<t>All UDP packets sent SHALL have a Destination Port of TODO set. In order to participate in the network, a client must listen on this port.</t>
 			<t>Messages sent using UDP MUST NOT exceed 512 octets length.</t>
 
-			<t>Messages are strings encoded as UTF-8. Messages contain several field which are seperated by a field separator. Each message is terminated by a message separator. ASCII control caracter 31 (Unit Separator, U+001F) is used as a field separator, ASCII control character 30 (Record Separator, U+001E) is used as a message separator (according to <xref target="refs.RFC20">RFC 20</xref>). In this document, "|" is used to visualize a field separator and "\" is used to visualize a message separator.</t>
+			<t>Messages are strings encoded as UTF-8. Messages contain several field which are seperated by a field separator. Each message is terminated by a message separator. ASCII control caracter 31 (Unit Separator, U+001F) is used as a field separator, ASCII control character 30 (Record Separator, U+001E) is used as a message separator. In this document, "|" is used to visualize a field separator and "\" is used to visualize a message separator.</t>
 			<t>Integers are represented in their decimal form, encoded as UTF-8 strings.</t>
 			<t>All control messages are of the following format:
 				<figure>
@@ -154,56 +154,52 @@
 	<back>
 
 		<references>
-			<reference anchor="refs.RFC768">
+			<reference anchor="RFC2119">
 				<front>
-					<title>User Datagram Protocol</title>
-					<author initials="J." surname="Postel" fullname="Jon Postel">
-						<organization abbrev="ISI">USC/Information Sciences Institute</organization>
+					<title abbrev="RFC Key Words">
+						Key words for use in RFCs to Indicate Requirement Levels
+					</title>
+					<author initials="S." surname="Bradner" fullname="Scott Bradner">
+						<organization>Harvard University</organization>
+						<address>
+							<postal>
+								<street>1350 Mass. Ave.</street>
+								<street>Cambridge</street>
+								<street>MA 02138</street>
+							</postal>
+							<phone>- +1 617 495 3864</phone>
+							<email>sob@harvard.edu</email>
+						</address>
 					</author>
-					<date month="August" year="1980" />
+					<date year="1997" month="March"/>
+					<area>General</area>
+					<keyword>keyword</keyword>
+					<abstract>
+						<t>
+							In many standards track documents several words are used to signify the requirements in the specification. These words are often capitalized. This document defines these words as they should be interpreted in IETF documents. Authors who follow these guidelines should incorporate this phrase near the beginning of their document:
+							<list>
+								<t>
+									The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in RFC 2119.
+								</t>
+							</list>
+						</t>
+						<t>
+							Note that the force of these words is modified by the requirement level of the document in which they are used.
+						</t>
+					</abstract>
 				</front>
-				<seriesInfo name="RFC" value="768" />
-				<seriesInfo name="STD" value="6" />
-			</reference>
-			<reference anchor="refs.RFC793">
-				<front>
-					<title>Transmission Control Protocol</title>
-					<author initials="J." surname="Postel" fullname="Jon Postel">
-						<organization abbrev="ISI">USC/Information Sciences Institute</organization>
-					</author>
-					<date month="September" year="1981" />
-				</front>
-				<seriesInfo name="RFC" value="793" />
-				<seriesInfo name="STD" value="7" />
-			</reference>
-			<reference anchor="refs.RFC791">
-				<front>
-					<title>Internet Protocol</title>
-					<author initials="J." surname="Postel" fullname="Jon Postel">
-						<organization abbrev="ISI">USC/Information Sciences Institute</organization>
-					</author>
-					<date month="September" year="1981" />
-				</front>
-				<seriesInfo name="RFC" value="791" />
-				<seriesInfo name="STD" value="5" />
-			</reference>
-			<reference anchor="refs.RFC20">
-				<front>
-					<title>ASCII format for network interchange</title>
-					<author initials="C." surname="Cerf" fullname="Vint Cerf">
-						<organization abbrev="UCLA">UCLA</organization>
-					</author>
-					<date month="October" year="1969" />
-				</front>
-				<seriesInfo name="RFC" value="20" />
+				<seriesInfo name="BCP" value="14"/>
+				<seriesInfo name="RFC" value="2119"/>
+				<format type="TXT" octets="4723" target="http://www.rfc-editor.org/rfc/rfc2119.txt"/>
+				<format type="HTML" octets="17970" target="http://xml.resource.org/public/rfc/html/rfc2119.html"/>
+				<format type="XML" octets="5777" target="http://xml.resource.org/public/rfc/xml/rfc2119.xml"/>
 			</reference>
 		</references>
 
 		<section title="Glossary">
 			<t>
-				<list>
-					<t>Peer - a client in general </t>
-					<t>Host - an client, which offers a file to others</t>
+				<list style="symbols">
+					<t>Participating Peer: A computer participating in the file sharing network. </t>
 				</list>
 			</t>
 		</section>
