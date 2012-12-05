@@ -52,7 +52,7 @@
 			<t>Messages sent using UDP MUST NOT exceed 512 octets length.</t>
 
 			<t>Messages are strings encoded as UTF-8. Messages contain several field which are seperated by a field separator. Each message is terminated by a message separator. ASCII control caracter 31 (Unit Separator, U+001F) is used as a field separator, ASCII control character 30 (Record Separator, U+001E) is used as a message separator. In this document, "|" is used to visualize a field separator and "\" is used to visualize a message separator.</t>
-			<t>Integers are represented in their decimal form, encoded as UTF-8 strings.</t>
+			<t>Integers are represented in their decimal form, encoded as UTF-8 strings. All Types and Fields are case sensitive.</t>
 			<t>All control messages are of the following format:</t>
 			<t><figure align="center">
 					<artwork>Type|Field1|Field2|[...]|Fieldn\</artwork>
@@ -96,7 +96,7 @@
 
 					<list>
 						<t>The Type field, set to "File".</t>
-						<t>A Hash field, containing a hexadecimal representation of the SHA-1 hash of the file.</t>
+						<t>A Hash field, containing a lowercase hexadecimal representation of the SHA-1 hash of the file.</t>
 						<t>A TTL field, indicating the expected remaining time that this file will be made available for transfer in seconds. A value of -1 SHALL be used to indicate an indefinite amount of time. A value of 0 may be used to indicate that a file is no longer available for transfer. The integer must be in the range of a 64-bit signed integer datatype.</t>
 						<t>A Length field, indicating the length of the file offered in octets</t>
 						<t>A Display Name field, containing a human-readable name for the file. All Unicode characters (expect those excluded above) may be used. A directory structure MAY be encoded in the value of this member. If this is the case, the '/' character (U+002F) MUST be used as a path separator.</t>
@@ -121,7 +121,7 @@
 				<t>A "Get File" message contains the following fields in the following order:
 					<list>
 						<t>The Type field, set to "Get File".</t>
-						<t>A Hash field, set to the SHA-1 hash in hexadecimal representation of the requested file. A client SHOULD request only files that have been announced as available for transfer from that host.</t>
+						<t>A Hash field, set to the SHA-1 hash in lowercase hexadecimal representation of the requested file. A client SHOULD request only files that have been announced as available for transfer from that host.</t>
 						<t>An Offset field, indicating the number of octets from the beginning of the file that the sending host should skip. This value MUST be in the range of a 64-bit unsigned integer datatype.</t>
 						<t>A Length field, indicating the number of octets of the file that the receiving host wishes to receive from the offset onward. This value MUST be in the range of a 64-bit unsigned integer datatype.</t>
 					</list>
