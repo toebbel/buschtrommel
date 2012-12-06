@@ -114,8 +114,9 @@
 		</section>
 
 		<section title="File Transfer">
-			<t>To request the transfer of a file, a client may open a connection to the peer offering the file using the peer's announced TCP port an send a "Get File" Message.</t>
 			<section title='"Get File" Messages'>
+				<t>To request the transfer of a file, a client may open a connection to the peer offering the file using the peer's announced TCP port an send a "Get File" Message.</t>
+
 				<t>"Get File" messages are used to request the transfer of a file from another peer.</t>
 
 				<t>A "Get File" message contains the following fields in the following order:
@@ -127,9 +128,10 @@
 					</list>
 				</t>
 			</section>
-			<t>The peer receiving the "Get File" message MUST reply with a File Transfer Response message. If appropriate according to the status communicated in the File Transfer Response Message, it MUST then send the requested data and close the connection. The Length and Offset fields of the "Get File" message MUST be respected.</t>
 
 			<section title="File Transfer Response Messages">
+				<t>The peer receiving the "Get File" message MUST reply with a File Transfer Response message. If appropriate according to the status communicated in the File Transfer Response Message, it MUST then send the requested data and close the connection. The Length and Offset fields of the "Get File" message MUST be respected.</t>
+				
 				<t>
 					File Transfer Response Messages are used to confirm or indicate an error concerning a request for transfer using a "Get File" message.
 
