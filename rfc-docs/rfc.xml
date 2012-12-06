@@ -45,7 +45,7 @@
 				Buschtrommel uses the following multicast addresses to address all participating peers:
 				<list style="symbols">
 					<t>239.255.0.113 for IPv4</t>
-					<t>ff02::7171 for IPv6</t>
+					<t>ff05::7171 for IPv6</t>
 				</list>
 			</t>
 			<t>All UDP packets sent SHALL have a Destination Port of TODO set. In order to participate in the network, a client must listen on this port.</t>
@@ -131,7 +131,7 @@
 
 			<section title="File Transfer Response Messages">
 				<t>The peer receiving the "Get File" message MUST reply with a File Transfer Response message. If appropriate according to the status communicated in the File Transfer Response Message, it MUST then send the requested data and close the connection. The Length and Offset fields of the "Get File" message MUST be respected.</t>
-				
+
 				<t>
 					File Transfer Response Messages are used to confirm or indicate an error concerning a request for transfer using a "Get File" message.
 
