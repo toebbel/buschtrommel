@@ -40,52 +40,73 @@
 			</t>
 		</section>
 
+
 		<section title="General Notes">
 			<t>
 				Buschtrommel uses the following multicast addresses to address all participating peers:
 				<list style="symbols">
 					<t>239.255.0.113 for IPv4</t>
-					<t>ff02::7171 for IPv6</t>
+					<t>ff05::7171 for IPv6</t>
 				</list>
 			</t>
-			<t>All UDP packets sent SHALL have a Destination Port of TODO set. In order to participate in the network, a client must listen on this port.</t>
+			<t>All UDP packets sent SHALL have a destination port of 4747 set. In order to participate in the network a client must listen on this port.</t>
 			<t>Messages sent using UDP MUST NOT exceed 512 octets length.</t>
 
-			<t>Messages are strings encoded as UTF-8. Messages contain several field which are seperated by a field separator. Each message is terminated by a message separator. ASCII control caracter 31 (Unit Separator, U+001F) is used as a field separator, ASCII control character 30 (Record Separator, U+001E) is used as a message separator. In this document, "|" is used to visualize a field separator and "\" is used to visualize a message separator.</t>
-			<t>Integers are represented in their decimal form, encoded as UTF-8 strings. All Types and Fields are case sensitive.</t>
+			<t>Messages are strings encoded as UTF-8. Messages contain several fields which are seperated by a field separator. In addition each message is terminated by a message separator.
+			<list style="symbols">
+				<t>field seperator: ASCII control character 31 (Unit Separator, U+001F)</t>
+				<t>message seperator: ASCII control character 30 (Record Separator, U+001E)</t>
+			</list>
+			In this document, "|" is used to visualize a field separator and "\" is used to visualize a message separator.</t>
+			<t>Integers are represented in their decimal form, encoded as UTF-8 strings.</t>
 			<t>All control messages are of the following format:</t>
 			<t><figure align="center">
 					<artwork>Type|Field1|Field2|[...]|Fieldn\</artwork>
 			</figure></t>
-			<t>The "Type" field identifies the message type while all remaining fields carry information as specified in the message type specification. Fields MUST NOT contain any of the field or message separator characters.</t>
+			<t>The "Type" field identifies the message type while all remaining fields carry information as of the message type specification. Fields MUST NOT contain any of the field or message separator characters.</t>
 		</section>
+
 
 		<section title="Peer Discovery">
-			<section title="Hi Messages">
-				<t>A peer MAY send a Hi message at any time to inform other peers of its presence and to request a reply from all peers in form of a Yo message. Usually, a Hi message is send immediately after joining the network.</t>
+			<section title="Hi Message">
+				<t>A peer MAY send a "Hi" message at any time to inform other peers of its presence and to request a reply from all peers in form of a "Yo" message. Usually, a "Hi" message is send immediately after joining the network.</t>
 
-				<t>A Hi message is sent using UDP and contains the following fields in the following order:</t>
+				<t>A "Hi" message is sent using UDP and contains the following fields in the the given order:</t>
 				<t>
-					<list>
-						<t>The Type field, set to "Hi".</t>
-						<t>A Port field containing an integer identifying a valid TCP port that the peer sending the message uses for Buschtrommel TCP communication. The peer MUST listen for incoming connections from other peers on this port.</t>
-						<t>A human-readable name that is to be displayed by a client as an alias for the peer sending the message. The field may be empty, but MUST NOT be omitted.</t>
+					<list style="symbols">
+						<t>The "Type" field, set to "Hi".</t>
+						<t>A "Port" field containing an integer identifying a valid TCP port that the peer sending the message uses for Buschtrommel TCP communication. The peer MUST listen for incoming connections from other peers on this port. Note that this number is also encoded as an UTF-8 string.</t>
+						<t>An "Alias" field as an human-readable name that is to be displayed by a client for the peer sending the message. The field may be empty, but MUST NOT be omitted.</t>
 					</list>
 				</t>
-				<t>A client SHOULD only send as many Hi messages as are required for its operation.</t>
+				<t>Fields of a "Hi" message:
+				<figure align="center">
+					<artwork>Type|Port|Alias\</artwork>
+			</figure></t>
+				<t>A client SHOULD only send as many "Hi" messages as are required for its operation.</t>
 			</section>
-			<section title="Yo Messages">
-				<t>Yo messages are sent as replies to HI messages. Every HI message SHOULD be replied to with a Yo message. Yo messages are sent either directly to the unicast address of the sender of the HI message that is being replied to or to the multicast address of all participating peers.</t>
-				<t>A Yo message is sent using UDP and has its Type field set to "Yo". All other fields are identical to those of a HI message.</t>
-
-				<t>Clients MAY use Yo messages they receive to update their internal state concerning the availability of other peers.</t>
+			
+			<section title="Yo Message">
+				<t>"Yo" messages are sent as replies to "Hi" messages. Every "Hi" message SHOULD be replied to with a "Yo" message. "Yo" messages are sent either directly to the unicast address of the sender of the "Hi" message that is being replied to or to the multicast address of all participating peers.</t>
+				<t>A "Yo" message is sent using UDP and has its "Type" field set to "Yo". All other fields are identical to those of a "Hi" message.</t>
+				<t>Fields of a "Yo" message:
+				<figure align="center">
+						<artwork>Type|Port|Alias\</artwork>
+				</figure></t>
+				<t>Clients MAY use "Yo" messages they receive to update their internal state concerning the availability of other peers.</t>
 			</section>
-			<section title="Bye Messages">
-				<t>Bye Messages are used to inform all network participants that a peer is going to leave the network.</t>
-				<t>Bye Messages are sent using UDP and contain only a type field, set to "Bye".</t>
-				<t>Clients SHOULD send a Bye Message to all participating peers before leaving the network. Clients receiving a Bye Message SHOULD assume that the sending peer as well as all files previously offered for transfer by this peer are no longer available.</t>
+			
+			<section title="Bye Message">
+				<t>"Bye" messages are used to inform all network participants that a peer is going to leave the network.</t>
+				<t>They are sent using UDP and contain only a "Type" field set to "Bye".</t>
+				<t>Fields of a "Bye" message:
+				<figure align="center">
+						<artwork>Type\</artwork>
+				</figure></t>
+				<t>Clients SHOULD send a "Bye" message to all participating peers before leaving the network. Clients receiving a "Bye" message SHOULD assume that the sending peer as well as all files previously offered for transfer by this peer are no longer available.  Note that "Bye" messages are unreliable and a client might leave the network without a "Bye" message reaching participating peers.</t>
 			</section>
 		</section>
+
 
 		<section title="File Discovery">
 			<section title="File Announcement Messages">
@@ -114,8 +135,9 @@
 		</section>
 
 		<section title="File Transfer">
-			<t>To request the transfer of a file, a client may open a connection to the peer offering the file using the peer's announced TCP port an send a "Get File" Message.</t>
 			<section title='"Get File" Messages'>
+				<t>To request the transfer of a file, a client may open a connection to the peer offering the file using the peer's announced TCP port an send a "Get File" Message.</t>
+
 				<t>"Get File" messages are used to request the transfer of a file from another peer.</t>
 
 				<t>A "Get File" message contains the following fields in the following order:
@@ -127,9 +149,10 @@
 					</list>
 				</t>
 			</section>
-			<t>The peer receiving the "Get File" message MUST reply with a File Transfer Response message. If appropriate according to the status communicated in the File Transfer Response Message, it MUST then send the requested data and close the connection. The Length and Offset fields of the "Get File" message MUST be respected.</t>
 
 			<section title="File Transfer Response Messages">
+				<t>The peer receiving the "Get File" message MUST reply with a File Transfer Response message. If appropriate according to the status communicated in the File Transfer Response Message, it MUST then send the requested data and close the connection. The Length and Offset fields of the "Get File" message MUST be respected.</t>
+
 				<t>
 					File Transfer Response Messages are used to confirm or indicate an error concerning a request for transfer using a "Get File" message.
 
