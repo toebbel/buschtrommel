@@ -130,7 +130,7 @@
 				<t>To request a complete announcement of all files offered for transfer by a peer, a client may open a connection to the other peer using the peers's announced TCP port and send a "Get Filelist" Message. The other peer MUST reply with exactly one File Announcement Message for each file offered for transfer. After all messages have been sent, the other peer MUST close the connection.</t>
 			</section>
 			<section title="Updating File Announcement Messages using UDP">
-				<t>A peer may at any time send a File Announcement Message encapsulated in a single UDP packet to the multicast address of all participating peers. Other peers MUST use these messages to update their internal state concerning the availability of files for transfer from other peers. This mechanism MUST be used to announce if a file will no longer be available for transfer, e.g. if it has been deleted or the peer is about to leave the network.</t>
+				<t>A peer may at any time send a File Announcement Message encapsulated in a single UDP packet to the multicast address of all participating peers. Other peers SHOULD use these messages to update their internal state concerning the availability of files for transfer from other peers. This mechanism SHOULD be used to announce if a file will no longer be available for transfer, e.g. if it has been deleted or the peer is about to leave the network.</t>
 			</section>
 		</section>
 
