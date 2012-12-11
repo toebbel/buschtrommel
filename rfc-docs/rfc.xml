@@ -58,12 +58,14 @@
 				<t>message seperator: ASCII control character 30 (Record Separator, U+001E)</t>
 			</list>
 			In this document, "|" is used to visualize a field separator and "\" is used to visualize a message separator.</t>
-			<t>Integers are represented in their decimal form, encoded as UTF-8 strings. SHA-1 hashes MUST be encoded without leading "0x", e. g. "440aa37400eeae2e7f4d54cece14e547a57b189b".</t>
+			<t>Integers are represented in their decimal form, encoded as UTF-8 strings. SHA-1 hashes MUST be encoded in uppercase and without leading "0x", e. g. "440AA37400EEAE2E7f4d54CECE14E547A57B189B".</t>
 			<t>All control messages are of the following format:</t>
 			<t><figure align="center">
 					<artwork>Type|Field1|Field2|[...]|Fieldn\</artwork>
 			</figure></t>
-			<t>The "Type" field identifies the message type while all remaining fields carry information as of the message type specification. Fields MUST NOT contain any of the field or message separator characters. </t>
+			<t>The "Type" field identifies the message type while all remaining fields carry information as of the message type specification. Fields MUST NOT contain any of the field or message separator characters. The "Type" field MUST be encoded
+			in uppercase.
+			</t>
 		</section>
 
 
@@ -74,7 +76,7 @@
 				<t>A "Hi" message is sent using UDP and contains the following fields in the the given order:</t>
 				<t>
 					<list style="symbols">
-						<t>The "Type" field, set to "Hi".</t>
+						<t>The "Type" field, set to "HI".</t>
 						<t>A "Port" field containing an integer identifying a valid TCP port that the peer sending the message uses for Buschtrommel TCP communication. The peer MUST listen for incoming connections from other peers on this port. Note that this number is also encoded as an UTF-8 string.</t>
 						<t>An "Alias" field as an human-readable name that is to be displayed by a client for the peer sending the message. The field may be empty, but MUST NOT be omitted.</t>
 					</list>
@@ -88,7 +90,7 @@
 			
 			<section title="Yo Message">
 				<t>"Yo" messages are sent as replies to "Hi" messages. Every "Hi" message SHOULD be replied to with a "Yo" message. "Yo" messages are sent either directly to the unicast address of the sender of the "Hi" message that is being replied to or to the multicast address of all participating peers.</t>
-				<t>A "Yo" message is sent using UDP and has its "Type" field set to "Yo". All other fields are identical to those of a "Hi" message.</t>
+				<t>A "Yo" message is sent using UDP and has its "Type" field set to "YO". All other fields are identical to those of a "Hi" message.</t>
 				<t>Fields of a "Yo" message:
 				<figure align="center">
 						<artwork>Type|Port|Alias\</artwork>
@@ -98,7 +100,7 @@
 			
 			<section title="Bye Message">
 				<t>"Bye" messages are used to inform all network participants that a peer is going to leave the network.</t>
-				<t>They are sent using UDP and contain only a "Type" field set to "Bye".</t>
+				<t>They are sent using UDP and contain only a "Type" field set to "BYE".</t>
 				<t>Fields of a "Bye" message:
 				<figure align="center">
 						<artwork>Type\</artwork>
@@ -116,8 +118,8 @@
 					A File Announcement Message is contains the following fields in the following order:
 
 					<list>
-						<t>The Type field, set to "File".</t>
-						<t>A Hash field, containing a lowercase hexadecimal representation of the SHA-1 hash of the file.</t>
+						<t>The Type field, set to "FILE".</t>
+						<t>A Hash field, containing a uppercase hexadecimal representation of the SHA-1 hash of the file.</t>
 						<t>A TTL field, indicating the expected remaining time that this file will be made available for transfer in seconds. A value of -1 SHALL be used to indicate an indefinite amount of time. A value of 0 may be used to indicate that a file is no longer available for transfer. The integer must be in the range of a 64-bit signed integer datatype.</t>
 						<t>A Length field, indicating the length of the file offered in octets</t>
 						<t>A Display Name field, containing a human-readable name for the file. All Unicode characters (expect those excluded above) may be used. A directory structure MAY be encoded in the value of this member. If this is the case, the '/' character (U+002F) MUST be used as a path separator.</t>
@@ -126,7 +128,7 @@
 				</t>
 			</section>
 			<section title="Accumulated File Announcement Messages using TCP">
-				<t>A "Get Filelist" Message is a message which has its Type field set to "Get Filelist". This message type has no other fields.</t>
+				<t>A "Get Filelist" Message is a message which has its Type field set to "GET FILELIST". This message type has no other fields.</t>
 				<t>To request a complete announcement of all files offered for transfer by a peer, a client may open a connection to the other peer using the peers's announced TCP port and send a "Get Filelist" Message. The other peer MUST reply with exactly one File Announcement Message for each file offered for transfer. After all messages have been sent, the other peer MUST close the connection.</t>
 			</section>
 			<section title="Updating File Announcement Messages using UDP">
@@ -142,8 +144,8 @@
 
 				<t>A "Get File" message contains the following fields in the following order:
 					<list>
-						<t>The Type field, set to "Get File".</t>
-						<t>A Hash field, set to the SHA-1 hash in lowercase hexadecimal representation of the requested file. A client SHOULD request only files that have been announced as available for transfer from that host.</t>
+						<t>The Type field, set to "GET FILE".</t>
+						<t>A Hash field, set to the SHA-1 hash in uppercase hexadecimal representation of the requested file. A client SHOULD request only files that have been announced as available for transfer from that host.</t>
 						<t>An Offset field, indicating the number of octets from the beginning of the file that the sending host should skip. This value MUST be in the range of a 64-bit unsigned integer datatype.</t>
 						<t>A Length field, indicating the number of octets of the file that the receiving host wishes to receive from the offset onward. This value MUST be in the range of a 64-bit unsigned integer datatype.</t>
 					</list>
@@ -159,7 +161,7 @@
 					A File Transfer Response Message contains the following fields in the following order:
 					<list>
 						<t>The Type field, set to "File Transfer Response".</t>
-						<t>A Status Code field, indicating if the file request can be served. Valid values are "OK" if the sending peer is ready to send the file, "Try Again Later" if the file cannot currently be served but the problem is expected to be resolved in the future or "Never Try Again" if the file cannot currently be served and the problem is not expected to be resolved in the future (e.g. if the file does not exist).</t>
+						<t>A Status Code field, indicating if the file request can be served. Valid values are "OK" if the sending peer is ready to send the file, "TRY AGAIN LATER" if the file cannot currently be served but the problem is expected to be resolved in the future or "NEVER TRY AGAIN" if the file cannot currently be served and the problem is not expected to be resolved in the future (e.g. if the file does not exist).</t>
 						<t>An Expected Transfer Volume field, indicating the number of octets of the file that the peer expects to send. This MAY be less than the amount requested in the "Get File" message.</t>
 					</list>
 				</t>
