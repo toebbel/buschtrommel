@@ -28,7 +28,7 @@
 
 		<section title="High Level Overview">
 			<t>
-				Buschtrommel is focused on scenarios where the set of shared files is changed frequently. Files are announced in a short-termed fashion. Clients will not be connected for more than a few hours. The fast announcement of new clients and files is one of the main focuses.
+				Buschtrommel is focused on scenarios where the set of shared files is changed frequently. Files are announced in a short-termed fashion. The fast announcement of new clients and files is one of the main focuses.
 			</t>
 			<t>The protocol features can be roughly split into four tasks:
 				<list style="symbols">
@@ -58,18 +58,18 @@
 				<t>message seperator: ASCII control character 30 (Record Separator, U+001E)</t>
 			</list>
 			In this document, "|" is used to visualize a field separator and "\" is used to visualize a message separator.</t>
-			<t>Integers are represented in their decimal form, encoded as UTF-8 strings.</t>
+			<t>Integers are represented in their decimal form, encoded as UTF-8 strings. SHA-1 hashes MUST be encoded without leading "0x", e. g. "440aa37400eeae2e7f4d54cece14e547a57b189b".</t>
 			<t>All control messages are of the following format:</t>
 			<t><figure align="center">
 					<artwork>Type|Field1|Field2|[...]|Fieldn\</artwork>
 			</figure></t>
-			<t>The "Type" field identifies the message type while all remaining fields carry information as of the message type specification. Fields MUST NOT contain any of the field or message separator characters.</t>
+			<t>The "Type" field identifies the message type while all remaining fields carry information as of the message type specification. Fields MUST NOT contain any of the field or message separator characters. </t>
 		</section>
 
 
 		<section title="Peer Discovery">
 			<section title="Hi Message">
-				<t>A peer MAY send a "Hi" message at any time to inform other peers of its presence and to request a reply from all peers in form of a "Yo" message. Usually, a "Hi" message is send immediately after joining the network.</t>
+				<t>A peer MAY send a "Hi" message at any time to inform other peers of its presence and to request a reply from all peers in form of a "Yo" message. A "Hi" message SHOULD be sent to the multicast address of all participating peers immediately after joining the network.</t>
 
 				<t>A "Hi" message is sent using UDP and contains the following fields in the the given order:</t>
 				<t>
@@ -103,7 +103,7 @@
 				<figure align="center">
 						<artwork>Type\</artwork>
 				</figure></t>
-				<t>Clients SHOULD send a "Bye" message to all participating peers before leaving the network. Clients receiving a "Bye" message SHOULD assume that the sending peer as well as all files previously offered for transfer by this peer are no longer available.  Note that "Bye" messages are unreliable and a client might leave the network without a "Bye" message reaching participating peers.</t>
+				<t>Clients SHOULD send a "Bye" message to all participating peers before leaving the network. Clients receiving a "Bye" message SHOULD assume that the sending peer as well as all files previously offered for transfer by this peer are no longer available.  Note that "Bye" messages are unreliable and a client might leave the network without a "Bye" message reaching participating peers. The "Bye" message SHOULD be sent to the multicast address of all participating peers.</t>
 			</section>
 		</section>
 
