@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import de.tr0llhoehle.buschtrommel.models.File;
 import de.tr0llhoehle.buschtrommel.models.Host;
 import de.tr0llhoehle.buschtrommel.network.FileTransferAdapter;
+import de.tr0llhoehle.buschtrommel.network.ITransferProgress;
 import de.tr0llhoehle.buschtrommel.network.UDPAdapter;
 
 public class Buschtrommel {

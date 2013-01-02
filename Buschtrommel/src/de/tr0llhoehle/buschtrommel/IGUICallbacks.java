@@ -2,6 +2,7 @@ package de.tr0llhoehle.buschtrommel;
 
 import de.tr0llhoehle.buschtrommel.models.File;
 import de.tr0llhoehle.buschtrommel.models.Host;
+import de.tr0llhoehle.buschtrommel.network.ITransferProgress;
 
 public interface IGUICallbacks {
 	public void NewHostDiscovered(Host host);
