@@ -33,11 +33,11 @@ public class ShareCacheTest {
 
 		assertTrue(troll.has(share.getHash()));
 
-		troll.saveToFile("shares.xml");
+		troll.saveToFile("shares.ht");
 
 		ShareCache troll2 = new ShareCache();
 
-		troll2.restoreFromFile("shares.xml");
+		troll2.restoreFromFile("shares.ht");
 
 		assertTrue(troll2.has(share.getHash()));
 
