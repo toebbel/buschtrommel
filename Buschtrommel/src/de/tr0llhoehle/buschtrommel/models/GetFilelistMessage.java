@@ -2,10 +2,13 @@ package de.tr0llhoehle.buschtrommel.models;
 
 public class GetFilelistMessage extends Message {
 
+	public GetFilelistMessage() {
+		type = "GET FILELIST";
+	}
+
 	@Override
 	public String Serialize() {
-		// TODO Auto-generated method stub
-		return null;
+		return type + MESSAGE_SPERATOR;
 	}
 
 }
