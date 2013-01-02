@@ -14,23 +14,26 @@ public class MessageDeserializer {
 	 * @return instance or null if no message could be found
 	 */
 	public static Message Deserialize(String raw) {
+		LoggerWrapper.logInfo("deserialize '" + raw + "'");
 		int typeSeperator = -1;
 		typeSeperator = raw.indexOf(Message.FIELD_SEPERATOR);
 		if(typeSeperator == -1) //some messages don't contain any field seperator, because they have only a type field
 			typeSeperator = raw.indexOf(Message.MESSAGE_SPERATOR);
-		if(typeSeperator == -1)
+		if(typeSeperator == -1) {
 			LoggerWrapper.logError("Can't deserialize raw message '" + raw + "'");
+			return null;
+		}
 		
 		String typeField = raw.substring(0, typeSeperator);
 		switch(typeField.toUpperCase()) {
 			case "HI":
-				return DeserializePeerDiscoveryMessage(PeerDiscoveryMessage.DiscoveryMessageType.HI, raw.substring(typeSeperator));
+				return DeserializePeerDiscoveryMessage(PeerDiscoveryMessage.DiscoveryMessageType.HI, raw.substring(typeSeperator + 1));
 			case "BYE":
 				return new ByeMessage();
 			case "YO":
-				return DeserializePeerDiscoveryMessage(PeerDiscoveryMessage.DiscoveryMessageType.YO, raw.substring(typeSeperator));
+				return DeserializePeerDiscoveryMessage(PeerDiscoveryMessage.DiscoveryMessageType.YO, raw.substring(typeSeperator + 1));
 			case "FILE":
-				return DeserializeFileMessage(raw.substring(typeSeperator));
+				return DeserializeFileMessage(raw.substring(typeSeperator + 1));
 			default:
 				LoggerWrapper.logError("I don't unterstand the following message: '" + raw + "' :(");
 				return null;
@@ -49,7 +52,14 @@ public class MessageDeserializer {
 		try {
 			int ttl = Integer.valueOf(fields[1]);
 			long length = Long.valueOf(fields[2]);
-			result = new FileAnnouncementMessage(new File(fields[0], length, ttl, fields[3], fields[4]));
+
+			String meta = fields[4].length() > 1 ? fields[4].substring(0, fields[4].length() - 1) : ""; //if meta contains only message seperator -> "". Otherwise: cut off sperator
+			String hash = fields[0].toUpperCase();
+			if(hash.startsWith("0X")) {
+				hash = hash.substring(2);
+			}
+			
+			result = new FileAnnouncementMessage(new File(hash, length, ttl, fields[3], meta));
 		} catch(IllegalArgumentException e) { //NumberFormatException is subtype
 			LoggerWrapper.logError("Could not pars the FileAnnouncementMessage body: '" + msgContent + "'. Excpetion: " + e.getMessage());
 		}
@@ -68,7 +78,17 @@ public class MessageDeserializer {
 		
 		try{
 			int port = Integer.valueOf(fields[0]);
-			result = new PeerDiscoveryMessage(t, fields[1], port);
+			
+			String alias = fields[1].length() > 1 ? fields[1] : ""; //cut off message seperator
+			
+			
+			if(alias.length() > 1){ //alias is contains more than message seperator
+				alias = alias.substring(0, alias.length() - 1);
+			} else {
+				alias = "";
+			}
+			
+			result = new PeerDiscoveryMessage(t, alias, port);
 		} catch(IllegalArgumentException e) { //NumberFormatException is subtype
 			LoggerWrapper.logError("Could not pars the Hi/Yo message body: '" + msgContent + "'. Excpetion: " + e.getMessage());
 		}
