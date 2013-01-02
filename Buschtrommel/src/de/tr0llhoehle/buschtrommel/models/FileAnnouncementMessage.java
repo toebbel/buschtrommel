@@ -17,5 +17,9 @@ public class FileAnnouncementMessage extends Message {
 				+ announcedFile.getDisplayName() + FIELD_SEPERATOR
 				+ announcedFile.getMeta() + MESSAGE_SPERATOR;
 	}
+	
+	public File getFile() {
+		return this.announcedFile;
+	}
 
 }

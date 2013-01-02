@@ -1,5 +1,7 @@
 package de.tr0llhoehle.buschtrommel.models;
 
+import java.util.Vector;
+
 
 public class File {
 
@@ -10,6 +12,7 @@ public class File {
 	private int ttl;
 	private String displayName;
 	private String meta;
+	private Vector<Host> sources;
 
 	/**
 	 * Creates an instance of file that is either local or on a remote client
@@ -75,5 +78,13 @@ public class File {
 
 	public String getMeta() {
 		return meta;
+	}
+	
+	public Vector<Host> getSources() {
+		return this.sources;
+	}
+	
+	public void addHost(Host host) {
+		this.sources.add(host);
 	}
 }

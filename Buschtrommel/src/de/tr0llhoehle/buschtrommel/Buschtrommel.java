@@ -1,5 +1,6 @@
 package de.tr0llhoehle.buschtrommel;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Hashtable;
 
@@ -7,6 +8,7 @@ import de.tr0llhoehle.buschtrommel.models.File;
 import de.tr0llhoehle.buschtrommel.models.Host;
 import de.tr0llhoehle.buschtrommel.network.FileTransferAdapter;
 import de.tr0llhoehle.buschtrommel.network.ITransferProgress;
+import de.tr0llhoehle.buschtrommel.network.NetCache;
 import de.tr0llhoehle.buschtrommel.network.UDPAdapter;
 
 public class Buschtrommel {
@@ -14,19 +16,27 @@ public class Buschtrommel {
 	private IGUICallbacks gui;
 	private FileTransferAdapter fileTransferAdapter;
 	private UDPAdapter udpAdapter;
+	private NetCache netCache;
 
 	public Buschtrommel(IGUICallbacks gui) {
 		if (!HashFuncWrapper.check()) {
 			//cancel bootstrap: Hashfunction is not available!
+			this.gui = gui;
+			this.netCache = new NetCache();
 		}
 	}
 	
 	public void start() {
-		
+		//TODO: create new FileTransferAdapter
+		this.udpAdapter = new UDPAdapter();
+		this.udpAdapter.registerObserver(netCache);
 	}
 	
-	public void stop() {
-		
+	public void stop() throws IOException {
+		//TODO: destroy fileTransferAdapter
+		this.udpAdapter.closeConnection();
+		this.udpAdapter.removeObserver(netCache);
+		this.udpAdapter = null;
 	}
 	
 	public ITransferProgress DownloadFile(String hash, Host host) {
