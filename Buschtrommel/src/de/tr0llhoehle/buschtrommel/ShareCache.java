@@ -1,15 +1,13 @@
 package de.tr0llhoehle.buschtrommel;
 
-import java.beans.XMLDecoder;
-import java.beans.XMLEncoder;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Iterator;
-
 import de.tr0llhoehle.buschtrommel.models.FileAnnouncementMessage;
 import de.tr0llhoehle.buschtrommel.models.Share;
 
@@ -85,44 +83,88 @@ public class ShareCache {
 			LoggerWrapper.logError("A Share with the given Hash: " + share.getHash()
 					+ "has already be defined. It is now replaced with the new Share");
 			this.shares.remove(share.getHash());
-			
+
 		}
-//		LoggerWrapper.logInfo("set hash: " + share.getHash());
+		// LoggerWrapper.logInfo("set hash: " + share.getHash());
 		this.shares.put(share.getHash(), share);
-//		LoggerWrapper.logInfo("file has been added");
+		// LoggerWrapper.logInfo("file has been added");
 
 	}
+	protected void convertToShares(String shares){
+		Hashtable<String, Share> temp_shares = new Hashtable<>();
+		//TODO
+		
+		
+	
+	}
+	
+	
+	protected String convertSharesToString(){
+		StringBuilder allShares = new StringBuilder("");
+		Enumeration<Share> e = shares.elements();
+		while (e.hasMoreElements()) {
+			allShares.append(new FileAnnouncementMessage(e.nextElement()).Serialize() + e.nextElement().getPath()+ "\n");
+		}
 
+		return allShares.toString();
+	}
+
+	/**
+	 * saves the actual shares to disk
+	 * 
+	 * @param path
+	 *            a path to an binary ht-file
+	 */
 	public void saveToFile(String path) {
-		if (path == null || !path.endsWith(".xml")) {
-			LoggerWrapper.logError("the given path: " + path + " is not valid (must end with .xml)");
+		if (path == null || !path.endsWith(".ht")) {
+			LoggerWrapper.logError("the given path: " + path + " is not valid (must end with .ht)");
 			return;
 		}
 		FileOutputStream fos;
 		try {
 			fos = new FileOutputStream(path);
-			XMLEncoder e = new XMLEncoder(fos);
-			e.writeObject(shares);
-			e.close();
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+			oos.writeObject(convertSharesToString());
+			oos.close();
 		} catch (FileNotFoundException e1) {
+			LoggerWrapper.logError("the given path: " + path + " is not valid");
+
+		} catch (IOException e) {
 			LoggerWrapper.logError("the given path: " + path + " is not valid");
 
 		}
 
 	}
 
+	/**
+	 * reads shares from a file
+	 * 
+	 * @param path
+	 *            path to a ht-file
+	 */
 	@SuppressWarnings("unchecked")
 	public void restoreFromFile(String path) {
+		if (path == null || !path.endsWith(".ht")) {
+			LoggerWrapper.logError("the given path: " + path + " is not valid (must end with .ht)");
+			return;
+		}
 		FileInputStream fis;
 		try {
 			fis = new FileInputStream(path);
-			XMLDecoder r = new XMLDecoder(fis);
+			ObjectInputStream ois = new ObjectInputStream(fis);
+			
+//			XMLDecoder r = new XMLDecoder(fis);
 			Hashtable<String, Share> temp_shares;
-			temp_shares = ((Hashtable<String, Share>) r.readObject());
-			r.close();
+			temp_shares = ((Hashtable<String, Share>) ois.readObject());
+			ois.close();
 			shares = temp_shares;
 		} catch (FileNotFoundException e) {
 			LoggerWrapper.logError("File not found: " + path);
+		} catch (ClassNotFoundException e) {
+			LoggerWrapper.logError("Class not found Exception - should never happen");
+		} catch (IOException e) {
+			LoggerWrapper.logError("Could not read file: " + path);
 		}
 
 	}
