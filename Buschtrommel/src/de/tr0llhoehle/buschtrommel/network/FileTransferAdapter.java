@@ -3,14 +3,13 @@ package de.tr0llhoehle.buschtrommel.network;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Hashtable;
 
 import de.tr0llhoehle.buschtrommel.LoggerWrapper;
 import de.tr0llhoehle.buschtrommel.ShareCache;
-import de.tr0llhoehle.buschtrommel.models.File;
-import de.tr0llhoehle.buschtrommel.models.FileRequestResponseMessage;
-import de.tr0llhoehle.buschtrommel.models.FileRequestResponseMessage.ResponseCode;
 import de.tr0llhoehle.buschtrommel.models.GetFileMessage;
 import de.tr0llhoehle.buschtrommel.models.GetFilelistMessage;
 import de.tr0llhoehle.buschtrommel.models.Message;
@@ -21,6 +20,8 @@ public class FileTransferAdapter extends MessageMonitor {
 	private ServerSocket listeningSocket;
 	private Thread receiveThread;
 	private boolean keepAlive;
+	private Hashtable<java.net.InetAddress, ITransferProgress> outgoingTransfers;
+	private Hashtable<String, ITransferProgress> incomingTransfers;
 
 	/**
 	 * Creates an instance of FileTransferAdapter and opens a listening TCP Port
@@ -36,6 +37,8 @@ public class FileTransferAdapter extends MessageMonitor {
 	public FileTransferAdapter(ShareCache s, int port) throws IOException {
 		this.port = port;
 		myShares = s;
+		incomingTransfers = new Hashtable<>();
+		outgoingTransfers = new Hashtable<>();
 		startListening();
 	}
 
@@ -82,32 +85,42 @@ public class FileTransferAdapter extends MessageMonitor {
 					sendMessageToObservers(m);
 				m.setSource(s.getInetAddress());
 				final OutputStream out = s.getOutputStream();
+				ITransferProgress p = null;
 				if (m instanceof GetFileMessage) {
-					new OutgoingFileTransfer((GetFileMessage) m, out, myShares).start();
+					OutgoingFileTransfer transfer = new OutgoingFileTransfer((GetFileMessage) m, out, myShares);
+					transfer.start();
+					p = transfer;
 				} else if (m instanceof GetFilelistMessage) {
-					new Thread(new Runnable() {
-
-						@Override
-						public void run() {
-							try {
-								handleGetFileList((GetFilelistMessage) m, out);
-							} catch (IOException e) {
-								LoggerWrapper.logError("could not handle GET FILELIST:" + e.getMessage());
-							}
-						}
-					}).start();
+					OutgoingFilelistTransfer transfer = new OutgoingFilelistTransfer(out, myShares);
+					transfer.start();
+					p = transfer;
 				}
+				
+				if(p != null)
+					outgoingTransfers.put(m.getSource(), p);
+				
 			} catch (IOException e) {
 				LoggerWrapper.logError(e.getMessage());
 			}
 		}
 	}
 
+	/**
+	 * Returns all outgoing Transfers that have been made.
+	 * This is a clone of the internal data structure.
+	 * @return all outgoing transfers
+	 */
+	public Hashtable<java.net.InetAddress, ITransferProgress> getOutgoingTransfers() {
+		return (Hashtable<InetAddress, ITransferProgress>) outgoingTransfers.clone();
+	}
 	
-
-	private void handleGetFileList(GetFilelistMessage m, OutputStream out) throws IOException {
-		out.write(myShares.getAllShares().getBytes());
-		out.close();
+	/**
+	 * Returns all incoming Transfers that have been made.
+	 * This is a copy of the internal data structure
+	 * @return all incoming transfers
+	 */
+	public Hashtable<String, ITransferProgress> getIncomingTransfers() {
+		return (Hashtable<String, ITransferProgress>) incomingTransfers.clone();
 	}
 
 	/**
@@ -119,7 +132,15 @@ public class FileTransferAdapter extends MessageMonitor {
 		return port;
 	}
 
+	/**
+	 * Stops the listening thread and all running transfers.
+	 */
 	public void close() {
-
+		keepAlive = false;
+		receiveThread.interrupt();
+		for(InetAddress k : outgoingTransfers.keySet())
+			outgoingTransfers.get(k).cancel();
+		for(String k : incomingTransfers.keySet())
+			incomingTransfers.get(k).cancel();
 	}
 }
