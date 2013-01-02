@@ -3,6 +3,8 @@
  */
 package de.tr0llhoehle.buschtrommel.models;
 
+import java.net.InetAddress;
+
 /**
  * @author tobi
  * 
@@ -12,8 +14,21 @@ public abstract class Message {
 	public static char MESSAGE_SPERATOR = 30;
 
 	protected String type;
+	protected InetAddress source;
 
 	public abstract String Serialize();
+	
+	/**
+	 * Indicates the sender of the message, or null if the message was created on this system
+	 * @return sender or null
+	 */
+	public InetAddress getSource() {
+		return source;
+	}
+	
+	public void setSource(InetAddress s) {
+		source = s;
+	}
 	
 	@Override
 	public String toString() {
