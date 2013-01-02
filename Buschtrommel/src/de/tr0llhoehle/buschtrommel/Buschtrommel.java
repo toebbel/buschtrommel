@@ -15,8 +15,9 @@ public class Buschtrommel {
 	private UDPAdapter udpAdapter;
 
 	public Buschtrommel(IGUICallbacks gui) {
-		if(!HashFuncWrapper.check())
+		if (!HashFuncWrapper.check()) {
 			//cancel bootstrap: Hashfunction is not available!
+		}
 	}
 	
 	public void start() {

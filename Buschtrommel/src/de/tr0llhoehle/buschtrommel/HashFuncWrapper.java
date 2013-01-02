@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Formatter;
@@ -39,18 +40,19 @@ public class HashFuncWrapper {
 			MessageDigest md = MessageDigest.getInstance(HASH_FUNCTION);
 			return byteArray2Hex(md.digest(d));
 		} catch (NoSuchAlgorithmException ex) {
-			LoggerWrapper.logError("SHA1 is not available on this machine!");
+			LoggerWrapper.logError(HASH_FUNCTION + "is not available on this machine!");
+			throw new IllegalStateException(HASH_FUNCTION + "is not available on this machine!");
 		}
-		return "";
+		
 	}
 
 	/**
-	 * Generates the hash string of the content of a file
+	 * Generates the hash of the content of a file. 
 	 * @param path path to the file
 	 * @return the hash as uppercase string
-	 * @throws FileNotFoundException if file was not found ^.^
+	 * @throws IOException 
 	 */
-	public static String hash(String path) throws FileNotFoundException {
+	public static String hash(String path) throws IOException {
 		MessageDigest md;
 		try {
 			md = MessageDigest.getInstance(HASH_FUNCTION);
@@ -63,10 +65,12 @@ public class HashFuncWrapper {
 				md.update(dataBytes, 0, nread);
 			};
 
-			return byteArray2Hex(md.digest(d));
+			return byteArray2Hex(md.digest());
 		} catch (NoSuchAlgorithmException e) {
-			LoggerWrapper.logError("SHA1 is not available on this machine!");
+			LoggerWrapper.logError(HASH_FUNCTION + "is not available on this machine!");
+			throw new IllegalStateException(HASH_FUNCTION + "is not available on this machine!");
 		}
+		
 	}
 
 	private static String byteArray2Hex(final byte[] hash) {
