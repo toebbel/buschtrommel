@@ -43,6 +43,6 @@ class MessageThread extends Thread {
 	}
 	
 	public void run() {
-		this.observer.incomingMessage(message);
+		this.observer.receiveMessage(message);
 	}
 }

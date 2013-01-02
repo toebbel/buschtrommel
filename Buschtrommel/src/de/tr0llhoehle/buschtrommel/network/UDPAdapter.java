@@ -10,6 +10,7 @@ import java.net.MulticastSocket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+import de.tr0llhoehle.buschtrommel.LoggerWrapper;
 import de.tr0llhoehle.buschtrommel.models.Host;
 import de.tr0llhoehle.buschtrommel.models.Message;
 
@@ -52,12 +53,16 @@ public class UDPAdapter extends MessageMonitor implements Runnable {
 	public void run() {
 		byte[] buffer;
 		DatagramPacket receivePacket;
+		Message message;
 		while (this.running) {
 			buffer = new byte[512];
 			receivePacket = new DatagramPacket(buffer, buffer.length);
 			try {
 				multicastSocket.receive(receivePacket);
-				this.sendMessageToObservers(MessageDeserializer.Deserialize(new String(receivePacket.getData())));
+				message = MessageDeserializer.Deserialize(new String(receivePacket.getData()));
+				if (message != null) {
+					this.sendMessageToObservers(message);
+				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -88,8 +93,10 @@ public class UDPAdapter extends MessageMonitor implements Runnable {
 	/**
 	 * Sends the specified message to the specified host via unicast.
 	 * 
-	 * @param message the specified message
-	 * @param host the specified host
+	 * @param message
+	 *            the specified message
+	 * @param host
+	 *            the specified host
 	 */
 	public void send(Message message, Host host) {
 		String data = message.Serialize();
