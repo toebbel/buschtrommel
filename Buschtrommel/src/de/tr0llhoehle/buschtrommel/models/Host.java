@@ -11,15 +11,17 @@ public class Host {
 	private java.net.InetAddress address;
 	private String displayName;
 	private Hashtable<String, File> shares;
+	private int port;
 	
 	/**
 	 * Creates an instance of Host with an emtpy share
 	 * @param address address of the host (IPv4 / IPv6)
 	 * @param displayName human readable Displayname. Can be empty (IP address will be used). Message and Field seperator will be replaced with spaces.
 	 */
-	public Host(java.net.InetAddress address, String displayName) {
+	public Host(java.net.InetAddress address, String displayName, int port) {
 		firstSeen = new Date();
 		lastSeen = firstSeen;
+		this.port = port;
 		this.address = address;
 		this.displayName = displayName.replace(Message.FIELD_SEPERATOR, ' ').replace(Message.MESSAGE_SPERATOR, ' ');
 		if(this.displayName.trim().equals(""))
@@ -88,5 +90,9 @@ public class Host {
 		if(!(obj instanceof Host))
 			return false;
 		return ((Host) obj).getAddress().equals(address);
+	}
+
+	public int getPort() {
+		return port;
 	}
 }
