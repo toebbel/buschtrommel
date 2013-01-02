@@ -1,5 +1,6 @@
 package de.tr0llhoehle.buschtrommel.models;
 
+
 public class File {
 
 	public static int TTL_INFINITY = -1;
@@ -11,7 +12,7 @@ public class File {
 	private String meta;
 
 	/**
-	 * Creates an instance of file that is eigher local or on a remote client
+	 * Creates an instance of file that is either local or on a remote client
 	 * 
 	 * @param hash
 	 *            the hash of the file as uppercase String, without leading 0x
@@ -20,12 +21,18 @@ public class File {
 	 * @param ttl
 	 *            TimeToLive in seconds.
 	 * @param displayName
-	 *            human readable string that represents the filename
+	 *            human readable UTF8-string that represents the filename. MUST NOT contain any character with ascii code < 32 (space). Any of these characters will be replaced with spaces
 	 * @param meta
-	 *            any information about the file (description or path)
+	 *            any information about the file (description or path) as UTF8-String. MUST NOT contain any character with ascii code < 32 (space). Any of these characters will be replaced with spaces
 	 */
 	public File(String hash, long length, int ttl, String displayName,
 			String meta) {
+		
+		displayName.replace(Message.FIELD_SEPERATOR, ' ');
+		meta.replace(Message.FIELD_SEPERATOR, ' ');
+		displayName.replace(Message.MESSAGE_SPERATOR, ' ');
+		meta.replace(Message.MESSAGE_SPERATOR, ' ');
+		
 		this.hash = hash;
 		this.length = length;
 		this.ttl = ttl;
