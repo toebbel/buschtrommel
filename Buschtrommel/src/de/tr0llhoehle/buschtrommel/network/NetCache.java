@@ -21,7 +21,7 @@ public class NetCache implements IMessageObserver {
 			String hash = ((FileAnnouncementMessage) message).getFile().getHash();
 			File file = ((FileAnnouncementMessage) message).getFile();
 			int ttl = ((FileAnnouncementMessage) message).getFile().getTTL();
-			Host host = new Host(message.getSource(), message.getSource().toString());
+			Host host = new Host(message.getSource(), message.getSource().toString(), -1);
 			if(this.knownShares.containsKey(hash)) {
 				if(this.knownShares.get(hash).getSources().contains(host)) {
 					this.knownShares.get(hash).setTTL(ttl);
