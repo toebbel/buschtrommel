@@ -8,6 +8,7 @@ public interface ITransferProgress {
 	public long getTotalLength();
 	public long getOffset();
 	public long getExpectedTransferVolume();
+	public long getTransferedAmount();
 	public String getExpectedHash();
 	public void cancel();
 	public List<ITransferProgress> getSubTransfers();
