@@ -7,11 +7,13 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Hashtable;
+import java.util.List;
 
 import de.tr0llhoehle.buschtrommel.LoggerWrapper;
 import de.tr0llhoehle.buschtrommel.ShareCache;
 import de.tr0llhoehle.buschtrommel.models.GetFileMessage;
 import de.tr0llhoehle.buschtrommel.models.GetFilelistMessage;
+import de.tr0llhoehle.buschtrommel.models.Host;
 import de.tr0llhoehle.buschtrommel.models.Message;
 
 public class FileTransferAdapter extends MessageMonitor {
@@ -103,6 +105,22 @@ public class FileTransferAdapter extends MessageMonitor {
 				LoggerWrapper.logError(e.getMessage());
 			}
 		}
+	}
+	
+	public ITransferProgress DownloadFile(String hash, Host host, long length) {
+		return new IncomingDownload(hash, host, 0, length);
+	}
+	
+	/**
+	 * Starts a multisource download
+	 * @param hash hash of requested file
+	 * @param hosts hosts that are offering the file
+	 * @param length expected length of download
+	 * @return one ITransferProgress that may contain multiple children.
+	 */
+	public ITransferProgress DownloadFile(String hash, List<Host> hosts, long length) {
+		assert hosts.size() > 0;
+		return DownloadFile(hash, hosts.get(0), length); //TODO implement multisource
 	}
 
 	/**

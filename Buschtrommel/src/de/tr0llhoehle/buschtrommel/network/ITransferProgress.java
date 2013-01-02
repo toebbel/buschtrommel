@@ -26,7 +26,8 @@ public interface ITransferProgress {
 		otherSideCanceled,
 		canceled,
 		error,
-		finished
+		finished, 
+		invalidChecksum
 	}
 }
 
