@@ -26,8 +26,7 @@ public class GetFileMessage extends Message {
 
 	@Override
 	public String Serialize() {
-		return type + FIELD_SEPERATOR + hash + FIELD_SEPERATOR + offset
-				+ offset + length + FIELD_SEPERATOR + MESSAGE_SPERATOR;
+		return type + FIELD_SEPERATOR + hash + FIELD_SEPERATOR + offset + FIELD_SEPERATOR + length  + MESSAGE_SPERATOR;
 	}
 
 }
