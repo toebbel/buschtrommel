@@ -34,10 +34,35 @@ public class MessageDeserializer {
 				return DeserializePeerDiscoveryMessage(PeerDiscoveryMessage.DiscoveryMessageType.YO, raw.substring(typeSeperator + 1));
 			case "FILE":
 				return DeserializeFileMessage(raw.substring(typeSeperator + 1));
+			case "GET FILE":
+				return DeserializeGetFileMessage(raw.substring(typeSeperator + 1));
+			case "GET FILELIST":
+				return new GetFilelistMessage();
 			default:
 				LoggerWrapper.logError("I don't unterstand the following message: '" + raw + "' :(");
 				return null;
 		}
+	}
+
+	private static Message DeserializeGetFileMessage(String msgContent) {
+		String[] fields = msgContent.split(String.valueOf(Message.FIELD_SEPERATOR));
+		Message result = null;
+		
+		if(fields.length != 3) {
+			LoggerWrapper.logError("Invlaid number of fields in GetFileMessage body: '" + msgContent + "'");
+			return result;
+		}
+		try {
+			return new GetFileMessage(fixBrokenHash(fields[0]), Long.valueOf(fields[1]), Long.valueOf(fields[2].substring(0, fields[2].length() - 1)));
+		} catch(IllegalArgumentException e) { //NumberFormatException is subtype
+			LoggerWrapper.logError("Could not parse the GetFileMessage body: '" + msgContent + "'. Excpetion: " + e.getMessage());
+		}
+		
+		return result;
+	}
+	
+	private static String fixBrokenHash(String in) {
+		return in.toLowerCase().startsWith("0x") ? in.substring(2).toUpperCase() : in.toUpperCase();
 	}
 
 	private static Message DeserializeFileMessage(String msgContent) {
@@ -54,14 +79,12 @@ public class MessageDeserializer {
 			long length = Long.valueOf(fields[2]);
 
 			String meta = fields[4].length() > 1 ? fields[4].substring(0, fields[4].length() - 1) : ""; //if meta contains only message seperator -> "". Otherwise: cut off sperator
-			String hash = fields[0].toUpperCase();
-			if(hash.startsWith("0X")) {
-				hash = hash.substring(2);
-			}
+			String hash = fixBrokenHash(fields[0]);
+			
 			
 			result = new FileAnnouncementMessage(new File(hash, length, ttl, fields[3], meta));
 		} catch(IllegalArgumentException e) { //NumberFormatException is subtype
-			LoggerWrapper.logError("Could not pars the FileAnnouncementMessage body: '" + msgContent + "'. Excpetion: " + e.getMessage());
+			LoggerWrapper.logError("Could not parse the FileAnnouncementMessage body: '" + msgContent + "'. Excpetion: " + e.getMessage());
 		}
 		
 		return result;
@@ -90,7 +113,7 @@ public class MessageDeserializer {
 			
 			result = new PeerDiscoveryMessage(t, alias, port);
 		} catch(IllegalArgumentException e) { //NumberFormatException is subtype
-			LoggerWrapper.logError("Could not pars the Hi/Yo message body: '" + msgContent + "'. Excpetion: " + e.getMessage());
+			LoggerWrapper.logError("Could not parse the Hi/Yo message body: '" + msgContent + "'. Excpetion: " + e.getMessage());
 		}
 		
 		return result;

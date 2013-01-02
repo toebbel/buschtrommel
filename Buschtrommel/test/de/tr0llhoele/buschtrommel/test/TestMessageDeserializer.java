@@ -6,6 +6,8 @@ import org.junit.Test;
 import de.tr0llhoehle.buschtrommel.models.ByeMessage;
 import de.tr0llhoehle.buschtrommel.models.File;
 import de.tr0llhoehle.buschtrommel.models.FileAnnouncementMessage;
+import de.tr0llhoehle.buschtrommel.models.GetFileMessage;
+import de.tr0llhoehle.buschtrommel.models.GetFilelistMessage;
 import de.tr0llhoehle.buschtrommel.models.Message;
 import de.tr0llhoehle.buschtrommel.models.PeerDiscoveryMessage;
 import de.tr0llhoehle.buschtrommel.models.PeerDiscoveryMessage.DiscoveryMessageType;
@@ -16,6 +18,23 @@ public class TestMessageDeserializer {
 	@Test
 	public void testDeserializeByeMessage() {
 		assertEquals(new ByeMessage(), MessageDeserializer.Deserialize(new ByeMessage().Serialize()));
+	}
+	
+	@Test
+	public void testDeserializeGetFileListMessage() {
+		assertEquals(new GetFilelistMessage(), MessageDeserializer.Deserialize(new GetFilelistMessage().Serialize()));
+	}
+	
+	@Test
+	public void testDeserializeGetFileMessage() {
+		assertEquals(new GetFileMessage("ABC", 0, 100), MessageDeserializer.Deserialize(new GetFileMessage("ABC", 0, 100).Serialize()));
+		assertEquals(new GetFileMessage("ABC", 12, 101), MessageDeserializer.Deserialize(new GetFileMessage("ABC", 12, 101).Serialize()));
+	}
+	
+	@Test
+	public void testDeserializeGetFileMessage_brokenHash() {
+		assertEquals(new GetFileMessage("0AC", 0, 100), MessageDeserializer.Deserialize(new GetFileMessage("0aC", 0, 100).Serialize()));
+		assertEquals(new GetFileMessage("ABC", 12, 101), MessageDeserializer.Deserialize(new GetFileMessage("0xabc", 12, 101).Serialize()));
 	}
 
 	@Test
