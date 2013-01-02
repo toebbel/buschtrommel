@@ -10,6 +10,7 @@ public interface ITransferProgress {
 	public long getExpectedTransferVolume();
 	public long getTransferedAmount();
 	public String getExpectedHash();
+	public TransferStatus getStatus();
 	public void cancel();
 	public List<ITransferProgress> getSubTransfers();
 	
@@ -17,6 +18,15 @@ public interface ITransferProgress {
 		Multisource,
 		Singlesource,
 		Outgoing
+	}
+	
+	public enum TransferStatus {
+		establishing,
+		transfering,
+		otherSideCanceled,
+		canceled,
+		error,
+		finished
 	}
 }
 
