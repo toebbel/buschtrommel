@@ -8,5 +8,9 @@ public class Share extends File {
 		super(hash, length, ttl, displayName, meta);
 		this.path = path;
 	}
+	
+	public String getPath(){
+		return this.path;
+	}
 
 }
