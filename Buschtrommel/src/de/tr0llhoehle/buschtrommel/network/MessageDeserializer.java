@@ -1,0 +1,79 @@
+package de.tr0llhoehle.buschtrommel.network;
+
+import java.util.logging.Logger;
+
+import de.tr0llhoehle.buschtrommel.LoggerWrapper;
+import de.tr0llhoehle.buschtrommel.models.*;
+
+public class MessageDeserializer {
+	
+	/**
+	 * Creates an instance of a subclass of Message that matches the given context.
+	 * 
+	 * @param raw Message as String.
+	 * @return instance or null if no message could be found
+	 */
+	public static Message Deserialize(String raw) {
+		int typeSeperator = -1;
+		typeSeperator = raw.indexOf(Message.FIELD_SEPERATOR);
+		if(typeSeperator == -1) //some messages don't contain any field seperator, because they have only a type field
+			typeSeperator = raw.indexOf(Message.MESSAGE_SPERATOR);
+		if(typeSeperator == -1)
+			LoggerWrapper.logError("Can't deserialize raw message '" + raw + "'");
+		
+		String typeField = raw.substring(0, typeSeperator);
+		switch(typeField.toUpperCase()) {
+			case "HI":
+				return DeserializePeerDiscoveryMessage(PeerDiscoveryMessage.DiscoveryMessageType.HI, raw.substring(typeSeperator));
+			case "BYE":
+				return new ByeMessage();
+			case "YO":
+				return DeserializePeerDiscoveryMessage(PeerDiscoveryMessage.DiscoveryMessageType.YO, raw.substring(typeSeperator));
+			case "FILE":
+				return DeserializeFileMessage(raw.substring(typeSeperator));
+			default:
+				LoggerWrapper.logError("I don't unterstand the following message: '" + raw + "' :(");
+				return null;
+		}
+	}
+
+	private static Message DeserializeFileMessage(String msgContent) {
+		String[] fields = msgContent.split(String.valueOf(Message.FIELD_SEPERATOR));
+		Message result = null;
+		
+		if(fields.length != 5) {
+			LoggerWrapper.logError("Invlaid number of fields in FileAnnouncementMessage body: '" + msgContent + "'");
+			return result;
+		}
+		
+		try {
+			int ttl = Integer.valueOf(fields[1]);
+			long length = Long.valueOf(fields[2]);
+			result = new FileAnnouncementMessage(new File(fields[0], length, ttl, fields[3], fields[4]));
+		} catch(IllegalArgumentException e) { //NumberFormatException is subtype
+			LoggerWrapper.logError("Could not pars the FileAnnouncementMessage body: '" + msgContent + "'. Excpetion: " + e.getMessage());
+		}
+		
+		return result;
+	}
+
+	private static Message DeserializePeerDiscoveryMessage(PeerDiscoveryMessage.DiscoveryMessageType t, String msgContent) {
+		String[] fields = msgContent.split(String.valueOf(Message.FIELD_SEPERATOR));
+		Message result = null;
+		
+		if(fields.length != 2) {
+			LoggerWrapper.logError("Invlaid number of fields in HI/YO message body: '" + msgContent + "'");
+			return result;
+		}
+		
+		try{
+			int port = Integer.valueOf(fields[0]);
+			result = new PeerDiscoveryMessage(t, fields[1], port);
+		} catch(IllegalArgumentException e) { //NumberFormatException is subtype
+			LoggerWrapper.logError("Could not pars the Hi/Yo message body: '" + msgContent + "'. Excpetion: " + e.getMessage());
+		}
+		
+		return result;
+	}
+
+}
