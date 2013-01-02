@@ -24,6 +24,18 @@ public class GetFileMessage extends Message {
 		type = "GET FILE";
 	}
 
+	public String getHash() {
+		return hash;
+	}
+	
+	public long getOffset() {
+		return offset;
+	}
+	
+	public long getLength() {
+		return length;
+	}
+	
 	@Override
 	public String Serialize() {
 		return type + FIELD_SEPERATOR + hash + FIELD_SEPERATOR + offset + FIELD_SEPERATOR + length  + MESSAGE_SPERATOR;
