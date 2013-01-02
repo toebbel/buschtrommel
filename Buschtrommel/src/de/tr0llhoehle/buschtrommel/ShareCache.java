@@ -104,6 +104,7 @@ public class ShareCache {
 		Enumeration<Share> e = shares.elements();
 		while (e.hasMoreElements()) {
 			allShares.append(new FileAnnouncementMessage(e.nextElement()).Serialize() + e.nextElement().getPath()+ "\n");
+			LoggerWrapper.logInfo("Share added");
 		}
 
 		return allShares.toString();
@@ -126,6 +127,7 @@ public class ShareCache {
 			ObjectOutputStream oos = new ObjectOutputStream(fos);
 
 			oos.writeObject(convertSharesToString());
+			LoggerWrapper.logInfo("All Shares written to file: " + path);
 			oos.close();
 		} catch (FileNotFoundException e1) {
 			LoggerWrapper.logError("the given path: " + path + " is not valid");
@@ -149,23 +151,29 @@ public class ShareCache {
 			LoggerWrapper.logError("the given path: " + path + " is not valid (must end with .ht)");
 			return;
 		}
-		FileInputStream fis;
-		try {
-			fis = new FileInputStream(path);
-			ObjectInputStream ois = new ObjectInputStream(fis);
-			
-//			XMLDecoder r = new XMLDecoder(fis);
-			Hashtable<String, Share> temp_shares;
-			temp_shares = ((Hashtable<String, Share>) ois.readObject());
-			ois.close();
-			shares = temp_shares;
-		} catch (FileNotFoundException e) {
-			LoggerWrapper.logError("File not found: " + path);
-		} catch (ClassNotFoundException e) {
-			LoggerWrapper.logError("Class not found Exception - should never happen");
-		} catch (IOException e) {
-			LoggerWrapper.logError("Could not read file: " + path);
-		}
+		
+		
+		LoggerWrapper.logError("Not implemented");
+		this.shares = new Hashtable<>();
+		return;
+//		
+//		FileInputStream fis;
+//		try {
+//			fis = new FileInputStream(path);
+//			ObjectInputStream ois = new ObjectInputStream(fis);
+//			
+////			XMLDecoder r = new XMLDecoder(fis);
+//			Hashtable<String, Share> temp_shares;
+//			temp_shares = ((Hashtable<String, Share>) ois.readObject());
+//			ois.close();
+//			shares = temp_shares;
+//		} catch (FileNotFoundException e) {
+//			LoggerWrapper.logError("File not found: " + path);
+//		} catch (ClassNotFoundException e) {
+//			LoggerWrapper.logError("Class not found Exception - should never happen");
+//		} catch (IOException e) {
+//			LoggerWrapper.logError("Could not read file: " + path);
+//		}
 
 	}
 }
