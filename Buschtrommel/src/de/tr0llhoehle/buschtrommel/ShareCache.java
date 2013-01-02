@@ -23,7 +23,7 @@ import de.tr0llhoehle.buschtrommel.models.Share;
  */
 public class ShareCache {
 
-	protected Hashtable<String, Share> shares;
+	protected Hashtable<String, Share> shares = new Hashtable<>();
 
 	/**
 	 * 
@@ -77,6 +77,7 @@ public class ShareCache {
 	 */
 	public void newShare(Share share) {
 		if (share == null) {
+			LoggerWrapper.logError("no share given");
 			return;
 		}
 		// String hash = share.getHash();
@@ -84,14 +85,18 @@ public class ShareCache {
 			LoggerWrapper.logError("A Share with the given Hash: " + share.getHash()
 					+ "has already be defined. It is now replaced with the new Share");
 			this.shares.remove(share.getHash());
-			this.shares.put(share.getHash(), share);
+			
 		}
+//		LoggerWrapper.logInfo("set hash: " + share.getHash());
+		this.shares.put(share.getHash(), share);
+//		LoggerWrapper.logInfo("file has been added");
 
 	}
 
 	public void saveToFile(String path) {
 		if (path == null || !path.endsWith(".xml")) {
 			LoggerWrapper.logError("the given path: " + path + " is not valid (must end with .xml)");
+			return;
 		}
 		FileOutputStream fos;
 		try {
