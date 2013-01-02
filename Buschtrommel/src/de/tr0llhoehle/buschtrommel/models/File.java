@@ -17,9 +17,9 @@ public class File {
 	 * @param hash
 	 *            the hash of the file as uppercase String, without leading 0x
 	 * @param length
-	 *            number of bytes in the file
+	 *            number of bytes in the file. Has to be >= 0
 	 * @param ttl
-	 *            TimeToLive in seconds.
+	 *            TimeToLive in seconds. Has to be >= 0 or TTL_INFINITY
 	 * @param displayName
 	 *            human readable UTF8-string that represents the filename. MUST NOT contain any character with ascii code < 32 (space). Any of these characters will be replaced with spaces
 	 * @param meta
@@ -28,10 +28,15 @@ public class File {
 	public File(String hash, long length, int ttl, String displayName,
 			String meta) {
 		
-		displayName.replace(Message.FIELD_SEPERATOR, ' ');
-		meta.replace(Message.FIELD_SEPERATOR, ' ');
-		displayName.replace(Message.MESSAGE_SPERATOR, ' ');
-		meta.replace(Message.MESSAGE_SPERATOR, ' ');
+		displayName = displayName.replace(Message.FIELD_SEPERATOR, ' ');
+		displayName = displayName.replace(Message.MESSAGE_SPERATOR, ' ');
+		meta = meta.replace(Message.FIELD_SEPERATOR, ' ');
+		meta = meta.replace(Message.MESSAGE_SPERATOR, ' ');
+		
+		if (!(ttl >= 0 || ttl == TTL_INFINITY))
+			throw new IllegalArgumentException("TTL is invalid (" + ttl + ")");
+		if(length < 0)
+			throw new IllegalArgumentException("Length is < 0");
 		
 		this.hash = hash;
 		this.length = length;
