@@ -7,14 +7,26 @@ import de.tr0llhoehle.buschtrommel.models.Message;
 public class MessageMonitor {
 	Vector<IMessageObserver> observers;
 	
+	/**
+	 * Register new observer.
+	 * @param observer
+	 */
 	public void registerObserver(IMessageObserver observer) {
 		this.observers.add(observer);
 	}
 	
+	/**
+	 * Remove observer.
+	 * @param observer
+	 */
 	public void removeObserver(IMessageObserver observer) {
 		this.observers.remove(observer);
 	}
 	
+	/**
+	 * Send the specified message to each registered observer. Each operation gets his own thread.
+	 * @param message the specified message
+	 */
 	protected void sendMessageToObservers(Message message) {
 		for(IMessageObserver observer : observers) {
 			new MessageThread(message, observer).start();
@@ -31,6 +43,6 @@ class MessageThread extends Thread {
 	}
 	
 	public void run() {
-		this.observer.incomingMessage(message);
+		this.observer.receiveMessage(message);
 	}
 }
