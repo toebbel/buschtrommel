@@ -61,6 +61,7 @@ public class UDPAdapter extends MessageMonitor implements Runnable {
 				multicastSocket.receive(receivePacket);
 				message = MessageDeserializer.Deserialize(new String(receivePacket.getData()));
 				if (message != null) {
+					message.setSource(receivePacket.getAddress());
 					this.sendMessageToObservers(message);
 				}
 			} catch (IOException e) {
