@@ -21,6 +21,7 @@ public class GetFileMessage extends Message {
 		this.hash = hash;
 		this.offset = offset;
 		this.length = length;
+		type = "GET FILE";
 	}
 
 	@Override
