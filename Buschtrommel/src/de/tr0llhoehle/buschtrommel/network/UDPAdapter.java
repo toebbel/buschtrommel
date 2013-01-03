@@ -15,7 +15,7 @@ import de.tr0llhoehle.buschtrommel.models.Host;
 import de.tr0llhoehle.buschtrommel.models.Message;
 
 public class UDPAdapter extends MessageMonitor implements Runnable {
-	private final static int PORT = 7474;
+	public final static int DEFAULT_PORT = 7474;
 	private final static String MULTICAST_ADDRESS_V4 = "239.255.0.113";
 	private final static String MULTICAST_ADDRESS_V6 = "ff05::7171";
 
@@ -37,7 +37,7 @@ public class UDPAdapter extends MessageMonitor implements Runnable {
 	}
 
 	private void openConnection() throws IOException {
-		this.multicastSocket = new MulticastSocket(PORT);
+		this.multicastSocket = new MulticastSocket(DEFAULT_PORT);
 		this.multicastSocket.joinGroup(multicastv4Group);
 		this.multicastSocket.joinGroup(multicastv6Group);
 	}
@@ -80,8 +80,8 @@ public class UDPAdapter extends MessageMonitor implements Runnable {
 	 */
 	public void send(Message message) {
 		String data = message.Serialize();
-		DatagramPacket v4Packet = new DatagramPacket(data.getBytes(), data.length(), this.multicastv4Group, PORT);
-		DatagramPacket v6Packet = new DatagramPacket(data.getBytes(), data.length(), this.multicastv6Group, PORT);
+		DatagramPacket v4Packet = new DatagramPacket(data.getBytes(), data.length(), this.multicastv4Group, DEFAULT_PORT);
+		DatagramPacket v6Packet = new DatagramPacket(data.getBytes(), data.length(), this.multicastv6Group, DEFAULT_PORT);
 		try {
 			this.multicastSocket.send(v4Packet);
 			this.multicastSocket.send(v6Packet);
@@ -101,7 +101,7 @@ public class UDPAdapter extends MessageMonitor implements Runnable {
 	 */
 	public void send(Message message, Host host) {
 		String data = message.Serialize();
-		DatagramPacket packet = new DatagramPacket(data.getBytes(), data.length(), host.getAddress(), PORT);
+		DatagramPacket packet = new DatagramPacket(data.getBytes(), data.length(), host.getAddress(), DEFAULT_PORT);
 		try {
 			this.multicastSocket.send(packet);
 		} catch (IOException e) {

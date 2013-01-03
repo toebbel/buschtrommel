@@ -14,57 +14,70 @@ public class NetCache implements IMessageObserver {
 
 	protected Hashtable<InetAddress, Host> knownHosts;
 	protected Hashtable<String, File> knownShares;
-	
+
 	@Override
 	public void receiveMessage(Message message) {
-		if(message instanceof FileAnnouncementMessage) {
-			String hash = ((FileAnnouncementMessage) message).getFile().getHash();
-			File file = ((FileAnnouncementMessage) message).getFile();
-			int ttl = ((FileAnnouncementMessage) message).getFile().getTTL();
-			Host host = new Host(message.getSource(), message.getSource().toString(), -1);
-			if(this.knownShares.containsKey(hash)) {
-				if(this.knownShares.get(hash).getSources().contains(host)) {
-					this.knownShares.get(hash).setTTL(ttl);
-				} else {
-					boolean found = false;
-					for(InetAddress address : this.knownHosts.keySet()) {
-						if(host.equals(this.knownHosts.get(address))) {
-							host = this.knownHosts.get(address);
-							found = true;
-							break;
-						}
-					}
-					if(!found) {
-						//TODO: add additional information to host
-						host.addFileToSharedFiles(file);
-						this.knownHosts.put(host.getAddress(), host);
-					}
-					this.knownShares.get(hash).addHost(host);
-				}
-			} else {
-				boolean found = false;
-				for(InetAddress address : this.knownHosts.keySet()) {
-					if(host.equals(this.knownHosts.get(address))) {
-						host = this.knownHosts.get(address);
-						file.addHost(host);
-						found = true;
-						break;
-					}
-				}
-				//TODO: add additional information to host
-				host.addFileToSharedFiles(file);
-				if(!found) {
-					this.knownHosts.put(host.getAddress(), host);
-				}
-				
-				this.knownShares.put(hash, file);
-			}
-		} else if(message instanceof PeerDiscoveryMessage) {
-			
-		} else if(message instanceof ByeMessage) {
-			
+		if (message instanceof FileAnnouncementMessage) {
+			this.fileAnnouncmentHandler((FileAnnouncementMessage) message);
+		} else if (message instanceof PeerDiscoveryMessage) {
+			this.peerDiscoveryHandler((PeerDiscoveryMessage) message);
+		} else if (message instanceof ByeMessage) {
+			this.byeHandler((ByeMessage) message);
 		}
 
+	}
+	
+	private void fileAnnouncmentHandler(FileAnnouncementMessage message) {
+		File file = message.getFile();
+		Host host = new Host(message.getSource(), message.getSource().toString(), UDPAdapter.DEFAULT_PORT);
+		int ttl = message.getFile().getTTL();
+		String hash = message.getFile().getHash();
+
+		boolean foundHost = false;
+		for (InetAddress address : this.knownHosts.keySet()) {
+			if (host.equals(this.knownHosts.get(address))) {
+				host = this.knownHosts.get(address);
+				host.Seen();
+				foundHost = true;
+				break;
+			}
+		}
+
+		if (this.knownShares.containsKey(hash)) {
+			file = this.knownShares.get(hash);
+			if (foundHost) {
+				if (file.getSources().contains(host)) {
+					file.setTTL(ttl);
+				} else {
+					file.addHost(host);
+					host.addFileToSharedFiles(file);
+				}
+			} else {
+				this.knownHosts.put(host.getAddress(), host);
+				file.addHost(host);
+				host.addFileToSharedFiles(file);
+			}
+
+		} else {
+			if (foundHost) {
+				this.knownShares.put(hash, file);
+				file.addHost(host);
+				host.addFileToSharedFiles(file);
+			} else {
+				this.knownHosts.put(host.getAddress(), host);
+				this.knownShares.put(hash, file);
+				host.addFileToSharedFiles(file);
+				file.addHost(host);
+			}
+		}
+	}
+	
+	private void peerDiscoveryHandler(PeerDiscoveryMessage message) {
+		
+	}
+	
+	private void byeHandler(ByeMessage message) {
+		
 	}
 
 }
