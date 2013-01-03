@@ -14,55 +14,56 @@ public class NetCache implements IMessageObserver {
 
 	protected Hashtable<InetAddress, Host> knownHosts;
 	protected Hashtable<String, File> knownShares;
-	
+
 	@Override
 	public void receiveMessage(Message message) {
-		if(message instanceof FileAnnouncementMessage) {
-			String hash = ((FileAnnouncementMessage) message).getFile().getHash();
+		if (message instanceof FileAnnouncementMessage) {
 			File file = ((FileAnnouncementMessage) message).getFile();
+			Host host = new Host(message.getSource(), message.getSource().toString(), UDPAdapter.DEFAULT_PORT);
 			int ttl = ((FileAnnouncementMessage) message).getFile().getTTL();
-			Host host = new Host(message.getSource(), message.getSource().toString(), -1);
-			if(this.knownShares.containsKey(hash)) {
-				if(this.knownShares.get(hash).getSources().contains(host)) {
-					this.knownShares.get(hash).setTTL(ttl);
-				} else {
-					boolean found = false;
-					for(InetAddress address : this.knownHosts.keySet()) {
-						if(host.equals(this.knownHosts.get(address))) {
-							host = this.knownHosts.get(address);
-							found = true;
-							break;
-						}
-					}
-					if(!found) {
-						//TODO: add additional information to host
-						host.addFileToSharedFiles(file);
-						this.knownHosts.put(host.getAddress(), host);
-					}
-					this.knownShares.get(hash).addHost(host);
+			String hash = ((FileAnnouncementMessage) message).getFile().getHash();
+
+			boolean foundHost = false;
+			for (InetAddress address : this.knownHosts.keySet()) {
+				if (host.equals(this.knownHosts.get(address))) {
+					host = this.knownHosts.get(address);
+					host.Seen();
+					foundHost = true;
+					break;
 				}
-			} else {
-				boolean found = false;
-				for(InetAddress address : this.knownHosts.keySet()) {
-					if(host.equals(this.knownHosts.get(address))) {
-						host = this.knownHosts.get(address);
-						file.addHost(host);
-						found = true;
-						break;
-					}
-				}
-				//TODO: add additional information to host
-				host.addFileToSharedFiles(file);
-				if(!found) {
-					this.knownHosts.put(host.getAddress(), host);
-				}
-				
-				this.knownShares.put(hash, file);
 			}
-		} else if(message instanceof PeerDiscoveryMessage) {
-			
-		} else if(message instanceof ByeMessage) {
-			
+
+			if (this.knownShares.containsKey(hash)) {
+				file = this.knownShares.get(hash);
+				if (foundHost) {
+					if (file.getSources().contains(host)) {
+						file.setTTL(ttl);
+					} else {
+						file.addHost(host);
+						host.addFileToSharedFiles(file);
+					}
+				} else {
+					this.knownHosts.put(host.getAddress(), host);
+					file.addHost(host);
+					host.addFileToSharedFiles(file);
+				}
+
+			} else {
+				if (foundHost) {
+					this.knownShares.put(hash, file);
+					file.addHost(host);
+					host.addFileToSharedFiles(file);
+				} else {
+					this.knownHosts.put(host.getAddress(), host);
+					this.knownShares.put(hash, file);
+					host.addFileToSharedFiles(file);
+					file.addHost(host);
+				}
+			}
+		} else if (message instanceof PeerDiscoveryMessage) {
+
+		} else if (message instanceof ByeMessage) {
+
 		}
 
 	}
