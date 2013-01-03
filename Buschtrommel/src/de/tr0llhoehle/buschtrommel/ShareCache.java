@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import de.tr0llhoehle.buschtrommel.models.FileAnnouncementMessage;
@@ -61,9 +62,11 @@ public class ShareCache {
 	 */
 	public String getAllShares() {
 		StringBuilder allShares = new StringBuilder("");
-		Enumeration<Share> e = shares.elements();
-		while (e.hasMoreElements()) {
-			allShares.append(new FileAnnouncementMessage(e.nextElement()).Serialize());
+
+		ArrayList<Share> shareList = new ArrayList<Share>(shares.values());
+
+		for (Share i : shareList) {
+			allShares.append((new FileAnnouncementMessage(i).Serialize()));
 		}
 
 		return allShares.toString();
@@ -90,21 +93,20 @@ public class ShareCache {
 		// LoggerWrapper.logInfo("file has been added");
 
 	}
-	protected void convertToShares(String shares){
+
+	protected void convertToShares(String shares) {
 		Hashtable<String, Share> temp_shares = new Hashtable<>();
-		//TODO
-		
-		
-	
+		// TODO
+
 	}
-	
-	
-	protected String convertSharesToString(){
+
+	protected String convertSharesToString() {
 		StringBuilder allShares = new StringBuilder("");
-		Enumeration<Share> e = shares.elements();
-		while (e.hasMoreElements()) {
-			allShares.append(new FileAnnouncementMessage(e.nextElement()).Serialize() + e.nextElement().getPath()+ "\n");
-			LoggerWrapper.logInfo("Share added");
+
+		ArrayList<Share> shareList = new ArrayList<Share>(shares.values());
+
+		for (Share i : shareList) {
+			allShares.append((new FileAnnouncementMessage(i).Serialize()) + i.getPath() + "\n");
 		}
 
 		return allShares.toString();
@@ -151,29 +153,28 @@ public class ShareCache {
 			LoggerWrapper.logError("the given path: " + path + " is not valid (must end with .ht)");
 			return;
 		}
-		
-		
+
 		LoggerWrapper.logError("Not implemented");
 		this.shares = new Hashtable<>();
 		return;
-//		
-//		FileInputStream fis;
-//		try {
-//			fis = new FileInputStream(path);
-//			ObjectInputStream ois = new ObjectInputStream(fis);
-//			
-////			XMLDecoder r = new XMLDecoder(fis);
-//			Hashtable<String, Share> temp_shares;
-//			temp_shares = ((Hashtable<String, Share>) ois.readObject());
-//			ois.close();
-//			shares = temp_shares;
-//		} catch (FileNotFoundException e) {
-//			LoggerWrapper.logError("File not found: " + path);
-//		} catch (ClassNotFoundException e) {
-//			LoggerWrapper.logError("Class not found Exception - should never happen");
-//		} catch (IOException e) {
-//			LoggerWrapper.logError("Could not read file: " + path);
-//		}
+		//
+		// FileInputStream fis;
+		// try {
+		// fis = new FileInputStream(path);
+		// ObjectInputStream ois = new ObjectInputStream(fis);
+		//
+		// // XMLDecoder r = new XMLDecoder(fis);
+		// Hashtable<String, Share> temp_shares;
+		// temp_shares = ((Hashtable<String, Share>) ois.readObject());
+		// ois.close();
+		// shares = temp_shares;
+		// } catch (FileNotFoundException e) {
+		// LoggerWrapper.logError("File not found: " + path);
+		// } catch (ClassNotFoundException e) {
+		// LoggerWrapper.logError("Class not found Exception - should never happen");
+		// } catch (IOException e) {
+		// LoggerWrapper.logError("Could not read file: " + path);
+		// }
 
 	}
 }

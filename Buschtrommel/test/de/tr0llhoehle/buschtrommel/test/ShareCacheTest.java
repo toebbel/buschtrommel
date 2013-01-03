@@ -29,7 +29,10 @@ public class ShareCacheTest {
 		ShareCache troll = new ShareCache();
 		Share share = new Share("AC3", 29, 31, "test blubb", "meta", "/home/path");
 
+		Share share2 = new Share("asdasd", 29, 31, "test blubb", "meta", "/home/path");
+		
 		troll.newShare(share);
+		troll.newShare(share2);
 
 		assertTrue(troll.has(share.getHash()));
 
