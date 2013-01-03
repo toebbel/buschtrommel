@@ -72,6 +72,10 @@ $RECYCLE.BIN/
 .LSOverride
 Icon
 
+# linux
+.*
+!.gitignore
+*~
 
 # Thumbnails
 ._*
