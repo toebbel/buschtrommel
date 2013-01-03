@@ -11,6 +11,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import de.tr0llhoehle.buschtrommel.models.FileAnnouncementMessage;
 import de.tr0llhoehle.buschtrommel.models.Share;
+import de.tr0llhoehle.buschtrommel.network.MessageDeserializer;
 
 /**
  * All the Shared Files from the user are stored in this class
@@ -94,9 +95,22 @@ public class ShareCache {
 
 	}
 
-	protected void convertToShares(String shares) {
-		Hashtable<String, Share> temp_shares = new Hashtable<>();
+	protected boolean convertToShares(String shares) {
+		if(shares == null){
+			return false;
+		}
+		Hashtable<String, Share> temp_shares = new Hashtable<String, Share>();
 		// TODO
+		String[] temp = shares.split("\n");
+		for(String i : temp){
+			//TODO deserialize
+			LoggerWrapper.logError("Not yet implemented");
+			
+//			temp_shares.put("hash", "share");
+		}
+		
+		
+		return true;
 
 	}
 
@@ -154,27 +168,36 @@ public class ShareCache {
 			return;
 		}
 
-		LoggerWrapper.logError("Not implemented");
-		this.shares = new Hashtable<>();
-		return;
-		//
-		// FileInputStream fis;
-		// try {
-		// fis = new FileInputStream(path);
-		// ObjectInputStream ois = new ObjectInputStream(fis);
-		//
-		// // XMLDecoder r = new XMLDecoder(fis);
-		// Hashtable<String, Share> temp_shares;
-		// temp_shares = ((Hashtable<String, Share>) ois.readObject());
-		// ois.close();
-		// shares = temp_shares;
-		// } catch (FileNotFoundException e) {
-		// LoggerWrapper.logError("File not found: " + path);
-		// } catch (ClassNotFoundException e) {
-		// LoggerWrapper.logError("Class not found Exception - should never happen");
-		// } catch (IOException e) {
-		// LoggerWrapper.logError("Could not read file: " + path);
-		// }
+//		LoggerWrapper.logError("Not implemented");
+//		Hashtable<String, Share> temp_shares = new Hashtable<String, Share>();
+//		return;
+		
+		 FileInputStream fis;
+		 try {
+		 fis = new FileInputStream(path);
+		 ObjectInputStream ois = new ObjectInputStream(fis);
+		
+		 // XMLDecoder r = new XMLDecoder(fis);
+		 
+		 String shareString = (String) ois.readObject();
+		 ois.close();
+		 
+		 if (convertToShares(shareString)){
+			 LoggerWrapper.logInfo("Restored from save");
+		 }
+		 else {
+			 LoggerWrapper.logError("Couldn't restore from save"); 
+		 }
+		 
+		 
+//		 shares = temp_shares;
+		 } catch (FileNotFoundException e) {
+		 LoggerWrapper.logError("File not found: " + path);
+		 } catch (ClassNotFoundException e) {
+		 LoggerWrapper.logError("Class not found Exception - should never happen");
+		 } catch (IOException e) {
+		 LoggerWrapper.logError("Could not read file: " + path);
+		 }
 
 	}
 }

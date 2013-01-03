@@ -1,7 +1,5 @@
 package de.tr0llhoehle.buschtrommel.network;
 
-import java.util.logging.Logger;
-
 import de.tr0llhoehle.buschtrommel.LoggerWrapper;
 import de.tr0llhoehle.buschtrommel.models.*;
 
@@ -70,7 +68,7 @@ public class MessageDeserializer {
 		Message result = null;
 		
 		if(fields.length != 5) {
-			LoggerWrapper.logError("Invlaid number of fields in FileAnnouncementMessage body: '" + msgContent + "'");
+			LoggerWrapper.logError("Invalid number of fields in FileAnnouncementMessage body: '" + msgContent + "'");
 			return result;
 		}
 		
