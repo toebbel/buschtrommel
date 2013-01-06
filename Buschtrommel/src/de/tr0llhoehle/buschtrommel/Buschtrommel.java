@@ -26,7 +26,7 @@ public class Buschtrommel {
 		}
 	}
 	
-	public void start() {
+	public void start() throws IOException {
 		//TODO: create new FileTransferAdapter
 		this.udpAdapter = new UDPAdapter();
 		this.udpAdapter.registerObserver(netCache);

@@ -2,19 +2,21 @@ package de.tr0llhoehle.buschtrommel.network;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
-import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.net.SocketException;
 import java.net.UnknownHostException;
 
 import de.tr0llhoehle.buschtrommel.LoggerWrapper;
 import de.tr0llhoehle.buschtrommel.models.Host;
 import de.tr0llhoehle.buschtrommel.models.Message;
 
-public class UDPAdapter extends MessageMonitor implements Runnable {
+/**
+ * 
+ * @author moritz
+ *
+ */
+public class UDPAdapter extends MessageMonitor {
 	public final static int DEFAULT_PORT = 7474;
 	private final static String MULTICAST_ADDRESS_V4 = "239.255.0.113";
 	private final static String MULTICAST_ADDRESS_V6 = "ff05::7171";
@@ -24,16 +26,28 @@ public class UDPAdapter extends MessageMonitor implements Runnable {
 	private MulticastSocket multicastSocket;
 	private boolean running;
 
-	public UDPAdapter() {
-		try {
-			this.multicastv4Group = (Inet4Address) Inet4Address.getByName(MULTICAST_ADDRESS_V4);
-			this.multicastv6Group = (Inet6Address) Inet6Address.getByName(MULTICAST_ADDRESS_V6);
-			this.openConnection();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	private Thread receiveThread;
+
+	public UDPAdapter() throws IOException {
+
+		this.multicastv4Group = (Inet4Address) Inet4Address.getByName(MULTICAST_ADDRESS_V4);
+		this.multicastv6Group = (Inet6Address) Inet6Address.getByName(MULTICAST_ADDRESS_V6);
+		this.openConnection();
+
+		receiveThread = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					startReceiving();
+				} catch (IOException e) {
+					LoggerWrapper.logError(e.getMessage());
+				}
+			}
+		});
+
 		this.running = true;
+		receiveThread.start();
 	}
 
 	private void openConnection() throws IOException {
@@ -42,6 +56,11 @@ public class UDPAdapter extends MessageMonitor implements Runnable {
 		this.multicastSocket.joinGroup(multicastv6Group);
 	}
 
+	/**
+	 * Stops listening for messages and closes the socket.
+	 * 
+	 * @throws IOException
+	 */
 	public void closeConnection() throws IOException {
 		this.running = false;
 		this.multicastSocket.leaveGroup(multicastv4Group);
@@ -49,27 +68,20 @@ public class UDPAdapter extends MessageMonitor implements Runnable {
 		this.multicastSocket.close();
 	}
 
-	@Override
-	public void run() {
+	private void startReceiving() throws IOException {
 		byte[] buffer;
 		DatagramPacket receivePacket;
 		Message message;
 		while (this.running) {
 			buffer = new byte[512];
 			receivePacket = new DatagramPacket(buffer, buffer.length);
-			try {
-				multicastSocket.receive(receivePacket);
-				message = MessageDeserializer.Deserialize(new String(receivePacket.getData()));
-				if (message != null) {
-					message.setSource(receivePacket.getAddress());
-					this.sendMessageToObservers(message);
-				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			multicastSocket.receive(receivePacket);
+			message = MessageDeserializer.Deserialize(new String(receivePacket.getData()));
+			if (message != null) {
+				message.setSource(receivePacket.getAddress());
+				this.sendMessageToObservers(message);
 			}
 		}
-
 	}
 
 	/**
@@ -77,18 +89,17 @@ public class UDPAdapter extends MessageMonitor implements Runnable {
 	 * 
 	 * @param message
 	 *            the specified message
+	 * @throws IOException
 	 */
-	public void send(Message message) {
+	public void sendMulticast(Message message) throws IOException {
 		String data = message.Serialize();
-		DatagramPacket v4Packet = new DatagramPacket(data.getBytes(), data.length(), this.multicastv4Group, DEFAULT_PORT);
-		DatagramPacket v6Packet = new DatagramPacket(data.getBytes(), data.length(), this.multicastv6Group, DEFAULT_PORT);
-		try {
-			this.multicastSocket.send(v4Packet);
-			this.multicastSocket.send(v6Packet);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		DatagramPacket v4Packet = new DatagramPacket(data.getBytes(), data.length(), this.multicastv4Group,
+				DEFAULT_PORT);
+		DatagramPacket v6Packet = new DatagramPacket(data.getBytes(), data.length(), this.multicastv6Group,
+				DEFAULT_PORT);
+
+		this.multicastSocket.send(v4Packet);
+		this.multicastSocket.send(v6Packet);
 	}
 
 	/**
@@ -98,15 +109,12 @@ public class UDPAdapter extends MessageMonitor implements Runnable {
 	 *            the specified message
 	 * @param host
 	 *            the specified host
+	 * @throws IOException 
 	 */
-	public void send(Message message, Host host) {
+	public void sendUnicast(Message message, Host host) throws IOException {
 		String data = message.Serialize();
 		DatagramPacket packet = new DatagramPacket(data.getBytes(), data.length(), host.getAddress(), DEFAULT_PORT);
-		try {
-			this.multicastSocket.send(packet);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
+		this.multicastSocket.send(packet);
 	}
 }
