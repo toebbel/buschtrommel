@@ -95,4 +95,12 @@ public class Host {
 	public int getPort() {
 		return port;
 	}
+
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
+	}
 }

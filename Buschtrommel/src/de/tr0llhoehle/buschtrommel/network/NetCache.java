@@ -13,7 +13,7 @@ import de.tr0llhoehle.buschtrommel.models.PeerDiscoveryMessage;
 /**
  * 
  * @author moritz
- *
+ * 
  */
 public class NetCache implements IMessageObserver {
 
@@ -31,44 +31,51 @@ public class NetCache implements IMessageObserver {
 		}
 
 	}
-	
+
 	private void fileAnnouncmentHandler(FileAnnouncementMessage message) {
 		File file = message.getFile();
 		Host host = new Host(message.getSource(), message.getSource().toString(), UDPAdapter.DEFAULT_PORT);
 		int ttl = message.getFile().getTTL();
 		String hash = message.getFile().getHash();
 
-		boolean foundHost = false;
-		for (InetAddress address : this.knownHosts.keySet()) {
-			if (host.equals(this.knownHosts.get(address))) {
-				host = this.knownHosts.get(address);
-				host.Seen();
-				foundHost = true;
-				break;
-			}
-		}
+		boolean foundHost = this.hostExists(host);
 
 		if (this.knownShares.containsKey(hash)) {
 			file = this.knownShares.get(hash);
-			if (foundHost) { //case: host and share already cached
-				if (file.getSources().contains(host)) { //if the share is already associated to the host, just update ttl
+
+			// case: host and share already cached
+			if (foundHost) {
+
+				// if the share is already associated to the host, just update
+				// ttl
+				if (file.getSources().contains(host)) {
 					file.setTTL(ttl);
-				} else { //if the share share isn't already associated, associate it to the host
+				}
+
+				// if the share share isn't already associated, associate it to
+				// the host
+				else {
 					file.addHost(host);
 					host.addFileToSharedFiles(file);
 				}
-			} else { //case: host cached but new share
+
+				// case: host cached but new share
+			} else {
 				this.knownHosts.put(host.getAddress(), host);
 				file.addHost(host);
 				host.addFileToSharedFiles(file);
 			}
 
 		} else {
-			if (foundHost) { //case: share not cached, but host already cached
+			// case: share not cached, but host already cached
+			if (foundHost) {
 				this.knownShares.put(hash, file);
 				file.addHost(host);
 				host.addFileToSharedFiles(file);
-			} else { //case: neither host nor share cached
+			}
+
+			// case: neither host nor share cached
+			else {
 				this.knownHosts.put(host.getAddress(), host);
 				this.knownShares.put(hash, file);
 				host.addFileToSharedFiles(file);
@@ -76,13 +83,43 @@ public class NetCache implements IMessageObserver {
 			}
 		}
 	}
-	
+
 	private void peerDiscoveryHandler(PeerDiscoveryMessage message) {
-		
+		Host host = new Host(message.getSource(), message.getAlias(), message.getPort());
+		if (this.hostExists(host)) {
+			// update values
+			host.setDisplayName(message.getAlias());
+			host.setPort(message.getPort());
+		} else {
+			// add new host
+			this.knownHosts.put(host.getAddress(), host);
+		}
 	}
-	
+
 	private void byeHandler(ByeMessage message) {
-		
+
+	}
+
+	/**
+	 * Checks if the specified host already exists. Updates the last seen value
+	 * of the host.
+	 * 
+	 * Changes the host to the host found in cache!
+	 * 
+	 * @param host
+	 *            the specified host
+	 * @return true if the specified host was found
+	 */
+	private boolean hostExists(Host host) {
+		boolean foundHost = false;
+		for (InetAddress address : this.knownHosts.keySet()) {
+			if (host.equals(this.knownHosts.get(address))) {
+				host = this.knownHosts.get(address);
+				host.Seen();
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
