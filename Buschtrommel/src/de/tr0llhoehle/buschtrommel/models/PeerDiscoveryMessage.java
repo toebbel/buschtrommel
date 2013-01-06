@@ -54,4 +54,12 @@ public class PeerDiscoveryMessage extends Message {
 	public enum DiscoveryMessageType {
 		HI, YO
 	}
+
+	public int getPort() {
+		return port;
+	}
+
+	public String getAlias() {
+		return alias;
+	}
 }

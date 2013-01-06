@@ -41,4 +41,8 @@ public abstract class Message {
 			return false;
 		return ((Message) obj).Serialize().equals(Serialize());
 	}
+
+	public String getType() {
+		return type;
+	}
 }
