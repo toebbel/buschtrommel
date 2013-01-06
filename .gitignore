@@ -72,6 +72,10 @@ $RECYCLE.BIN/
 .LSOverride
 Icon
 
+# linux
+.*
+!.gitignore
+*~
 
 # Thumbnails
 ._*
@@ -79,3 +83,7 @@ Icon
 # Files that might appear on external disk
 .Spotlight-V100
 .Trashes
+
+#unser kram
+Buschtrommel/bin
+shares.ht
