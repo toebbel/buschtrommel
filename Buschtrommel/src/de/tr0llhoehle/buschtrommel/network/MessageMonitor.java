@@ -5,7 +5,7 @@ import java.util.Vector;
 import de.tr0llhoehle.buschtrommel.models.Message;
 
 public class MessageMonitor {
-	Vector<IMessageObserver> observers;
+	Vector<IMessageObserver> observers = new Vector<>();
 	
 	/**
 	 * Register new observer.
