@@ -76,7 +76,7 @@ public class UDPAdapter extends MessageMonitor {
 			buffer = new byte[512];
 			receivePacket = new DatagramPacket(buffer, buffer.length);
 			multicastSocket.receive(receivePacket);
-			message = MessageDeserializer.Deserialize(new String(receivePacket.getData()));
+			message = MessageDeserializer.Deserialize(new String(receivePacket.getData(), Message.ENCODING));
 			if (message != null) {
 				message.setSource(receivePacket.getAddress());
 				this.sendMessageToObservers(message);
@@ -113,7 +113,7 @@ public class UDPAdapter extends MessageMonitor {
 	 */
 	public void sendUnicast(Message message, Host host) throws IOException {
 		String data = message.Serialize();
-		DatagramPacket packet = new DatagramPacket(data.getBytes(), data.length(), host.getAddress(), DEFAULT_PORT);
+		DatagramPacket packet = new DatagramPacket(data.getBytes(Message.ENCODING), data.length(), host.getAddress(), DEFAULT_PORT);
 
 		this.multicastSocket.send(packet);
 	}
