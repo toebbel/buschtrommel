@@ -2,6 +2,8 @@ package de.tr0llhoehle.buschtrommel.models;
 
 public class FileRequestResponseMessage extends Message {
 
+	public static final String TYPE_FIELD = "FILEREQUESTRESPONSE";
+	
 	private ResponseCode code;
 	private long expectedVolume;
 
@@ -21,7 +23,7 @@ public class FileRequestResponseMessage extends Message {
 		this.code = code;
 		this.expectedVolume = expectedTransferVolume;
 
-		type = "FILEREQUESTRESPONSE";
+		type = TYPE_FIELD;
 	}
 
 	/**

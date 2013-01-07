@@ -2,6 +2,8 @@ package de.tr0llhoehle.buschtrommel.models;
 
 public class GetFileMessage extends Message {
 
+	public static final String TYPE_FIELD = "GET FILE";
+	
 	private String hash;
 	private long offset;
 	private long length;
@@ -21,7 +23,7 @@ public class GetFileMessage extends Message {
 		this.hash = hash;
 		this.offset = offset;
 		this.length = length;
-		type = "GET FILE";
+		type = TYPE_FIELD;
 	}
 
 	public String getHash() {

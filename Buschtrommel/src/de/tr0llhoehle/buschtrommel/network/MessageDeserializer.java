@@ -26,17 +26,17 @@ public class MessageDeserializer {
 		
 		String typeField = raw.substring(0, typeSeperator);
 		switch(typeField.toUpperCase()) {
-			case "HI":
+			case PeerDiscoveryMessage.TYPE_FIELD_HI:
 				return DeserializePeerDiscoveryMessage(PeerDiscoveryMessage.DiscoveryMessageType.HI, raw.substring(typeSeperator + 1));
-			case "BYE":
+			case ByeMessage.TYPE_FIELD:
 				return new ByeMessage();
-			case "YO":
+			case PeerDiscoveryMessage.TYPE_FIELD_YO:
 				return DeserializePeerDiscoveryMessage(PeerDiscoveryMessage.DiscoveryMessageType.YO, raw.substring(typeSeperator + 1));
-			case "FILE":
+			case FileAnnouncementMessage.TYPE_FIELD:
 				return DeserializeFileMessage(raw.substring(typeSeperator + 1));
-			case "GET FILE":
+			case GetFileMessage.TYPE_FIELD:
 				return DeserializeGetFileMessage(raw.substring(typeSeperator + 1));
-			case "GET FILELIST":
+			case GetFilelistMessage.TYPE_FIELD:
 				return new GetFilelistMessage();
 			default:
 				LoggerWrapper.logError("I don't unterstand the following message: '" + raw + "' :(");

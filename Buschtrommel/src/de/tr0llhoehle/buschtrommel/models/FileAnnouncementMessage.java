@@ -2,10 +2,12 @@ package de.tr0llhoehle.buschtrommel.models;
 
 public class FileAnnouncementMessage extends Message {
 
+	public static final String TYPE_FIELD = "FILE";
+	
 	private File announcedFile;
 
 	public FileAnnouncementMessage(File f) {
-		type = "FILE";
+		type = TYPE_FIELD;
 		announcedFile = f;
 	}
 

@@ -9,6 +9,9 @@ package de.tr0llhoehle.buschtrommel.models;
  */
 public class PeerDiscoveryMessage extends Message {
 
+	public static final String TYPE_FIELD_HI = "HI";
+	public static final String TYPE_FIELD_YO = "YO";
+	
 	private int port;
 	private String alias;
 
@@ -25,10 +28,10 @@ public class PeerDiscoveryMessage extends Message {
 	public PeerDiscoveryMessage(DiscoveryMessageType type, String alias, int transferPort) {
 		switch (type) {
 		case HI:
-			this.type = "HI";
+			this.type = TYPE_FIELD_HI;
 			break;
 		case YO:
-			this.type = "YO";
+			this.type = TYPE_FIELD_YO;
 			break;
 		}
 
