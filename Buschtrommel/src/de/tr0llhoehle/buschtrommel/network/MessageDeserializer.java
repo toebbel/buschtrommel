@@ -8,8 +8,10 @@ public class MessageDeserializer {
 	/**
 	 * Creates an instance of a subclass of Message that matches the given context.
 	 * 
+	 * The Deserializer can handle HI, YO, GET FILE, GET FILELIST, and FILE messages.
+	 * 
 	 * @param raw Message as String.
-	 * @return instance or null if no message could be found
+	 * @return instance or null if no matching message could be found
 	 */
 	public static Message Deserialize(String raw) {
 		LoggerWrapper.logInfo("deserialize '" + raw + "'");
