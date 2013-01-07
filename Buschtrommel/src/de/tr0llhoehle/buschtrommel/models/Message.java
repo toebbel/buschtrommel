@@ -10,8 +10,8 @@ import java.net.InetAddress;
  * 
  */
 public abstract class Message {
-	public static char FIELD_SEPERATOR = 31;
-	public static char MESSAGE_SPERATOR = 30;
+	public static final char FIELD_SEPERATOR = 31;
+	public static final char MESSAGE_SPERATOR = 30;
 
 	protected String type;
 	protected InetAddress source;
