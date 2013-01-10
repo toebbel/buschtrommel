@@ -20,34 +20,40 @@ import de.tr0llhoehle.buschtrommel.network.UDPAdapter;
 
 public class Buschtrommel {
 
-	private IGUICallbacks gui;
+	private IGUICallbacks guiCallbacks;
 	private FileTransferAdapter fileTransferAdapter;
 	private UDPAdapter udpAdapter;
 	private NetCache netCache;
-	private ShareCache shareCache;
+	private LocalShareCache shareCache;
 
 	public Buschtrommel(IGUICallbacks gui) {
 		if (!HashFuncWrapper.check()) {
-			//cancel bootstrap: Hashfunction is not available!
+			// cancel bootstrap: Hashfunction is not available!
+			this.guiCallbacks = gui;
+			this.netCache = new NetCache(this.udpAdapter, guiCallbacks);
 		}
-		this.gui = gui;
-		this.netCache = new NetCache(this.udpAdapter);
-		this.shareCache = new ShareCache();
+		this.guiCallbacks = gui;
+		this.netCache = new NetCache(this.udpAdapter, this.guiCallbacks);
+		this.shareCache = new LocalShareCache();
 	}
-	
+
 	public void start() throws IOException {
-		//TODO: create new FileTransferAdapter
+		// TODO: create new FileTransferAdapter
 		this.udpAdapter = new UDPAdapter();
 		this.udpAdapter.registerObserver(netCache);
 	}
-	
+
 	public void stop() throws IOException {
 		this.sendByeMessage();
-		
-		//TODO: destroy fileTransferAdapter
+
+		// TODO: destroy fileTransferAdapter
 		this.udpAdapter.closeConnection();
 		this.udpAdapter.removeObserver(netCache);
 		this.udpAdapter = null;
+	}
+
+	public ITransferProgress DownloadFile(String hash, Host host) {
+		return null;
 	}
 	
 	/***
@@ -111,7 +117,7 @@ public class Buschtrommel {
 		shareCache.newShare(share);
 		udpAdapter.sendMulticast(new FileAnnouncementMessage(share));
 	}
-	
+
 	/**
 	 * Removes a file from the shares and announces, that it is not available any more via multicast
 	 * @param file the file to remove
@@ -122,30 +128,34 @@ public class Buschtrommel {
 			return;
 		shareCache.remove(hash);
 	}
-	
+
 	public Hashtable<String, ITransferProgress> getIncomingTransfers() {
 		return null;
 	}
-	
+
 	public Hashtable<InetAddress, ITransferProgress> getOutgoingTransfers() {
 		return null;
 	}
-	
+
 	public Hashtable<String, RemoteShare> getRemoteShares() {
 		return this.netCache.getShares();
 	}
-	
+
 	public Hashtable<InetAddress, Host> getHosts() {
-		return null;
+		return this.netCache.getHosts();
 	}
-	
+
 	public void CancelFileTransfer(ITransferProgress transferProgress) {
-		
+
 	}
-	
+
 	private void sendByeMessage() {
 		try {
-			this.udpAdapter.sendMulticast(new ByeMessage());
+			if (this.udpAdapter != null) {
+				this.udpAdapter.sendMulticast(new ByeMessage());
+			} else {
+				LoggerWrapper.logError("Could not find UDP Adapter");
+			}
 		} catch (IOException e) {
 			LoggerWrapper.logError(e.getMessage());
 		}

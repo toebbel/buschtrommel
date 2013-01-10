@@ -1,6 +1,6 @@
 package de.tr0llhoehle.buschtrommel.models;
 
-public class FileAvailability {
+public class ShareAvailability {
 	
 	
 	public static int TTL_DEFAULT;
@@ -11,7 +11,7 @@ public class FileAvailability {
 	private String displayName;
 	private String meta;
 	
-	public FileAvailability(Host host, RemoteShare file, int ttl, String displayName, String meta) {
+	public ShareAvailability(Host host, RemoteShare file, int ttl, String displayName, String meta) {
 		this.host = host;
 		this.file = file;
 		this.ttl = ttl;

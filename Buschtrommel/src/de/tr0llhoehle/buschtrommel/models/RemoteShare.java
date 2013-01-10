@@ -7,7 +7,7 @@ import java.util.Vector;
 
 public class RemoteShare extends Share {
 
-	private Vector<FileAvailability> sources;
+	private Vector<ShareAvailability> sources;
 
 	/**
 	 * Creates an instance of file that is either local or on a remote client
@@ -27,17 +27,17 @@ public class RemoteShare extends Share {
 		super(hash, length);		
 	}
 	
-	public Vector<FileAvailability> getSources() {
+	public Vector<ShareAvailability> getSources() {
 		return this.sources;
 	}
 	
-	public FileAvailability addFileSource(Host host, int ttl, String displayName, String meta) {
-		FileAvailability tmp = new FileAvailability(host, this, ttl, displayName, meta);
+	public ShareAvailability addFileSource(Host host, int ttl, String displayName, String meta) {
+		ShareAvailability tmp = new ShareAvailability(host, this, ttl, displayName, meta);
 		this.sources.add(tmp);
 		return tmp;
 	}
 	
-	public void removeFileSource(FileAvailability fileAvailability) {
+	public void removeFileSource(ShareAvailability fileAvailability) {
 		this.sources.remove(fileAvailability);
 	}
 	
@@ -51,7 +51,7 @@ public class RemoteShare extends Share {
 	 */
 	public int getMaxTTL() {
 		int ttl = 0;
-		for(FileAvailability tmp : this.sources) {
+		for(ShareAvailability tmp : this.sources) {
 			if(tmp.getTtl() > ttl) {
 				ttl = tmp.getTtl();
 			}
@@ -65,7 +65,7 @@ public class RemoteShare extends Share {
 	 */
 	public List<Host> getHostList() {
 		ArrayList<Host> result = new ArrayList<>();
-		for(FileAvailability f : sources) {
+		for(ShareAvailability f : sources) {
 			if(f.getTtl() > 0 || f.getTtl() == Share.TTL_INFINITY)
 				result.add(f.getHost());
 		}
