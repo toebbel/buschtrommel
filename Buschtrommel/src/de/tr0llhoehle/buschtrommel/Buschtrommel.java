@@ -51,7 +51,7 @@ public class Buschtrommel {
 	public void start() throws IOException {
 		fileTransferAdapter = new FileTransferAdapter(shareCache);
 		this.udpAdapter = new UDPAdapter();
-		this.netCache = new NetCache(this.udpAdapter, this.guiCallbacks);
+		this.netCache = new NetCache(this.udpAdapter, fileTransferAdapter, this.guiCallbacks);
 		this.udpAdapter.registerObserver(netCache);
 		udpAdapter.sendMulticast(new PeerDiscoveryMessage(PeerDiscoveryMessage.DiscoveryMessageType.HI, alias, fileTransferAdapter.getPort()));
 	}

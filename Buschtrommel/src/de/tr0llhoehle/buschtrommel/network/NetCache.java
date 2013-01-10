@@ -27,10 +27,12 @@ public class NetCache implements IMessageObserver {
 
 	protected IGUICallbacks guiCallbacks;
 	protected UDPAdapter udpAdapter;
+	protected FileTransferAdapter fileTransferAdapter;
 
-	public NetCache(UDPAdapter udpAdapter, IGUICallbacks guiCallbacks) {
+	public NetCache(UDPAdapter udpAdapter, FileTransferAdapter fileAdapter, IGUICallbacks guiCallbacks) {
 		this.udpAdapter = udpAdapter;
 		this.guiCallbacks = guiCallbacks;
+		this.fileTransferAdapter = fileAdapter;
 	}
 	
 	/**
@@ -132,6 +134,8 @@ public class NetCache implements IMessageObserver {
 					Thread.sleep((int) (Math.random() * Config.maximumYoResponseTime));
 					this.udpAdapter.sendUnicast(
 							new PeerDiscoveryMessage(DiscoveryMessageType.YO, Config.alias, message.getPort()), host);
+					Thread.sleep(5000);
+					fileTransferAdapter.downloadFilelist(host);
 				} else {
 					LoggerWrapper.logError("Could not find UDP Adapter");
 				}
