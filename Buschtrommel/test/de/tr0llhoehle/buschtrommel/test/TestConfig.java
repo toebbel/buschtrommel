@@ -21,14 +21,14 @@ public class TestConfig {
 	public void testSaveLoad() throws FileNotFoundException {
 		Config c = new Config();
 		c.defaultTTL = 60;
-		c.minimumYoResponseTime = 3;
+		c.maximumYoResponseTime = 3000;
 		c.shareCachePath = "shares.xml";
 		c.TTLRenewalTimer = 10;
 
 		Config.saveToFile(target, c);
 		Config loaded = Config.readFromFile(target);
 		assertEquals(loaded.defaultTTL, c.defaultTTL);
-		assertEquals(loaded.minimumYoResponseTime, c.minimumYoResponseTime);
+		assertEquals(loaded.maximumYoResponseTime, c.maximumYoResponseTime);
 		assertEquals(loaded.shareCachePath, c.shareCachePath);
 		assertEquals(loaded.TTLRenewalTimer, c.TTLRenewalTimer);
 	}

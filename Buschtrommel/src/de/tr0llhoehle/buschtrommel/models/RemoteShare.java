@@ -34,6 +34,15 @@ public class RemoteShare extends Share {
 		this.sources.add(tmp);
 		return tmp;
 	}
+	
+	public void removeFileSource(FileAvailability fileAvailability) {
+		this.sources.remove(fileAvailability);
+	}
+	
+	public boolean noSourcesAvailable() {
+		return this.sources.isEmpty();
+	}
+	
 	/**
 	 * Returns the highest ttl among all known sources
 	 * @return the highest ttl
