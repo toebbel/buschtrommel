@@ -143,9 +143,6 @@ public class Buschtrommel {
 		return this.netCache.getHosts();
 	}
 
-	public void CancelFileTransfer(ITransferProgress transferProgress) {
-
-	}
 
 	private void sendByeMessage() {
 		try {
