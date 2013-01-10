@@ -23,7 +23,7 @@ public class OutgoingFilelistTransfer extends Thread implements ITransferProgres
 		keepAlive = true;
 		this.out = out;
 		active = true;
-		run();
+		start();
 	}
 
 	@Override
