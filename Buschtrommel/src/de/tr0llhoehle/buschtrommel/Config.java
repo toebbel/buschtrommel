@@ -9,10 +9,11 @@ import java.io.FileOutputStream;
 
 public class Config {
 	
-	public int defaultTTL;
-	public int minimumYoResponseTime;
-	public int TTLRenewalTimer;
-	public String shareCachePath;
+	public static int defaultTTL;
+	public static int minimumYoResponseTime;
+	public static int TTLRenewalTimer;
+	public static String shareCachePath;
+	public static String alias;
 
 	public static Config readFromFile(File f) throws FileNotFoundException {
 		java.beans.XMLDecoder decoder = new XMLDecoder(new FileInputStream(f));

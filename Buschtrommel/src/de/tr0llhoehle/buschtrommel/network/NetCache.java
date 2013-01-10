@@ -1,10 +1,14 @@
 package de.tr0llhoehle.buschtrommel.network;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Hashtable;
 
+import de.tr0llhoehle.buschtrommel.Config;
+import de.tr0llhoehle.buschtrommel.LoggerWrapper;
 import de.tr0llhoehle.buschtrommel.models.ByeMessage;
 import de.tr0llhoehle.buschtrommel.models.LocalShare;
+import de.tr0llhoehle.buschtrommel.models.PeerDiscoveryMessage.DiscoveryMessageType;
 import de.tr0llhoehle.buschtrommel.models.RemoteShare;
 import de.tr0llhoehle.buschtrommel.models.FileAnnouncementMessage;
 import de.tr0llhoehle.buschtrommel.models.Host;
@@ -21,6 +25,12 @@ public class NetCache implements IMessageObserver {
 
 	protected Hashtable<InetAddress, Host> knownHosts;
 	protected Hashtable<String, RemoteShare> knownShares;
+
+	protected UDPAdapter udpAdapter;
+
+	public NetCache(UDPAdapter udpAdapter) {
+		this.udpAdapter = udpAdapter;
+	}
 
 	@Override
 	public void receiveMessage(Message message) {
@@ -56,15 +66,15 @@ public class NetCache implements IMessageObserver {
 				// if the share share isn't already associated, associate it to
 				// the host
 				else {
-					host.addFileToSharedFiles(tempShare.addFileSource(host, ttl,
-							message.getFile().getDisplayName(), message.getFile().getMeta()));
+					host.addFileToSharedFiles(tempShare.addFileSource(host, ttl, message.getFile().getDisplayName(),
+							message.getFile().getMeta()));
 				}
 
 				// case: share cached but new host
 			} else {
 				this.knownHosts.put(host.getAddress(), host);
-				host.addFileToSharedFiles(tempShare.addFileSource(host, ttl,
-						message.getFile().getDisplayName(), message.getFile().getMeta()));
+				host.addFileToSharedFiles(tempShare.addFileSource(host, ttl, message.getFile().getDisplayName(),
+						message.getFile().getMeta()));
 			}
 
 		} else {
@@ -96,6 +106,19 @@ public class NetCache implements IMessageObserver {
 		} else {
 			// add new host
 			this.knownHosts.put(host.getAddress(), host);
+		}
+		switch (message.getType()) {
+		case PeerDiscoveryMessage.TYPE_FIELD_HI:
+			try {
+				this.udpAdapter.sendUnicast(
+						new PeerDiscoveryMessage(DiscoveryMessageType.YO, Config.alias, message.getPort()), host);
+			} catch (IOException e) {
+				LoggerWrapper.logError(e.getMessage());
+			}
+			break;
+		case PeerDiscoveryMessage.TYPE_FIELD_YO: // nothing to do
+			break;
+		default:
 		}
 	}
 
