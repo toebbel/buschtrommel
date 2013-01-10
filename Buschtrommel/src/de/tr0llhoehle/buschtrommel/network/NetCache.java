@@ -4,11 +4,13 @@ import java.net.InetAddress;
 import java.util.Hashtable;
 
 import de.tr0llhoehle.buschtrommel.models.ByeMessage;
-import de.tr0llhoehle.buschtrommel.models.File;
+import de.tr0llhoehle.buschtrommel.models.LocalShare;
+import de.tr0llhoehle.buschtrommel.models.RemoteShare;
 import de.tr0llhoehle.buschtrommel.models.FileAnnouncementMessage;
 import de.tr0llhoehle.buschtrommel.models.Host;
 import de.tr0llhoehle.buschtrommel.models.Message;
 import de.tr0llhoehle.buschtrommel.models.PeerDiscoveryMessage;
+import de.tr0llhoehle.buschtrommel.models.Share;
 
 /**
  * 
@@ -18,7 +20,7 @@ import de.tr0llhoehle.buschtrommel.models.PeerDiscoveryMessage;
 public class NetCache implements IMessageObserver {
 
 	protected Hashtable<InetAddress, Host> knownHosts;
-	protected Hashtable<String, File> knownShares;
+	protected Hashtable<String, RemoteShare> knownShares;
 
 	@Override
 	public void receiveMessage(Message message) {
@@ -33,7 +35,6 @@ public class NetCache implements IMessageObserver {
 	}
 
 	private void fileAnnouncmentHandler(FileAnnouncementMessage message) {
-		File file = message.getFile();
 		Host host = new Host(message.getSource(), message.getSource().toString(), UDPAdapter.DEFAULT_PORT);
 		int ttl = message.getFile().getTTL();
 		String hash = message.getFile().getHash();
@@ -41,45 +42,47 @@ public class NetCache implements IMessageObserver {
 		boolean foundHost = this.hostExists(host);
 
 		if (this.knownShares.containsKey(hash)) {
-			file = this.knownShares.get(hash);
+			RemoteShare tempShare = this.knownShares.get(hash);
 
 			// case: host and share already cached
 			if (foundHost) {
 
 				// if the share is already associated to the host, just update
 				// ttl
-				if (file.getSources().contains(host)) {
-					file.setTTL(ttl);
+				if (host.getSharedFiles().containsKey(hash)) {
+					host.getSharedFiles().get(hash).setTTL(ttl);
 				}
 
 				// if the share share isn't already associated, associate it to
 				// the host
 				else {
-					file.addHost(host);
-					host.addFileToSharedFiles(file);
+					host.addFileToSharedFiles(tempShare.addFileSource(host, ttl,
+							message.getFile().getDisplayName(), message.getFile().getMeta()));
 				}
 
-				// case: host cached but new share
+				// case: share cached but new host
 			} else {
 				this.knownHosts.put(host.getAddress(), host);
-				file.addHost(host);
-				host.addFileToSharedFiles(file);
+				host.addFileToSharedFiles(tempShare.addFileSource(host, ttl,
+						message.getFile().getDisplayName(), message.getFile().getMeta()));
 			}
 
 		} else {
 			// case: share not cached, but host already cached
 			if (foundHost) {
-				this.knownShares.put(hash, file);
-				file.addHost(host);
-				host.addFileToSharedFiles(file);
+				RemoteShare tmp = new RemoteShare(hash, message.getFile().getLength());
+				this.knownShares.put(hash, tmp);
+				host.addFileToSharedFiles(tmp.addFileSource(host, ttl, message.getFile().getDisplayName(), message
+						.getFile().getMeta()));
 			}
 
 			// case: neither host nor share cached
 			else {
 				this.knownHosts.put(host.getAddress(), host);
-				this.knownShares.put(hash, file);
-				host.addFileToSharedFiles(file);
-				file.addHost(host);
+				RemoteShare tmp = new RemoteShare(hash, message.getFile().getLength());
+				this.knownShares.put(hash, tmp);
+				host.addFileToSharedFiles(tmp.addFileSource(host, ttl, message.getFile().getDisplayName(), message
+						.getFile().getMeta()));
 			}
 		}
 	}
@@ -97,7 +100,10 @@ public class NetCache implements IMessageObserver {
 	}
 
 	private void byeHandler(ByeMessage message) {
+		Host host = new Host(message.getSource(), message.getSource().toString(), UDPAdapter.DEFAULT_PORT);
+		if (this.hostExists(host)) {
 
+		}
 	}
 
 	/**
@@ -111,7 +117,6 @@ public class NetCache implements IMessageObserver {
 	 * @return true if the specified host was found
 	 */
 	private boolean hostExists(Host host) {
-		boolean foundHost = false;
 		for (InetAddress address : this.knownHosts.keySet()) {
 			if (host.equals(this.knownHosts.get(address))) {
 				host = this.knownHosts.get(address);

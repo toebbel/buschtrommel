@@ -8,7 +8,7 @@ import java.util.List;
 
 import de.tr0llhoehle.buschtrommel.LoggerWrapper;
 import de.tr0llhoehle.buschtrommel.ShareCache;
-import de.tr0llhoehle.buschtrommel.models.File;
+import de.tr0llhoehle.buschtrommel.models.LocalShare;
 import de.tr0llhoehle.buschtrommel.models.FileRequestResponseMessage;
 import de.tr0llhoehle.buschtrommel.models.GetFileMessage;
 import de.tr0llhoehle.buschtrommel.models.Message;
@@ -44,7 +44,7 @@ public class OutgoingFileTransfer extends Thread implements ITransferProgress{
 			out.write((new FileRequestResponseMessage(ResponseCode.NEVER_TRY_AGAIN, 0).Serialize() + Message.MESSAGE_SPERATOR).getBytes());
 			out.close();
 		} else {
-			File f = myShares.get(m.getHash());
+			LocalShare f = myShares.get(m.getHash());
 			if(m.getOffset() > f.getLength()) { //offset not in file
 				LoggerWrapper.logInfo("Requested offset is not valid");
 				out.write(new FileRequestResponseMessage(ResponseCode.OK, 0).Serialize().getBytes());

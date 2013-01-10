@@ -10,7 +10,7 @@ public class Host {
 	private Date firstSeen;
 	private java.net.InetAddress address;
 	private String displayName;
-	private Hashtable<String, File> shares;
+	private Hashtable<String, FileAvailability> shares;
 	private int port;
 	
 	/**
@@ -26,7 +26,7 @@ public class Host {
 		this.displayName = displayName.replace(Message.FIELD_SEPERATOR, ' ').replace(Message.MESSAGE_SPERATOR, ' ');
 		if(this.displayName.trim().equals(""))
 			this.displayName = address.toString();
-		shares = new Hashtable<>();
+		shares = new Hashtable<String, FileAvailability>();
 	}
 	
 	public Date getLastSeen() {
@@ -50,17 +50,17 @@ public class Host {
 	 * @return clone.
 	 */
 	@SuppressWarnings("unchecked")
-	public Hashtable<String, File> getSharedFiles() {
-		return (Hashtable<String, File>) shares.clone();
+	public Hashtable<String, FileAvailability> getSharedFiles() {
+		return (Hashtable<String, FileAvailability>) shares.clone();
 	}
 	
 	/**
 	 * Adds or replaces a offered file of this host
 	 * @param f the file to add
 	 */
-	public void addFileToSharedFiles(File f) {
-		LoggerWrapper.logInfo("Add file '" + f + "' to " + this.toString());
-		shares.put(f.getHash(), f);
+	public void addFileToSharedFiles(FileAvailability share) {
+		LoggerWrapper.logInfo("Add file '" + share.getFile() + "' to " + this.toString());
+		shares.put(share.getFile().getHash(), share);
 	}
 	
 	/**

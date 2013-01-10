@@ -1,16 +1,31 @@
 package de.tr0llhoehle.buschtrommel.models;
 
-public class Share extends File {
+public abstract class Share {
 
-	private String path;
+	public static int TTL_INFINITY = -1;
+	
+	private String hash;
+	private long length;	
 
-	public Share(String hash, long length, int ttl, String displayName, String meta, String path) {
-		super(hash, length, ttl, displayName, meta);
-		this.path = path;
+	public Share(String hash, long length) {
+		
+		
+		if(length < 0)
+			throw new IllegalArgumentException("Length is < 0");
+		
+		this.hash = hash;
+		this.length = length;
+
+	}
+	
+	public String getHash() {
+		return hash;
 	}
 
-	public String getPath() {
-		return this.path;
+	public long getLength() {
+		return length;
 	}
+	
 
+	
 }

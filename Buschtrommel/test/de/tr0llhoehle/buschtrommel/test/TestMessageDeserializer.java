@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import de.tr0llhoehle.buschtrommel.models.ByeMessage;
-import de.tr0llhoehle.buschtrommel.models.File;
+import de.tr0llhoehle.buschtrommel.models.RemoteShare;
 import de.tr0llhoehle.buschtrommel.models.FileAnnouncementMessage;
 import de.tr0llhoehle.buschtrommel.models.GetFileMessage;
 import de.tr0llhoehle.buschtrommel.models.GetFilelistMessage;
@@ -67,16 +67,16 @@ public class TestMessageDeserializer {
 
 	@Test
 	public void testDeserializeFileMessage() {
-		assertEquals(new FileAnnouncementMessage(new File("ABC", 1024, 2, "dsp", "meta")), MessageDeserializer.Deserialize(new FileAnnouncementMessage(new File("ABC", 1024, 2, "dsp", "meta")).Serialize()));
-		assertEquals(new FileAnnouncementMessage(new File("ABC", 1024, 2, "", "")), MessageDeserializer.Deserialize(new FileAnnouncementMessage(new File("ABC", 1024, 2, "", "")).Serialize()));
-		assertEquals(new FileAnnouncementMessage(new File("ABC", 1024, File.TTL_INFINITY, "foo", "")), MessageDeserializer.Deserialize(new FileAnnouncementMessage(new File("ABC", 1024, File.TTL_INFINITY, "foo", "")).Serialize()));
-		assertEquals(new FileAnnouncementMessage(new File("ABC", 1111111111111l, 2, "易事", "易事易事易事")), MessageDeserializer.Deserialize(new FileAnnouncementMessage(new File("ABC", 1111111111111l, 2, "易事", "易事易事易事")).Serialize()));
+		assertEquals(new FileAnnouncementMessage(new RemoteShare("ABC", 1024, 2, "dsp", "meta")), MessageDeserializer.Deserialize(new FileAnnouncementMessage(new RemoteShare("ABC", 1024, 2, "dsp", "meta")).Serialize()));
+		assertEquals(new FileAnnouncementMessage(new RemoteShare("ABC", 1024, 2, "", "")), MessageDeserializer.Deserialize(new FileAnnouncementMessage(new RemoteShare("ABC", 1024, 2, "", "")).Serialize()));
+		assertEquals(new FileAnnouncementMessage(new RemoteShare("ABC", 1024, RemoteShare.TTL_INFINITY, "foo", "")), MessageDeserializer.Deserialize(new FileAnnouncementMessage(new RemoteShare("ABC", 1024, RemoteShare.TTL_INFINITY, "foo", "")).Serialize()));
+		assertEquals(new FileAnnouncementMessage(new RemoteShare("ABC", 1111111111111l, 2, "易事", "易事易事易事")), MessageDeserializer.Deserialize(new FileAnnouncementMessage(new RemoteShare("ABC", 1111111111111l, 2, "易事", "易事易事易事")).Serialize()));
 	}
 	
 	@Test
 	public void testDeserializeFileMessage_brokenHashes() {
-		assertEquals(new FileAnnouncementMessage(new File("ABC", 1024, 2, "dsp", "meta")), MessageDeserializer.Deserialize(new FileAnnouncementMessage(new File("Abc", 1024, 2, "dsp", "meta")).Serialize()));
-		assertEquals(new FileAnnouncementMessage(new File("ABC", 1024, 2, "dsp", "meta")), MessageDeserializer.Deserialize(new FileAnnouncementMessage(new File("0xabc", 1024, 2, "dsp", "meta")).Serialize()));
+		assertEquals(new FileAnnouncementMessage(new RemoteShare("ABC", 1024, 2, "dsp", "meta")), MessageDeserializer.Deserialize(new FileAnnouncementMessage(new RemoteShare("Abc", 1024, 2, "dsp", "meta")).Serialize()));
+		assertEquals(new FileAnnouncementMessage(new RemoteShare("ABC", 1024, 2, "dsp", "meta")), MessageDeserializer.Deserialize(new FileAnnouncementMessage(new RemoteShare("0xabc", 1024, 2, "dsp", "meta")).Serialize()));
 	}
 	
 	@Test
