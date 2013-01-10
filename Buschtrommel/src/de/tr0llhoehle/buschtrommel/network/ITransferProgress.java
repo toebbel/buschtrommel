@@ -136,7 +136,7 @@ public interface ITransferProgress {
 		CheckingHash,
 		Finished,
 		TemporaryNotAvailable,
-		PermenentNotAvailable,
+		PermanentlyNotAvailable,
 		ConnectionFailed,
 		LostConnection,
 		LocalIOError,

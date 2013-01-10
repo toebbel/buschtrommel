@@ -9,12 +9,20 @@
  * Created on 02.01.2013, 19:15:29
  */
 package de.tr0llhoehle.buschtrommel.gui;
+import de.tr0llhoehle.buschtrommel.network.ITransferProgress;
+import de.tr0llhoehle.buschtrommel.network.ITransferProgress.TransferStatus;
+import de.tr0llhoehle.buschtrommel.network.ITransferProgress.TransferType;
+import de.tr0llhoehle.buschtrommel.network.IncomingDownload;
+import de.tr0llhoehle.buschtrommel.network.OutgoingTransfer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.Window.Type;
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.util.List;
+import java.util.logging.Handler;
 
 /**
  *
@@ -41,11 +49,6 @@ public class MainFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         jFileChooser1 = new javax.swing.JFileChooser();
-        fileDownload = new javax.swing.JPanel();
-        label1 = new java.awt.Label();
-        jScrollPane4 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
-        jProgressBar1 = new javax.swing.JProgressBar();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
@@ -58,7 +61,7 @@ public class MainFrame extends javax.swing.JFrame {
         jTable2 = new javax.swing.JTable();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList();
+        activeTransferList = new javax.swing.JList();
         abortTransfer = new javax.swing.JButton();
         resetTransfer = new javax.swing.JButton();
         resumeTransfer = new javax.swing.JButton();
@@ -71,33 +74,6 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
 
         jFileChooser1.setDialogTitle("Datei wählen");
-
-        label1.setText("label1");
-
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane4.setViewportView(jTextArea1);
-
-        javax.swing.GroupLayout fileDownloadLayout = new javax.swing.GroupLayout(fileDownload);
-        fileDownload.setLayout(fileDownloadLayout);
-        fileDownloadLayout.setHorizontalGroup(
-            fileDownloadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(fileDownloadLayout.createSequentialGroup()
-                .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 418, Short.MAX_VALUE))
-        );
-        fileDownloadLayout.setVerticalGroup(
-            fileDownloadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(fileDownloadLayout.createSequentialGroup()
-                .addGap(1, 1, 1)
-                .addGroup(fileDownloadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -236,7 +212,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         jPanel4.setName("activeTransfersTab"); // NOI18N
 
-        jScrollPane1.setViewportView(jList1);
+        jScrollPane1.setViewportView(activeTransferList);
 
         abortTransfer.setText("Abort");
         abortTransfer.addActionListener(new java.awt.event.ActionListener() {
@@ -425,6 +401,8 @@ private void removeShareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 
     private void abortTransferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_abortTransferActionPerformed
         // TODO add your handling code here:
+        //TODO add testtransfer
+       // activeTransferList.add(bla);
 
     }//GEN-LAST:event_abortTransferActionPerformed
 
@@ -474,29 +452,24 @@ private void removeShareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton abortTransfer;
+    private javax.swing.JList activeTransferList;
     private javax.swing.JButton addShare;
     private javax.swing.JButton downloadFilesBtn;
-    private javax.swing.JPanel fileDownload;
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JList jList1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
-    private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JTable jTable2;
-    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
-    private java.awt.Label label1;
     private javax.swing.JButton loadSettings;
     private javax.swing.JButton removeShare;
     private javax.swing.JButton resetTransfer;
