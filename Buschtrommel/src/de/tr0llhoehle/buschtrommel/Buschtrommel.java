@@ -8,6 +8,7 @@ import java.util.Hashtable;
 import de.tr0llhoehle.buschtrommel.models.ByeMessage;
 import de.tr0llhoehle.buschtrommel.models.FileAnnouncementMessage;
 import de.tr0llhoehle.buschtrommel.models.LocalShare;
+import de.tr0llhoehle.buschtrommel.models.PeerDiscoveryMessage;
 import de.tr0llhoehle.buschtrommel.models.RemoteShare;
 import de.tr0llhoehle.buschtrommel.models.Host;
 import de.tr0llhoehle.buschtrommel.models.Share;
@@ -16,6 +17,10 @@ import de.tr0llhoehle.buschtrommel.network.ITransferProgress;
 import de.tr0llhoehle.buschtrommel.network.NetCache;
 import de.tr0llhoehle.buschtrommel.network.UDPAdapter;
 
+/**
+ * The buschtrommel-object is the heart of the application. It manages all references to share-/net-/transfer management and is the facede for the GUI for all features.
+ *
+ */
 public class Buschtrommel {
 
 	private IGUICallbacks guiCallbacks;
@@ -23,36 +28,47 @@ public class Buschtrommel {
 	private UDPAdapter udpAdapter;
 	private NetCache netCache;
 	private LocalShareCache shareCache;
+	private String alias;
 
-	public Buschtrommel(IGUICallbacks gui) {
-		if (!HashFuncWrapper.check()) {
-			// cancel bootstrap: Hashfunction is not available!
-			this.guiCallbacks = gui;
-			this.netCache = new NetCache(this.udpAdapter, guiCallbacks);
+	/**
+	 * Creates an instance if buschtrommel
+	 * @param gui
+	 * @param alias
+	 */
+	public Buschtrommel(IGUICallbacks gui, String alias) {
+		if (!HashFuncWrapper.check()) {// cancel bootstrap: Hashfunction is not available!
+			throw new IllegalStateException("Hash function is not available!");
 		}
+		this.alias = alias;
 		this.guiCallbacks = gui;
-		this.netCache = new NetCache(this.udpAdapter, this.guiCallbacks);
 		this.shareCache = new LocalShareCache();
 	}
 
+	/**
+	 * Joins the network and sends a HI message
+	 * @throws IOException
+	 */
 	public void start() throws IOException {
-		// TODO: create new FileTransferAdapter
+		fileTransferAdapter = new FileTransferAdapter(shareCache);
 		this.udpAdapter = new UDPAdapter();
+		this.netCache = new NetCache(this.udpAdapter, this.guiCallbacks);
 		this.udpAdapter.registerObserver(netCache);
+		udpAdapter.sendMulticast(new PeerDiscoveryMessage(PeerDiscoveryMessage.DiscoveryMessageType.HI, alias, fileTransferAdapter.getPort()));
 	}
 
+	/**
+	 * Cancels all active transfers, leaves the network and shuts down.
+	 * @throws IOException
+	 */
 	public void stop() throws IOException {
 		this.sendByeMessage();
-
-		// TODO: destroy fileTransferAdapter
+		fileTransferAdapter.close();
+		fileTransferAdapter = null;
 		this.udpAdapter.closeConnection();
 		this.udpAdapter.removeObserver(netCache);
 		this.udpAdapter = null;
 	}
 
-	public ITransferProgress DownloadFile(String hash, Host host) {
-		return null;
-	}
 	
 	/***
 	 * Downloads a file from a specific host
@@ -127,23 +143,41 @@ public class Buschtrommel {
 		shareCache.remove(hash);
 	}
 
+	/**
+	 * All currently incoming top-level transfers (active and inactive)
+	 * @return transfers
+	 */
 	public Hashtable<String, ITransferProgress> getIncomingTransfers() {
-		return null;
+		return fileTransferAdapter.getIncomingTransfers();
 	}
 
+	/**
+	 * All currently outgoing transfers (active and inactive)
+	 * @return transfers
+	 */
 	public Hashtable<InetAddress, ITransferProgress> getOutgoingTransfers() {
-		return null;
+		return fileTransferAdapter.getOutgoingTransfers();
 	}
 
+	/**
+	 * Returns all known shares of other hosts
+	 * @return all known shares
+	 */
 	public Hashtable<String, RemoteShare> getRemoteShares() {
 		return this.netCache.getShares();
 	}
 
+	/**
+	 * Returns all currently known hosts
+	 * @return all known hosts
+	 */
 	public Hashtable<InetAddress, Host> getHosts() {
 		return this.netCache.getHosts();
 	}
 
-
+	/**
+	 * Send a BYE message over the network
+	 */
 	private void sendByeMessage() {
 		try {
 			if (this.udpAdapter != null) {
