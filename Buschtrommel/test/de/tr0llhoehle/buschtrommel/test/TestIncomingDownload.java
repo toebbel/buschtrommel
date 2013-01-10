@@ -135,7 +135,7 @@ public class TestIncomingDownload {
 		assertEquals((new GetFileMessage("ABCDEFABCDEF", 9, 1023)), MessageDeserializer.Deserialize(strRequest));
 		mock.send((new FileRequestResponseMessage(ResponseCode.NEVER_TRY_AGAIN, 0)).Serialize().getBytes(Message.ENCODING));
 		Thread.sleep(100);
-		assertEquals(TransferStatus.PermenentNotAvailable, in.getStatus());
+		assertEquals(TransferStatus.PermanentlyNotAvailable, in.getStatus());
 		assertEquals(1, obsMock .getMessages().size());
 		assertEquals(new FileRequestResponseMessage(ResponseCode.NEVER_TRY_AGAIN, 0), obsMock.getMessages().get(0));
 	}
