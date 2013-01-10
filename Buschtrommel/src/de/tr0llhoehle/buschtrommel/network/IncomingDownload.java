@@ -420,4 +420,9 @@ public class IncomingDownload extends MessageMonitor implements ITransferProgres
 	public void RemoveLogHander(Handler h) {
 		logger.removeHandler(h);
 	}
+
+	@Override
+	public String getTargetFile() {
+		return targetFile.getName();
+	}
 }
