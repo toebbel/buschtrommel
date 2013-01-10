@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Hashtable;
 
+import de.tr0llhoehle.buschtrommel.models.ByeMessage;
 import de.tr0llhoehle.buschtrommel.models.RemoteShare;
 import de.tr0llhoehle.buschtrommel.models.Host;
 import de.tr0llhoehle.buschtrommel.network.FileTransferAdapter;
@@ -33,6 +34,8 @@ public class Buschtrommel {
 	}
 	
 	public void stop() throws IOException {
+		this.sendByeMessage();
+		
 		//TODO: destroy fileTransferAdapter
 		this.udpAdapter.closeConnection();
 		this.udpAdapter.removeObserver(netCache);
@@ -69,5 +72,13 @@ public class Buschtrommel {
 	
 	public void CancelFileTransfer(ITransferProgress transferProgress) {
 		
+	}
+	
+	private void sendByeMessage() {
+		try {
+			this.udpAdapter.sendMulticast(new ByeMessage());
+		} catch (IOException e) {
+			LoggerWrapper.logError(e.getMessage());
+		}
 	}
 }
