@@ -114,7 +114,7 @@ public class IncomingDownload extends MessageMonitor implements ITransferProgres
 		// not ready for transfer? abort
 		switch (rsp.getResponseCode()) {
 		case NEVER_TRY_AGAIN:
-			status = TransferStatus.PermenentNotAvailable;
+			status = TransferStatus.PermanentlyNotAvailable;
 			return;
 		case TRY_AGAIN_LATER:
 			status = TransferStatus.TemporaryNotAvailable;
