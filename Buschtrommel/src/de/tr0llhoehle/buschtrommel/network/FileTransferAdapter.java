@@ -89,11 +89,11 @@ public class FileTransferAdapter extends MessageMonitor {
 				final OutputStream out = s.getOutputStream();
 				ITransferProgress p = null;
 				if (m instanceof GetFileMessage) {
-					OutgoingFileTransfer transfer = new OutgoingFileTransfer((GetFileMessage) m, out, myShares);
+					OutgoingTransfer transfer = new OutgoingTransfer((GetFileMessage) m, out, myShares);
 					transfer.start();
 					p = transfer;
 				} else if (m instanceof GetFilelistMessage) {
-					OutgoingFilelistTransfer transfer = new OutgoingFilelistTransfer(out, myShares);
+					OutgoingTransfer transfer = new OutgoingTransfer((GetFilelistMessage) m, out, myShares);
 					transfer.start();
 					p = transfer;
 				}
@@ -107,8 +107,8 @@ public class FileTransferAdapter extends MessageMonitor {
 		}
 	}
 	
-	public ITransferProgress DownloadFile(String hash, Host host, long length) {
-		return new IncomingDownload(hash, host, 0, length);
+	public ITransferProgress DownloadFile(String hash, Host host, long length, java.io.File target) {
+		return new IncomingDownload(new GetFileMessage(hash, 0, length), host, target);
 	}
 	
 	/**
@@ -118,9 +118,9 @@ public class FileTransferAdapter extends MessageMonitor {
 	 * @param length expected length of download
 	 * @return one ITransferProgress that may contain multiple children.
 	 */
-	public ITransferProgress DownloadFile(String hash, List<Host> hosts, long length) {
+	public ITransferProgress DownloadFile(String hash, List<Host> hosts, long length, java.io.File target) {
 		assert hosts.size() > 0;
-		return DownloadFile(hash, hosts.get(0), length); //TODO implement multisource
+		return DownloadFile(hash, hosts.get(0), length, target); //TODO implement multisource
 	}
 
 	/**

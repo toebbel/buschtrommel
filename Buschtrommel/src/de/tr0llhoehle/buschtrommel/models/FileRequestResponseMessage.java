@@ -27,15 +27,18 @@ public class FileRequestResponseMessage extends Message {
 	}
 
 	/**
-	 * Returns the FileRequest Response Message as string, ending with the last
-	 * field seperator that is before the bit-stream that follows
+	 * Returns the FileRequest Response Message as string, ending with a message seperator, which is followed by the bit-stream that follows
 	 */
 	@Override
 	public String Serialize() {
-		return type + FIELD_SEPERATOR + getResponseCode() + FIELD_SEPERATOR;
+		return type + FIELD_SEPERATOR + getResponseCodeAsString() + FIELD_SEPERATOR + expectedVolume + MESSAGE_SPERATOR;
 	}
 
-	private String getResponseCode() {
+	/**
+	 * Converts the response code to a string
+	 * @return
+	 */
+	public String getResponseCodeAsString() {
 		switch (code) {
 		case NEVER_TRY_AGAIN:
 			return "NEVER TRY AGAIN";
@@ -48,7 +51,20 @@ public class FileRequestResponseMessage extends Message {
 		return "fuuuu";
 	}
 
+	
+	/**
+	 * Returns the code that was sent in this message
+	 * @return the response code
+	 */
+	public ResponseCode getResponseCode() {
+		return code;
+	}
+	
 	public enum ResponseCode {
 		OK, TRY_AGAIN_LATER, NEVER_TRY_AGAIN
+	}
+
+	public long getExpectedVolume() {
+		return expectedVolume;
 	}
 }
