@@ -67,14 +67,14 @@ public class TestOutgoingTransfer {
 		
 		sendingSocket = new Socket("localhost", mock.getPort());
 		Thread.sleep(1000);
-		out = new OutgoingTransfer(m, sendingSocket.getOutputStream(), shares);
+		out = new OutgoingTransfer(m, sendingSocket.getOutputStream(), shares, null);
 	}
 	
 	@Test
 	public void testGetFilelist() throws IOException, InterruptedException {
 		//establish
 		Socket s = new Socket("localhost", mock.getPort());
-		OutgoingTransfer out = new OutgoingTransfer(new GetFilelistMessage(), s.getOutputStream(), shares);
+		OutgoingTransfer out = new OutgoingTransfer(new GetFilelistMessage(), s.getOutputStream(), shares, null);
 		Thread.sleep(100);
 		
 		//connect

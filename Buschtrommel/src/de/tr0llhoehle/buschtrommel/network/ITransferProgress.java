@@ -1,5 +1,6 @@
 package de.tr0llhoehle.buschtrommel.network;
 
+import java.net.InetSocketAddress;
 import java.util.List;
 
 public interface ITransferProgress {
@@ -97,6 +98,12 @@ public interface ITransferProgress {
 	 * @return true if transfer is active
 	 */
 	public boolean isActive();
+	
+	/**
+	 * Returns the other host, this transfer is associated to.
+	 * @return the transfer partner or null, if this is a multisource download
+	 */
+	public InetSocketAddress getTransferPartner();
 	
 	/**
 	 * List of all currently active and inactive sub-transfers
