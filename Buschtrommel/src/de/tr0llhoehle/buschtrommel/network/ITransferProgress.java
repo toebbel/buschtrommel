@@ -106,6 +106,14 @@ public interface ITransferProgress {
 	public InetSocketAddress getTransferPartner();
 	
 	/**
+	 * incoming transfer: location of the file, which is downloading
+	 * outgoing transfer: filename of the file or "filelist"
+	 * 
+	 * @return
+	 */
+	public String getTargetFile();
+	
+	/**
 	 * List of all currently active and inactive sub-transfers
 	 * @return
 	 */

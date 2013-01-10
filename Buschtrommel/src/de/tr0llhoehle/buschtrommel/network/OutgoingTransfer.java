@@ -42,6 +42,8 @@ public class OutgoingTransfer extends Thread implements ITransferProgress {
 	private String hash;
 	private InetSocketAddress partner;
 	
+	String filename;
+	
 	java.util.logging.Logger logger;
 
 	public OutgoingTransfer(Message m, OutputStream out, LocalShareCache myShares, InetSocketAddress partner) {
@@ -97,6 +99,7 @@ public class OutgoingTransfer extends Thread implements ITransferProgress {
 			byte[] fileList = myShares.getAllShares().getBytes(Message.ENCODING);
 			numAvailableData = fileList.length;
 			ressourceStream = new ByteArrayInputStream(fileList);
+			filename = "filelist";
 		} else  if (m instanceof GetFileMessage){
 			// do I know the file?
 			if (!myShares.has(((GetFileMessage) m).getHash())) {
@@ -107,6 +110,7 @@ public class OutgoingTransfer extends Thread implements ITransferProgress {
 
 			// does the file exist?
 			java.io.File file = new java.io.File(myShares.get(((GetFileMessage) m).getHash()).getPath());
+			filename = file.getName();
 			if (!file.exists()) {
 				logger.log(Level.INFO, "Requested file is not found");
 				ressourceStream = null;
@@ -271,5 +275,11 @@ public class OutgoingTransfer extends Thread implements ITransferProgress {
 	@Override
 	public void RemoveLogHander(Handler h) {
 		logger.removeHandler(h);
+	}
+
+	@Override
+	public String getTargetFile() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
