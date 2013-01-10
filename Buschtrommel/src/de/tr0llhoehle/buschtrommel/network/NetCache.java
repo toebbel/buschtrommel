@@ -128,7 +128,15 @@ public class NetCache implements IMessageObserver {
 	private void byeHandler(ByeMessage message) {
 		Host host = new Host(message.getSource(), message.getSource().toString(), UDPAdapter.DEFAULT_PORT);
 		if (this.hostExists(host)) {
-
+			RemoteShare tmp;
+			for(String hash : host.getSharedFiles().keySet()) {
+				tmp = this.knownShares.get(hash);
+				tmp.removeFileSource(host.getSharedFiles().get(hash));
+				if(tmp.noSourcesAvailable()) {
+					this.knownShares.remove(hash);
+				}
+				this.knownHosts.remove(host.getAddress());
+			}
 		}
 	}
 
