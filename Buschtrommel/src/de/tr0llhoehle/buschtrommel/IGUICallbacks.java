@@ -1,7 +1,6 @@
 package de.tr0llhoehle.buschtrommel;
 
 import de.tr0llhoehle.buschtrommel.models.ShareAvailability;
-import de.tr0llhoehle.buschtrommel.models.RemoteShare;
 import de.tr0llhoehle.buschtrommel.models.Host;
 import de.tr0llhoehle.buschtrommel.network.ITransferProgress;
 

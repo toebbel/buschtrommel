@@ -8,14 +8,12 @@ import de.tr0llhoehle.buschtrommel.Config;
 import de.tr0llhoehle.buschtrommel.IGUICallbacks;
 import de.tr0llhoehle.buschtrommel.LoggerWrapper;
 import de.tr0llhoehle.buschtrommel.models.ByeMessage;
-import de.tr0llhoehle.buschtrommel.models.LocalShare;
 import de.tr0llhoehle.buschtrommel.models.PeerDiscoveryMessage.DiscoveryMessageType;
 import de.tr0llhoehle.buschtrommel.models.RemoteShare;
 import de.tr0llhoehle.buschtrommel.models.FileAnnouncementMessage;
 import de.tr0llhoehle.buschtrommel.models.Host;
 import de.tr0llhoehle.buschtrommel.models.Message;
 import de.tr0llhoehle.buschtrommel.models.PeerDiscoveryMessage;
-import de.tr0llhoehle.buschtrommel.models.Share;
 
 /**
  * 
@@ -131,7 +129,7 @@ public class NetCache implements IMessageObserver {
 		case PeerDiscoveryMessage.TYPE_FIELD_HI:
 			try {
 				if (this.udpAdapter != null) {
-					Thread.currentThread().sleep((int) (Math.random() * Config.maximumYoResponseTime));
+					Thread.sleep((int) (Math.random() * Config.maximumYoResponseTime));
 					this.udpAdapter.sendUnicast(
 							new PeerDiscoveryMessage(DiscoveryMessageType.YO, Config.alias, message.getPort()), host);
 				} else {

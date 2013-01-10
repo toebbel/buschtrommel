@@ -1,7 +1,6 @@
 package de.tr0llhoehle.buschtrommel.network;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -81,7 +80,6 @@ public class FileTransferAdapter extends MessageMonitor {
 			Socket s;
 			try {
 				s = listeningSocket.accept();
-				InputStream in = s.getInputStream();
 				byte[] raw_message = new byte[512];
 				final Message m = MessageDeserializer.Deserialize(new String(raw_message).trim());
 				if(m != null)
@@ -129,6 +127,7 @@ public class FileTransferAdapter extends MessageMonitor {
 	 * This is a clone of the internal data structure.
 	 * @return all outgoing transfers
 	 */
+	@SuppressWarnings("unchecked")
 	public Hashtable<java.net.InetAddress, ITransferProgress> getOutgoingTransfers() {
 		return (Hashtable<InetAddress, ITransferProgress>) outgoingTransfers.clone();
 	}
@@ -138,6 +137,7 @@ public class FileTransferAdapter extends MessageMonitor {
 	 * This is a copy of the internal data structure
 	 * @return all incoming transfers
 	 */
+	@SuppressWarnings("unchecked")
 	public Hashtable<String, ITransferProgress> getIncomingTransfers() {
 		return (Hashtable<String, ITransferProgress>) incomingTransfers.clone();
 	}

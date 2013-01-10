@@ -7,14 +7,12 @@ import java.util.Hashtable;
 
 import de.tr0llhoehle.buschtrommel.models.ByeMessage;
 import de.tr0llhoehle.buschtrommel.models.FileAnnouncementMessage;
-import de.tr0llhoehle.buschtrommel.models.GetFileMessage;
 import de.tr0llhoehle.buschtrommel.models.LocalShare;
 import de.tr0llhoehle.buschtrommel.models.RemoteShare;
 import de.tr0llhoehle.buschtrommel.models.Host;
 import de.tr0llhoehle.buschtrommel.models.Share;
 import de.tr0llhoehle.buschtrommel.network.FileTransferAdapter;
 import de.tr0llhoehle.buschtrommel.network.ITransferProgress;
-import de.tr0llhoehle.buschtrommel.network.IncomingDownload;
 import de.tr0llhoehle.buschtrommel.network.NetCache;
 import de.tr0llhoehle.buschtrommel.network.UDPAdapter;
 
