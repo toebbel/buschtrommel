@@ -82,7 +82,7 @@ public class MessageDeserializer {
 			String hash = fixBrokenHash(fields[0]);
 			
 			
-			result = new FileAnnouncementMessage(new File(hash, length, ttl, fields[3], meta));
+			result = new FileAnnouncementMessage(new LocalShare(hash, length, ttl, fields[3], meta, ""));
 		} catch(IllegalArgumentException e) { //NumberFormatException is subtype
 			LoggerWrapper.logError("Could not parse the FileAnnouncementMessage body: '" + msgContent + "'. Excpetion: " + e.getMessage());
 		}

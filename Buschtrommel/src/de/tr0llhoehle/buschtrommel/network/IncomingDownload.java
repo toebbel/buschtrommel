@@ -41,6 +41,7 @@ public class IncomingDownload extends MessageMonitor implements ITransferProgres
 	FileOutputStream targetFilestream;
 	java.net.Socket socket;
 	Thread self;
+	InetSocketAddress partner;
 
 	public IncomingDownload(GetFileMessage sourceFile, Host host, java.io.File target) {
 		this.offset = sourceFile.getOffset();
@@ -53,6 +54,7 @@ public class IncomingDownload extends MessageMonitor implements ITransferProgres
 		checkIntegrity = true;
 		this.targetFile = target;
 		status = TransferStatus.Initialized;
+		this.partner = new InetSocketAddress(host.getAddress(), host.getPort());
 	}
 
 	public void DisableIntegrityCheck() {
@@ -400,5 +402,10 @@ public class IncomingDownload extends MessageMonitor implements ITransferProgres
 	@Override
 	public boolean isActive() {
 		return self != null;
+	}
+
+	@Override
+	public InetSocketAddress getTransferPartner() {
+		return partner;
 	}
 }

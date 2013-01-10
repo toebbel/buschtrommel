@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Hashtable;
 
-import de.tr0llhoehle.buschtrommel.models.File;
+import de.tr0llhoehle.buschtrommel.models.RemoteShare;
 import de.tr0llhoehle.buschtrommel.models.Host;
 import de.tr0llhoehle.buschtrommel.network.FileTransferAdapter;
 import de.tr0llhoehle.buschtrommel.network.ITransferProgress;
@@ -22,7 +22,7 @@ public class Buschtrommel {
 		if (!HashFuncWrapper.check()) {
 			//cancel bootstrap: Hashfunction is not available!
 			this.gui = gui;
-			this.netCache = new NetCache();
+			this.netCache = new NetCache(this.udpAdapter);
 		}
 	}
 	
@@ -47,7 +47,7 @@ public class Buschtrommel {
 		
 	}
 	
-	public void RemoveFileFromShare(File file) {
+	public void RemoveFileFromShare(RemoteShare file) {
 		
 	}
 	
@@ -59,7 +59,7 @@ public class Buschtrommel {
 		return null;
 	}
 	
-	public Hashtable<String, File> getShares() {
+	public Hashtable<String, RemoteShare> getShares() {
 		return null;
 	}
 	

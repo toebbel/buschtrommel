@@ -4,9 +4,9 @@ public class FileAnnouncementMessage extends Message {
 
 	public static final String TYPE_FIELD = "FILE";
 	
-	private File announcedFile;
+	private LocalShare announcedFile;
 
-	public FileAnnouncementMessage(File f) {
+	public FileAnnouncementMessage(LocalShare f) {
 		type = TYPE_FIELD;
 		announcedFile = f;
 	}
@@ -20,7 +20,7 @@ public class FileAnnouncementMessage extends Message {
 				+ announcedFile.getMeta() + MESSAGE_SPERATOR;
 	}
 	
-	public File getFile() {
+	public LocalShare getFile() {
 		return this.announcedFile;
 	}
 

@@ -7,12 +7,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
 import de.tr0llhoehle.buschtrommel.LoggerWrapper;
 import de.tr0llhoehle.buschtrommel.ShareCache;
-import de.tr0llhoehle.buschtrommel.models.File;
 import de.tr0llhoehle.buschtrommel.models.GetFileMessage;
 import de.tr0llhoehle.buschtrommel.models.FileRequestResponseMessage;
 import de.tr0llhoehle.buschtrommel.models.GetFilelistMessage;
@@ -41,11 +41,13 @@ public class OutgoingTransfer extends Thread implements ITransferProgress {
 	TransferStatus transferState;
 	boolean transferIsActive;
 	private String hash;
+	private InetSocketAddress partner;
 
-	public OutgoingTransfer(Message m, OutputStream out, ShareCache myShares) {
+	public OutgoingTransfer(Message m, OutputStream out, ShareCache myShares, InetSocketAddress partner) {
 		assert m instanceof GetFilelistMessage || m instanceof GetFileMessage;
 		this.net_out = out;
 		this.myShares = myShares;
+		this.partner = partner;
 		
 		transferIsActive = true;
 		keepThreadAlive = true;
@@ -249,5 +251,10 @@ public class OutgoingTransfer extends Thread implements ITransferProgress {
 	@Override
 	public boolean isActive() {
 		return transferIsActive;
+	}
+
+	@Override
+	public InetSocketAddress getTransferPartner() {
+		return partner;
 	}
 }

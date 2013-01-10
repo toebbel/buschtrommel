@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import de.tr0llhoehle.buschtrommel.models.FileAnnouncementMessage;
-import de.tr0llhoehle.buschtrommel.models.Share;
+import de.tr0llhoehle.buschtrommel.models.LocalShare;
 import de.tr0llhoehle.buschtrommel.network.MessageDeserializer;
 
 /**
@@ -23,7 +23,7 @@ import de.tr0llhoehle.buschtrommel.network.MessageDeserializer;
  */
 public class ShareCache {
 
-	protected Hashtable<String, Share> shares = new Hashtable<>();
+	protected Hashtable<String, LocalShare> shares = new Hashtable<>();
 
 	/**
 	 * 
@@ -47,7 +47,7 @@ public class ShareCache {
 	 * @return the Share to a given hash or null, if no such share is known
 	 */
 
-	public Share get(String hash) {
+	public LocalShare get(String hash) {
 		if (hash != null) {
 			return this.shares.get(hash);
 		}
@@ -64,9 +64,9 @@ public class ShareCache {
 	public String getAllShares() {
 		StringBuilder allShares = new StringBuilder("");
 
-		ArrayList<Share> shareList = new ArrayList<Share>(shares.values());
+		ArrayList<LocalShare> shareList = new ArrayList<LocalShare>(shares.values());
 
-		for (Share i : shareList) {
+		for (LocalShare i : shareList) {
 			allShares.append((new FileAnnouncementMessage(i).Serialize()));
 		}
 
@@ -77,7 +77,7 @@ public class ShareCache {
 	 * 
 	 * @param share
 	 */
-	public void newShare(Share share) {
+	public void newShare(LocalShare share) {
 		if (share == null) {
 			LoggerWrapper.logError("no share given");
 			return;
@@ -99,7 +99,7 @@ public class ShareCache {
 		if(shares == null){
 			return false;
 		}
-		Hashtable<String, Share> temp_shares = new Hashtable<String, Share>();
+		Hashtable<String, LocalShare> temp_shares = new Hashtable<String, LocalShare>();
 		// TODO
 		String[] temp = shares.split("\n");
 		for(String i : temp){
@@ -117,9 +117,9 @@ public class ShareCache {
 	protected String convertSharesToString() {
 		StringBuilder allShares = new StringBuilder("");
 
-		ArrayList<Share> shareList = new ArrayList<Share>(shares.values());
+		ArrayList<LocalShare> shareList = new ArrayList<LocalShare>(shares.values());
 
-		for (Share i : shareList) {
+		for (LocalShare i : shareList) {
 			allShares.append((new FileAnnouncementMessage(i).Serialize()) + i.getPath() + "\n");
 		}
 
