@@ -15,69 +15,73 @@ import de.tr0llhoehle.buschtrommel.network.UDPAdapter;
 
 public class Buschtrommel {
 
-	private IGUICallbacks gui;
+	private IGUICallbacks guiCallbacks;
 	private FileTransferAdapter fileTransferAdapter;
 	private UDPAdapter udpAdapter;
 	private NetCache netCache;
 
 	public Buschtrommel(IGUICallbacks gui) {
 		if (!HashFuncWrapper.check()) {
-			//cancel bootstrap: Hashfunction is not available!
-			this.gui = gui;
-			this.netCache = new NetCache(this.udpAdapter);
+			// cancel bootstrap: Hashfunction is not available!
+			this.guiCallbacks = gui;
+			this.netCache = new NetCache(this.udpAdapter, guiCallbacks);
 		}
 	}
-	
+
 	public void start() throws IOException {
-		//TODO: create new FileTransferAdapter
+		// TODO: create new FileTransferAdapter
 		this.udpAdapter = new UDPAdapter();
 		this.udpAdapter.registerObserver(netCache);
 	}
-	
+
 	public void stop() throws IOException {
 		this.sendByeMessage();
-		
-		//TODO: destroy fileTransferAdapter
+
+		// TODO: destroy fileTransferAdapter
 		this.udpAdapter.closeConnection();
 		this.udpAdapter.removeObserver(netCache);
 		this.udpAdapter = null;
 	}
-	
+
 	public ITransferProgress DownloadFile(String hash, Host host) {
 		return null;
 	}
-	
+
 	public void AddFileToShare(String path, String dspName, String meta) {
-		
+
 	}
-	
+
 	public void RemoveFileFromShare(LocalShare file) {
-		
+
 	}
-	
+
 	public Hashtable<String, ITransferProgress> getIncomingTransfers() {
 		return null;
 	}
-	
+
 	public Hashtable<InetAddress, ITransferProgress> getOutgoingTransfers() {
 		return null;
 	}
-	
+
 	public Hashtable<String, RemoteShare> getRemoteShares() {
 		return this.netCache.getShares();
 	}
-	
+
 	public Hashtable<InetAddress, Host> getHosts() {
-		return null;
+		return this.netCache.getHosts();
 	}
-	
+
 	public void CancelFileTransfer(ITransferProgress transferProgress) {
-		
+
 	}
-	
+
 	private void sendByeMessage() {
 		try {
-			this.udpAdapter.sendMulticast(new ByeMessage());
+			if (this.udpAdapter != null) {
+				this.udpAdapter.sendMulticast(new ByeMessage());
+			} else {
+				LoggerWrapper.logError("Could not find UDP Adapter");
+			}
 		} catch (IOException e) {
 			LoggerWrapper.logError(e.getMessage());
 		}
