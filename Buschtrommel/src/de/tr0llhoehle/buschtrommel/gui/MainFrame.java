@@ -27,6 +27,8 @@ public class MainFrame extends javax.swing.JFrame {
     	setIconImage(Toolkit.getDefaultToolkit().getImage(MainFrame.class.getResource("/de/tr0llhoehle/buschtrommel/gui/res/djembe.png")));
     	setTitle("Bongo");
         initComponents();
+        
+
     }
 
     /** This method is called from within the constructor to
@@ -39,6 +41,11 @@ public class MainFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         jFileChooser1 = new javax.swing.JFileChooser();
+        fileDownload = new javax.swing.JPanel();
+        label1 = new java.awt.Label();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jTextArea1 = new javax.swing.JTextArea();
+        jProgressBar1 = new javax.swing.JProgressBar();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
@@ -64,6 +71,33 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
 
         jFileChooser1.setDialogTitle("Datei wählen");
+
+        label1.setText("label1");
+
+        jTextArea1.setColumns(20);
+        jTextArea1.setRows(5);
+        jScrollPane4.setViewportView(jTextArea1);
+
+        javax.swing.GroupLayout fileDownloadLayout = new javax.swing.GroupLayout(fileDownload);
+        fileDownload.setLayout(fileDownloadLayout);
+        fileDownloadLayout.setHorizontalGroup(
+            fileDownloadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(fileDownloadLayout.createSequentialGroup()
+                .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 418, Short.MAX_VALUE))
+        );
+        fileDownloadLayout.setVerticalGroup(
+            fileDownloadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(fileDownloadLayout.createSequentialGroup()
+                .addGap(1, 1, 1)
+                .addGroup(fileDownloadLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(label1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+        );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -394,6 +428,9 @@ private void removeShareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 
     }//GEN-LAST:event_abortTransferActionPerformed
 
+
+    
+    
     /**
      * @param args the command line arguments
      */
@@ -423,6 +460,7 @@ private void removeShareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
         //</editor-fold>
 
 
+      
        
 
         /* Create and display the form */
@@ -438,6 +476,7 @@ private void removeShareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JButton abortTransfer;
     private javax.swing.JButton addShare;
     private javax.swing.JButton downloadFilesBtn;
+    private javax.swing.JPanel fileDownload;
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -446,14 +485,18 @@ private void removeShareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JTable jTable2;
+    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
+    private java.awt.Label label1;
     private javax.swing.JButton loadSettings;
     private javax.swing.JButton removeShare;
     private javax.swing.JButton resetTransfer;
