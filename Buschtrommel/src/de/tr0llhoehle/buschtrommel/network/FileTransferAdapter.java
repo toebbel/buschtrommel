@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Hashtable;
@@ -89,11 +90,11 @@ public class FileTransferAdapter extends MessageMonitor {
 				final OutputStream out = s.getOutputStream();
 				ITransferProgress p = null;
 				if (m instanceof GetFileMessage) {
-					OutgoingTransfer transfer = new OutgoingTransfer((GetFileMessage) m, out, myShares);
+					OutgoingTransfer transfer = new OutgoingTransfer((GetFileMessage) m, out, myShares, new InetSocketAddress(s.getInetAddress(), s.getPort()));
 					transfer.start();
 					p = transfer;
 				} else if (m instanceof GetFilelistMessage) {
-					OutgoingTransfer transfer = new OutgoingTransfer((GetFilelistMessage) m, out, myShares);
+					OutgoingTransfer transfer = new OutgoingTransfer((GetFilelistMessage) m, out, myShares, new InetSocketAddress(s.getInetAddress(), s.getPort()));
 					transfer.start();
 					p = transfer;
 				}
