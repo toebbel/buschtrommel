@@ -5,16 +5,15 @@ import java.net.InetAddress;
 import java.util.Hashtable;
 
 import de.tr0llhoehle.buschtrommel.Config;
+import de.tr0llhoehle.buschtrommel.IGUICallbacks;
 import de.tr0llhoehle.buschtrommel.LoggerWrapper;
 import de.tr0llhoehle.buschtrommel.models.ByeMessage;
-import de.tr0llhoehle.buschtrommel.models.LocalShare;
 import de.tr0llhoehle.buschtrommel.models.PeerDiscoveryMessage.DiscoveryMessageType;
 import de.tr0llhoehle.buschtrommel.models.RemoteShare;
 import de.tr0llhoehle.buschtrommel.models.FileAnnouncementMessage;
 import de.tr0llhoehle.buschtrommel.models.Host;
 import de.tr0llhoehle.buschtrommel.models.Message;
 import de.tr0llhoehle.buschtrommel.models.PeerDiscoveryMessage;
-import de.tr0llhoehle.buschtrommel.models.Share;
 
 /**
  * 
@@ -26,10 +25,21 @@ public class NetCache implements IMessageObserver {
 	protected Hashtable<InetAddress, Host> knownHosts;
 	protected Hashtable<String, RemoteShare> knownShares;
 
+	protected IGUICallbacks guiCallbacks;
 	protected UDPAdapter udpAdapter;
 
-	public NetCache(UDPAdapter udpAdapter) {
+	public NetCache(UDPAdapter udpAdapter, IGUICallbacks guiCallbacks) {
 		this.udpAdapter = udpAdapter;
+		this.guiCallbacks = guiCallbacks;
+	}
+	
+	/**
+	 * Returns the remoteShare with the given hash or null if the share is unknown
+	 * @param hash of the share
+	 * @return null or the share
+	 */
+	public RemoteShare getShare(String hash) {
+		return knownShares.get(hash);
 	}
 
 	@Override
@@ -61,6 +71,7 @@ public class NetCache implements IMessageObserver {
 				// ttl
 				if (host.getSharedFiles().containsKey(hash)) {
 					host.getSharedFiles().get(hash).setTTL(ttl);
+					this.guiCallbacks.updatedTTL(host.getSharedFiles().get(hash));
 				}
 
 				// if the share share isn't already associated, associate it to
@@ -68,6 +79,7 @@ public class NetCache implements IMessageObserver {
 				else {
 					host.addFileToSharedFiles(tempShare.addFileSource(host, ttl, message.getFile().getDisplayName(),
 							message.getFile().getMeta()));
+					this.guiCallbacks.newShareAvailable(host.getSharedFiles().get(hash));
 				}
 
 				// case: share cached but new host
@@ -75,6 +87,8 @@ public class NetCache implements IMessageObserver {
 				this.knownHosts.put(host.getAddress(), host);
 				host.addFileToSharedFiles(tempShare.addFileSource(host, ttl, message.getFile().getDisplayName(),
 						message.getFile().getMeta()));
+				this.guiCallbacks.newHostDiscovered(host);
+				this.guiCallbacks.newShareAvailable(host.getSharedFiles().get(hash));
 			}
 
 		} else {
@@ -84,6 +98,7 @@ public class NetCache implements IMessageObserver {
 				this.knownShares.put(hash, tmp);
 				host.addFileToSharedFiles(tmp.addFileSource(host, ttl, message.getFile().getDisplayName(), message
 						.getFile().getMeta()));
+				this.guiCallbacks.newShareAvailable(host.getSharedFiles().get(hash));
 			}
 
 			// case: neither host nor share cached
@@ -93,6 +108,8 @@ public class NetCache implements IMessageObserver {
 				this.knownShares.put(hash, tmp);
 				host.addFileToSharedFiles(tmp.addFileSource(host, ttl, message.getFile().getDisplayName(), message
 						.getFile().getMeta()));
+				this.guiCallbacks.newHostDiscovered(host);
+				this.guiCallbacks.newShareAvailable(host.getSharedFiles().get(hash));
 			}
 		}
 	}
@@ -106,13 +123,18 @@ public class NetCache implements IMessageObserver {
 		} else {
 			// add new host
 			this.knownHosts.put(host.getAddress(), host);
+			this.guiCallbacks.newHostDiscovered(host);
 		}
 		switch (message.getType()) {
 		case PeerDiscoveryMessage.TYPE_FIELD_HI:
 			try {
-				Thread.currentThread().sleep((int) (Math.random() * Config.maximumYoResponseTime));
-				this.udpAdapter.sendUnicast(
-						new PeerDiscoveryMessage(DiscoveryMessageType.YO, Config.alias, message.getPort()), host);
+				if (this.udpAdapter != null) {
+					Thread.sleep((int) (Math.random() * Config.maximumYoResponseTime));
+					this.udpAdapter.sendUnicast(
+							new PeerDiscoveryMessage(DiscoveryMessageType.YO, Config.alias, message.getPort()), host);
+				} else {
+					LoggerWrapper.logError("Could not find UDP Adapter");
+				}
 			} catch (IOException e) {
 				LoggerWrapper.logError(e.getMessage());
 			} catch (InterruptedException e) {
@@ -129,15 +151,24 @@ public class NetCache implements IMessageObserver {
 		Host host = new Host(message.getSource(), message.getSource().toString(), UDPAdapter.DEFAULT_PORT);
 		if (this.hostExists(host)) {
 			RemoteShare tmp;
-			for(String hash : host.getSharedFiles().keySet()) {
+			this.guiCallbacks.hostWentOffline(host);
+			for (String hash : host.getSharedFiles().keySet()) {
 				tmp = this.knownShares.get(hash);
 				tmp.removeFileSource(host.getSharedFiles().get(hash));
-				if(tmp.noSourcesAvailable()) {
+				if (tmp.noSourcesAvailable()) {
 					this.knownShares.remove(hash);
 				}
 				this.knownHosts.remove(host.getAddress());
 			}
 		}
+	}
+
+	public Hashtable<String, RemoteShare> getShares() {
+		return this.knownShares;
+	}
+
+	public Hashtable<InetAddress, Host> getHosts() {
+		return this.knownHosts;
 	}
 
 	/**

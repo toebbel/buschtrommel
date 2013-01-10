@@ -6,14 +6,14 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import de.tr0llhoehle.buschtrommel.ShareCache;
+import de.tr0llhoehle.buschtrommel.LocalShareCache;
 import de.tr0llhoehle.buschtrommel.models.LocalShare;
 import de.tr0llhoehle.buschtrommel.models.Share;
 
 public class TestShareCache {
 	@Test
 	public void testAddShare() {
-		ShareCache troll = new ShareCache();
+		LocalShareCache troll = new LocalShareCache();
 		LocalShare share = new LocalShare("AC3", 29, 31, "test blubb", "meta", "/home/path");
 		//System.out.println(share.getHash());
 		
@@ -30,14 +30,14 @@ public class TestShareCache {
 	@Test
 	public void testSaveAndLoad() throws IOException {
 		(new java.io.File("test.file")).createNewFile();
-		ShareCache shares = new ShareCache();
+		LocalShareCache shares = new LocalShareCache();
 		LocalShare s1 = new LocalShare("ABC", 1044, Share.TTL_INFINITY, "file 1", "metablub", "test.file");
 		LocalShare s2 = new LocalShare("asdasdasdasdsa", 10, 100, "file 2", "", "test2.file");
 		shares.newShare(s1);
 		shares.newShare(s2);
 		shares.saveToFile("test.ht");
 		
-		ShareCache loaded = new ShareCache();
+		LocalShareCache loaded = new LocalShareCache();
 		loaded.restoreFromFile("test.ht");
 		assertTrue(loaded.has("ABC"));
 		assertEquals(loaded.get("ABC").getDisplayName(), s1.getDisplayName());

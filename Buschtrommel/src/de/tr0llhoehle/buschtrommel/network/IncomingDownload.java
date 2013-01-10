@@ -342,7 +342,6 @@ public class IncomingDownload extends MessageMonitor implements ITransferProgres
 	}
 	
 	private Thread getCreateOwnThread() {
-		IncomingDownload me = this;
 		Thread t = new Thread(new Runnable() {
 
 			@Override

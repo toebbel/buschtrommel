@@ -1,16 +1,11 @@
 package de.tr0llhoehle.buschtrommel;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import de.tr0llhoehle.buschtrommel.models.FileAnnouncementMessage;
 import de.tr0llhoehle.buschtrommel.models.LocalShare;
@@ -26,10 +21,9 @@ import de.tr0llhoehle.buschtrommel.network.MessageDeserializer;
  * @author benjamin
  * 
  */
-public class ShareCache {
+public class LocalShareCache {
 
 	protected Hashtable<String, LocalShare> shares = new Hashtable<>();
-	private int defaultTTL;
 
 
 	/**
@@ -180,7 +174,7 @@ public class ShareCache {
 				// split into parseable part and path
 				String[] line = reader.readLine().split(String.valueOf(Message.MESSAGE_SPERATOR));
 				if (line.length != 2) {
-					LoggerWrapper.logError("Could not parse line " + line + " in shareCache file");
+					LoggerWrapper.logError("Could not parse line " + lineCount + " in shareCache file");
 					lineCount++;
 					continue;
 				}
@@ -211,9 +205,15 @@ public class ShareCache {
 																												// correct
 				newShare(s);
 			}
+			reader.close();
 		} catch (IOException e) {
 			LoggerWrapper.logError("Could not read ShareCache: " + e.getMessage());
 		}
 		return true;
+	}
+
+	public void remove(String hash) {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 
-import de.tr0llhoehle.buschtrommel.ShareCache;
+import de.tr0llhoehle.buschtrommel.LocalShareCache;
 import de.tr0llhoehle.buschtrommel.models.GetFileMessage;
 import de.tr0llhoehle.buschtrommel.models.FileRequestResponseMessage;
 import de.tr0llhoehle.buschtrommel.models.GetFilelistMessage;
@@ -28,7 +28,7 @@ import de.tr0llhoehle.buschtrommel.models.FileRequestResponseMessage.ResponseCod
 public class OutgoingTransfer extends Thread implements ITransferProgress {
 	OutputStream net_out; // network stream to the requester
 	java.io.InputStream ressourceStream; // stream from filelist / file
-	ShareCache myShares; // all my shares
+	LocalShareCache myShares; // all my shares
 
 	private boolean keepThreadAlive;
 	long offset; // number of bytes to skip in ressourceStream before send
@@ -44,7 +44,7 @@ public class OutgoingTransfer extends Thread implements ITransferProgress {
 	
 	java.util.logging.Logger logger;
 
-	public OutgoingTransfer(Message m, OutputStream out, ShareCache myShares, InetSocketAddress partner) {
+	public OutgoingTransfer(Message m, OutputStream out, LocalShareCache myShares, InetSocketAddress partner) {
 		assert m instanceof GetFilelistMessage || m instanceof GetFileMessage;
 		assert partner != null;
 		this.net_out = out;

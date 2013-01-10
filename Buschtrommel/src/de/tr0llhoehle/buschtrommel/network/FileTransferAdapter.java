@@ -1,7 +1,6 @@
 package de.tr0llhoehle.buschtrommel.network;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -11,14 +10,14 @@ import java.util.Hashtable;
 import java.util.List;
 
 import de.tr0llhoehle.buschtrommel.LoggerWrapper;
-import de.tr0llhoehle.buschtrommel.ShareCache;
+import de.tr0llhoehle.buschtrommel.LocalShareCache;
 import de.tr0llhoehle.buschtrommel.models.GetFileMessage;
 import de.tr0llhoehle.buschtrommel.models.GetFilelistMessage;
 import de.tr0llhoehle.buschtrommel.models.Host;
 import de.tr0llhoehle.buschtrommel.models.Message;
 
 public class FileTransferAdapter extends MessageMonitor {
-	private ShareCache myShares;
+	private LocalShareCache myShares;
 	private int port = -1;
 	private ServerSocket listeningSocket;
 	private Thread receiveThread;
@@ -37,7 +36,7 @@ public class FileTransferAdapter extends MessageMonitor {
 	 *            the tcp port to use.
 	 * @throws IOException
 	 */
-	public FileTransferAdapter(ShareCache s, int port) throws IOException {
+	public FileTransferAdapter(LocalShareCache s, int port) throws IOException {
 		this.port = port;
 		myShares = s;
 		incomingTransfers = new Hashtable<>();
@@ -45,7 +44,7 @@ public class FileTransferAdapter extends MessageMonitor {
 		startListening();
 	}
 
-	public FileTransferAdapter(ShareCache s) throws IOException {
+	public FileTransferAdapter(LocalShareCache s) throws IOException {
 		myShares = s;
 		startListening();
 	}
@@ -81,7 +80,6 @@ public class FileTransferAdapter extends MessageMonitor {
 			Socket s;
 			try {
 				s = listeningSocket.accept();
-				InputStream in = s.getInputStream();
 				byte[] raw_message = new byte[512];
 				final Message m = MessageDeserializer.Deserialize(new String(raw_message).trim());
 				if(m != null)
@@ -129,6 +127,7 @@ public class FileTransferAdapter extends MessageMonitor {
 	 * This is a clone of the internal data structure.
 	 * @return all outgoing transfers
 	 */
+	@SuppressWarnings("unchecked")
 	public Hashtable<java.net.InetAddress, ITransferProgress> getOutgoingTransfers() {
 		return (Hashtable<InetAddress, ITransferProgress>) outgoingTransfers.clone();
 	}
@@ -138,6 +137,7 @@ public class FileTransferAdapter extends MessageMonitor {
 	 * This is a copy of the internal data structure
 	 * @return all incoming transfers
 	 */
+	@SuppressWarnings("unchecked")
 	public Hashtable<String, ITransferProgress> getIncomingTransfers() {
 		return (Hashtable<String, ITransferProgress>) incomingTransfers.clone();
 	}

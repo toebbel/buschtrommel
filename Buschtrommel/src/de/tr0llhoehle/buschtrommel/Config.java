@@ -7,6 +7,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
+/**
+ * This class is a container for all settings
+ * 
+ * @author Tobias Sturm
+ *
+ */
 public class Config {
 	
 	public static int defaultTTL;
