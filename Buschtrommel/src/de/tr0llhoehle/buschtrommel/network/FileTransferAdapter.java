@@ -162,4 +162,10 @@ public class FileTransferAdapter extends MessageMonitor {
 		for(String k : incomingTransfers.keySet())
 			incomingTransfers.get(k).cancel();
 	}
+
+	public ITransferProgress downloadFilelist(Host host) {
+		ITransferProgress result = new IncomingFilelistTransfer(host);
+		result.start();
+		return result;
+	}
 }
