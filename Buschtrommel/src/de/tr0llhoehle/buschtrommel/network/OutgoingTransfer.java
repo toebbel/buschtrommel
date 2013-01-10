@@ -12,7 +12,6 @@ import java.util.List;
 
 import de.tr0llhoehle.buschtrommel.LoggerWrapper;
 import de.tr0llhoehle.buschtrommel.ShareCache;
-import de.tr0llhoehle.buschtrommel.models.File;
 import de.tr0llhoehle.buschtrommel.models.GetFileMessage;
 import de.tr0llhoehle.buschtrommel.models.FileRequestResponseMessage;
 import de.tr0llhoehle.buschtrommel.models.GetFilelistMessage;
