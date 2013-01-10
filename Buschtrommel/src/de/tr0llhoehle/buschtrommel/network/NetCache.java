@@ -148,6 +148,10 @@ public class NetCache implements IMessageObserver {
 			}
 		}
 	}
+	
+	public Hashtable<String, RemoteShare> getShares() {
+		return this.knownShares;
+	}
 
 	/**
 	 * Checks if the specified host already exists. Updates the last seen value
