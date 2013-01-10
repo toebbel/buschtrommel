@@ -9,6 +9,8 @@
  * Created on 02.01.2013, 19:15:29
  */
 package de.tr0llhoehle.buschtrommel.gui;
+import javax.swing.table.DefaultTableModel;
+import java.awt.Window.Type;
 
 /**
  *
@@ -18,6 +20,8 @@ public class MainFrame extends javax.swing.JFrame {
 
     /** Creates new form MainFrame */
     public MainFrame() {
+    	setType(Type.UTILITY);
+    	setTitle("Buschtrommel");
         initComponents();
     }
 
@@ -53,17 +57,31 @@ public class MainFrame extends javax.swing.JFrame {
 
         jPanel1.setName("filesTab"); // NOI18N
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
+        jTable1.setModel(new DefaultTableModel(
+        	new Object[][] {
+        		{null, null, null, null, null},
+        		{null, null, null, null, null},
+        		{null, null, null, null, null},
+        		{null, null, null, null, null},
+        	},
+        	new String[] {
+        		"Filename", "Meta-Information", "Host", "Hash", "TTL"
+        	}
+        ) {
+        	Class[] columnTypes = new Class[] {
+        		String.class, String.class, String.class, String.class, Integer.class
+        	};
+        	public Class getColumnClass(int columnIndex) {
+        		return columnTypes[columnIndex];
+        	}
+        	boolean[] columnEditables = new boolean[] {
+        		false, false, false, false, false
+        	};
+        	public boolean isCellEditable(int row, int column) {
+        		return columnEditables[column];
+        	}
+        });
+        jTable1.getColumnModel().getColumn(1).setPreferredWidth(135);
         jScrollPane3.setViewportView(jTable1);
 
         downloadFilesBtn.setText("Download selected");
@@ -109,17 +127,31 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
-        jTable2.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
+        jTable2.setModel(new DefaultTableModel(
+        	new Object[][] {
+        		{null, null, null, null, null},
+        		{null, null, null, null, null},
+        		{null, null, null, null, null},
+        		{null, null, null, null, null},
+        	},
+        	new String[] {
+        		"Filename", "Meta-Information", "Size", "Path", "Hash"
+        	}
+        ) {
+        	Class[] columnTypes = new Class[] {
+        		String.class, String.class, String.class, Object.class, String.class
+        	};
+        	public Class getColumnClass(int columnIndex) {
+        		return columnTypes[columnIndex];
+        	}
+        	boolean[] columnEditables = new boolean[] {
+        		true, true, false, false, false
+        	};
+        	public boolean isCellEditable(int row, int column) {
+        		return columnEditables[column];
+        	}
+        });
+        jTable2.getColumnModel().getColumn(1).setPreferredWidth(176);
         jScrollPane2.setViewportView(jTable2);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
