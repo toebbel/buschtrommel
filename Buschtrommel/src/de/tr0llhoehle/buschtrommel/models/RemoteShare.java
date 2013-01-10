@@ -1,5 +1,7 @@
 package de.tr0llhoehle.buschtrommel.models;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 
@@ -55,5 +57,18 @@ public class RemoteShare extends Share {
 			}
 		}
 		return ttl;
+	}
+
+	/**
+	 * Returns a list of all hosts that provide this file and have a valid TTL.
+	 * @return list of hosts. Can be empty.
+	 */
+	public List<Host> getHostList() {
+		ArrayList<Host> result = new ArrayList<>();
+		for(ShareAvailability f : sources) {
+			if(f.getTtl() > 0 || f.getTtl() == Share.TTL_INFINITY)
+				result.add(f.getHost());
+		}
+		return result;
 	}
 }

@@ -34,6 +34,15 @@ public class NetCache implements IMessageObserver {
 		this.udpAdapter = udpAdapter;
 		this.guiCallbacks = guiCallbacks;
 	}
+	
+	/**
+	 * Returns the remoteShare with the given hash or null if the share is unknown
+	 * @param hash of the share
+	 * @return null or the share
+	 */
+	public RemoteShare getShare(String hash) {
+		return knownShares.get(hash);
+	}
 
 	@Override
 	public void receiveMessage(Message message) {
