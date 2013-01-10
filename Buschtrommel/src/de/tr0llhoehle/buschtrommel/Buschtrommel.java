@@ -5,10 +5,12 @@ import java.net.InetAddress;
 import java.util.Hashtable;
 
 import de.tr0llhoehle.buschtrommel.models.ByeMessage;
+import de.tr0llhoehle.buschtrommel.models.GetFileMessage;
 import de.tr0llhoehle.buschtrommel.models.RemoteShare;
 import de.tr0llhoehle.buschtrommel.models.Host;
 import de.tr0llhoehle.buschtrommel.network.FileTransferAdapter;
 import de.tr0llhoehle.buschtrommel.network.ITransferProgress;
+import de.tr0llhoehle.buschtrommel.network.IncomingDownload;
 import de.tr0llhoehle.buschtrommel.network.NetCache;
 import de.tr0llhoehle.buschtrommel.network.UDPAdapter;
 
@@ -42,8 +44,31 @@ public class Buschtrommel {
 		this.udpAdapter = null;
 	}
 	
-	public ITransferProgress DownloadFile(String hash, Host host) {
-		return null;
+	/***
+	 * Downloads a file from a specific host
+	 * @param hash hash of the file to download
+	 * @param targetFile target file to save
+	 * @param host the host to download this file from
+	 * @return progress-indicator or null if the hash could not be resolved
+	 */
+	public ITransferProgress DownloadFile(String hash, String targetFile, Host host) {
+		RemoteShare s = netCache.getShare(hash);
+		if(s == null)
+			return null;
+		return fileTransferAdapter.DownloadFile(hash, host, s.getLength(), new java.io.File(targetFile));
+	}
+	
+	/**
+	 * Download a file from any available host.
+	 * @param hash hash of the file to download
+	 * @param targetFile target file to save
+	 * @return progress-indicator or null if the hash could not be resolved
+	 */
+	public ITransferProgress DownloadFile(String hash, String targetFile) {
+		RemoteShare s = netCache.getShare(hash);
+		if(s == null)
+			return null;
+		return fileTransferAdapter.DownloadFile(hash, s.getHostList(), s.getLength(), new java.io.File(targetFile));
 	}
 	
 	public void AddFileToShare(String path, String dspName, String meta) {
