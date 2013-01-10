@@ -57,9 +57,18 @@ public class DownloadItem extends javax.swing.JPanel implements ListCellRenderer
          };
          
          
-         
+         //set state
          TransferStatus.setText(statusToString(value.getStatus()));
-
+         
+         Filename.setText(value.getTargetFile());
+         
+         long length = value.getLength();
+         long transferred = value.getTransferedAmount();
+         
+         int percent = (int) (length/transferred)*100;
+         Progress.setMaximum(100);
+         Progress.setValue(percent);
+         
          setBackground(background);
          setForeground(foreground);
 
