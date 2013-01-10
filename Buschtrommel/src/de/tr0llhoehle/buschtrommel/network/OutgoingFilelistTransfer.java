@@ -14,31 +14,35 @@ public class OutgoingFilelistTransfer extends Thread implements ITransferProgres
 	private int transferedData;
 	private TransferStatus status;
 	OutputStream out;
+	boolean active;
 
 	public OutgoingFilelistTransfer(OutputStream out, ShareCache share) {
 		data = share.getAllShares().getBytes();
-		status = TransferStatus.establishing;
+		status = TransferStatus.Initialized;
 		transferedData = 0;
 		keepAlive = true;
 		this.out = out;
+		active = true;
 		run();
 	}
 
 	@Override
 	public void run() {
-		status = TransferStatus.transfering;
+		status = TransferStatus.Transfering;
 		try {
 			while (transferedData < data.length && keepAlive) {
 				out.write(data[transferedData++]);
 			}
 		} catch (IOException e) {
-			status = TransferStatus.otherSideCanceled;
+			status = TransferStatus.LostConnection;
+			active = false;
 			return;
 		} 
 		if(keepAlive)
-			status = TransferStatus.finished;
+			status = TransferStatus.Finished;
 		else
-			status = TransferStatus.canceled;
+			status = TransferStatus.Canceled;
+		active = false;
 	}
 
 	@Override
@@ -52,19 +56,10 @@ public class OutgoingFilelistTransfer extends Thread implements ITransferProgres
 	}
 
 	@Override
-	public long getTotalLength() {
-		return getLength();
-	}
-
-	@Override
 	public long getOffset() {
 		return 0;
 	}
 
-	@Override
-	public long getExpectedTransferVolume() {
-		return getLength();
-	}
 
 	@Override
 	public String getExpectedHash() {
@@ -74,6 +69,7 @@ public class OutgoingFilelistTransfer extends Thread implements ITransferProgres
 	@Override
 	public void cancel() {
 		keepAlive = false;
+		status = TransferStatus.Canceled;
 	}
 
 	@Override
@@ -89,6 +85,22 @@ public class OutgoingFilelistTransfer extends Thread implements ITransferProgres
 	@Override
 	public TransferStatus getStatus() {
 		return status;
+	}
+
+	@Override
+	public void reset() {
+		throw new UnsupportedOperationException("Outgoing filelist transfers can't be reset");
+		
+	}
+
+	@Override
+	public void resumeTransfer() {
+		throw new UnsupportedOperationException("Outgoing filelist transfers can't be resumed");
+	}
+
+	@Override
+	public boolean isActive() {
+		return active;
 	}
 
 }

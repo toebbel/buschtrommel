@@ -23,10 +23,12 @@ public class OutgoingFileTransfer extends Thread implements ITransferProgress{
 	private boolean keepAlive;
 	long transferedData;
 	TransferStatus status;
+	boolean active;
 	
 	public OutgoingFileTransfer(GetFileMessage m, OutputStream out, ShareCache myShares) {
 		this.m = m;
-		status = TransferStatus.establishing;
+		active = true;
+		status = TransferStatus.Initialized;
 		this.out = out;
 		this.myShares = myShares;
 		realLength = m.getLength();
@@ -37,6 +39,7 @@ public class OutgoingFileTransfer extends Thread implements ITransferProgress{
 		} catch (IOException e) {
 			
 		}
+		active = false;
 	}
 	
 	private void handleGetFile() throws IOException {
@@ -49,7 +52,7 @@ public class OutgoingFileTransfer extends Thread implements ITransferProgress{
 				LoggerWrapper.logInfo("Requested offset is not valid");
 				out.write(new FileRequestResponseMessage(ResponseCode.OK, 0).Serialize().getBytes());
 				out.close();
-				status = TransferStatus.canceled;
+				status = TransferStatus.Finished;
 				return;
 			} 
 			
@@ -64,21 +67,21 @@ public class OutgoingFileTransfer extends Thread implements ITransferProgress{
 			out.write((new FileRequestResponseMessage(ResponseCode.OK, realLength).Serialize() + Message.FIELD_SEPERATOR).getBytes());
 			int next;
 			fileStream.skip(m.getOffset());
+			status = TransferStatus.Transfering;
 			while(keepAlive && transferedData < realLength && (next = fileStream.read()) != -1) {
 				out.write(next);
 				transferedData++;
-				status = TransferStatus.transfering;
 			}
 			out.close();
 			fileStream.close();
 			
 			if(transferedData == realLength)
-				status = TransferStatus.finished;
+				status = TransferStatus.Finished;
 			else {
 				if(!keepAlive)
-					status = TransferStatus.canceled;
+					status = TransferStatus.Canceled;
 				else
-					status = TransferStatus.error;
+					status = TransferStatus.LostConnection;
 			}
 		}
 	}
@@ -93,19 +96,10 @@ public class OutgoingFileTransfer extends Thread implements ITransferProgress{
 		return realLength;
 	}
 
-	@Override
-	public long getTotalLength() {
-		return getLength();
-	}
 
 	@Override
 	public long getOffset() {
 		return m.getOffset();
-	}
-
-	@Override
-	public long getExpectedTransferVolume() {
-		return getLength();
 	}
 
 	@Override
@@ -116,6 +110,7 @@ public class OutgoingFileTransfer extends Thread implements ITransferProgress{
 	@Override
 	public void cancel() {
 		keepAlive = false;
+		status = TransferStatus.Canceled;
 	}
 
 	@Override
@@ -130,7 +125,21 @@ public class OutgoingFileTransfer extends Thread implements ITransferProgress{
 
 	@Override
 	public TransferStatus getStatus() {
-		// TODO Auto-generated method stub
-		return null;
+		return status;
+	}
+
+	@Override
+	public void reset() {
+		throw new UnsupportedOperationException("Outgoing transfers can't be reset");
+	}
+	
+	@Override
+	public void resumeTransfer() {
+		throw new UnsupportedOperationException("Outgoing transfers can't be resumed");
+	}
+
+	@Override
+	public boolean isActive() {
+		return active;
 	}
 }
