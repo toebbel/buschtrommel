@@ -3,6 +3,7 @@ package de.tr0llhoehle.buschtrommel;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.Hashtable;
 
 import de.tr0llhoehle.buschtrommel.models.ByeMessage;
@@ -155,7 +156,7 @@ public class Buschtrommel {
 	 * All currently outgoing transfers (active and inactive)
 	 * @return transfers
 	 */
-	public Hashtable<InetAddress, ITransferProgress> getOutgoingTransfers() {
+	public ArrayList<ITransferProgress> getOutgoingTransfers() {
 		return fileTransferAdapter.getOutgoingTransfers();
 	}
 

@@ -5,7 +5,7 @@ package de.tr0llhoehle.buschtrommel.network;
  * 
  * Monitors will call all registered observers, as soon as a message arrives. Some implementations will do this asynchronously.
  * 
- * @author tobi
+ * @author Tobias Sturm
  *
  */
 public interface IMessageMonitor {

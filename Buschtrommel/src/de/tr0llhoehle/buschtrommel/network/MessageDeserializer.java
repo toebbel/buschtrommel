@@ -3,6 +3,11 @@ package de.tr0llhoehle.buschtrommel.network;
 import de.tr0llhoehle.buschtrommel.LoggerWrapper;
 import de.tr0llhoehle.buschtrommel.models.*;
 
+/**
+ * This class deserializes messages. @see Deserialize()
+ * @author tobi
+ *
+ */
 public class MessageDeserializer {
 	
 	/**

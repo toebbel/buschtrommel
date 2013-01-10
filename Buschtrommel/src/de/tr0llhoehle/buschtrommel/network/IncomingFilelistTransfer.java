@@ -15,6 +15,14 @@ import de.tr0llhoehle.buschtrommel.models.GetFilelistMessage;
 import de.tr0llhoehle.buschtrommel.models.Host;
 import de.tr0llhoehle.buschtrommel.models.Message;
 
+/**
+ * This object starts a filelist tranfer from anoter host to this host.
+ * After a GET FILELIST message has been sent, the answer stream will be cut into single file announcement messages. These will be sent via the MessageMonitor interfaces.
+ * Make sure to call registerObserver befor calling start();
+ * 
+ * @author Tobias Sturm
+ *
+ */
 public class IncomingFilelistTransfer extends MessageMonitor implements ITransferProgress {
 
 	int length = 0;

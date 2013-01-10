@@ -19,8 +19,8 @@ import de.tr0llhoehle.buschtrommel.models.PeerDiscoveryMessage;
 import de.tr0llhoehle.buschtrommel.models.ShareAvailability;
 
 /**
- * 
- * @author moritz
+ * This class manages the state of the network. All known hosts and shares of other hosts are stored here. As soon as a new host is discovered, this object will start a filelist transfer and digest the results via the loose observer-interface.
+ * @author Moritz Winter
  * 
  */
 public class NetCache implements IMessageObserver {
