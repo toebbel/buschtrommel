@@ -53,6 +53,8 @@ public class MainFrame extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList();
         abortTransfer = new javax.swing.JButton();
+        resetTransfer = new javax.swing.JButton();
+        resumeTransfer = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         saveSettings = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
@@ -209,14 +211,31 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
+        resetTransfer.setText("Reset");
+        resetTransfer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resetTransferActionPerformed(evt);
+            }
+        });
+
+        resumeTransfer.setText("Resume");
+        resumeTransfer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resumeTransferActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 720, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 706, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(abortTransfer)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(resumeTransfer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(resetTransfer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(abortTransfer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
@@ -225,7 +244,12 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(abortTransfer))
+                        .addComponent(abortTransfer)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(resetTransfer)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(resumeTransfer)
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 631, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -334,12 +358,6 @@ private void removeShareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
         // TODO add your handling code here:
     }//GEN-LAST:event_loadSettingsActionPerformed
 
-    private void abortTransferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_abortTransferActionPerformed
-        // TODO add your handling code here:
-       
-   
-    }//GEN-LAST:event_abortTransferActionPerformed
-
     private void removeShareActionPerformed1(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeShareActionPerformed1
 
    
@@ -362,6 +380,19 @@ private void removeShareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
         System.out.println("File access cancelled by user.");
     }
     }//GEN-LAST:event_addShareActionPerformed
+
+    private void resumeTransferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resumeTransferActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_resumeTransferActionPerformed
+
+    private void resetTransferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetTransferActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_resetTransferActionPerformed
+
+    private void abortTransferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_abortTransferActionPerformed
+        // TODO add your handling code here:
+
+    }//GEN-LAST:event_abortTransferActionPerformed
 
     /**
      * @param args the command line arguments
@@ -425,6 +456,8 @@ private void removeShareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private javax.swing.JTextField jTextField2;
     private javax.swing.JButton loadSettings;
     private javax.swing.JButton removeShare;
+    private javax.swing.JButton resetTransfer;
+    private javax.swing.JButton resumeTransfer;
     private javax.swing.JButton saveSettings;
     // End of variables declaration//GEN-END:variables
 
