@@ -3,6 +3,8 @@ package de.tr0llhoehle.buschtrommel.network;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Hashtable;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import de.tr0llhoehle.buschtrommel.Config;
 import de.tr0llhoehle.buschtrommel.IGUICallbacks;
@@ -14,6 +16,7 @@ import de.tr0llhoehle.buschtrommel.models.FileAnnouncementMessage;
 import de.tr0llhoehle.buschtrommel.models.Host;
 import de.tr0llhoehle.buschtrommel.models.Message;
 import de.tr0llhoehle.buschtrommel.models.PeerDiscoveryMessage;
+import de.tr0llhoehle.buschtrommel.models.ShareAvailability;
 
 /**
  * 
@@ -21,6 +24,8 @@ import de.tr0llhoehle.buschtrommel.models.PeerDiscoveryMessage;
  * 
  */
 public class NetCache implements IMessageObserver {
+	
+	private static int TTL_REFRESH_RATE = 5;
 
 	protected Hashtable<InetAddress, Host> knownHosts;
 	protected Hashtable<String, RemoteShare> knownShares;
@@ -28,14 +33,27 @@ public class NetCache implements IMessageObserver {
 	protected IGUICallbacks guiCallbacks;
 	protected UDPAdapter udpAdapter;
 
+	protected Timer ttlChecker;
+
 	public NetCache(UDPAdapter udpAdapter, IGUICallbacks guiCallbacks) {
 		this.udpAdapter = udpAdapter;
 		this.guiCallbacks = guiCallbacks;
+
+		this.ttlChecker = new Timer();
+		TimerTask task = new TimerTask() {
+			public void run() {
+				checkTTL();
+			}
+		};
+		ttlChecker.scheduleAtFixedRate(task, TTL_REFRESH_RATE*1000, TTL_REFRESH_RATE*1000);
 	}
-	
+
 	/**
-	 * Returns the remoteShare with the given hash or null if the share is unknown
-	 * @param hash of the share
+	 * Returns the remoteShare with the given hash or null if the share is
+	 * unknown
+	 * 
+	 * @param hash
+	 *            of the share
 	 * @return null or the share
 	 */
 	public RemoteShare getShare(String hash) {
@@ -190,6 +208,30 @@ public class NetCache implements IMessageObserver {
 			}
 		}
 		return false;
+	}
+	
+	private void checkTTL() {
+		Host host;
+		ShareAvailability shareAvailability;
+		int tmpTTL = 0;
+		for(InetAddress address : knownHosts.keySet()) {
+			host = knownHosts.get(address);
+			for(String hash : host.getSharedFiles().keySet()) {
+				shareAvailability = host.getSharedFiles().get(hash);
+				tmpTTL = shareAvailability.getTtl();
+				if(tmpTTL <= 4) {
+					host.removeFileFromSharedFiles(hash);
+					shareAvailability.getFile().removeFileSource(shareAvailability);
+					if(shareAvailability.getFile().noSourcesAvailable()) {
+						knownShares.remove(hash);
+					}
+					guiCallbacks.removeShare(shareAvailability);
+				} else {
+					shareAvailability.setTTL(tmpTTL - TTL_REFRESH_RATE);
+				}
+			}
+		}
+		
 	}
 
 }
