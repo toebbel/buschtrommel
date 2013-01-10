@@ -70,13 +70,14 @@ public interface ITransferProgress {
 	/**
 	 * Deletes the local file, terminates existing connections and reconnects to hosts to restart the transfer.
 	 * 
-	 * The transfer hsa to be inactive to be resetted
+	 * The transfer has to be inactive to be reseted
 	 */
 	public void reset();
 	
 	/**
 	 * Resumes the transfer from the byte on, it stopped.
 	 * 
+	 * This method is async
 	 * The transfer has to be inactive to be started
 	 */
 	public void resumeTransfer();

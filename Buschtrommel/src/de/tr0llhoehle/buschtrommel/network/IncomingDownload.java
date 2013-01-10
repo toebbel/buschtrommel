@@ -320,7 +320,6 @@ public class IncomingDownload extends MessageMonitor implements ITransferProgres
 		closeSocket();
 		closeFile(targetFile.exists());
 		status = TransferStatus.Initialized;
-		self = new Thread(this);
 	}
 
 	@Override
@@ -339,7 +338,8 @@ public class IncomingDownload extends MessageMonitor implements ITransferProgres
 			LoggerWrapper.logError("target filestream doesn't exist anymore!");
 			status = TransferStatus.LocalIOError;
 		}
-		(new Thread(this)).start();
+		self = new Thread(this);
+		self.start();
 	}
 	
 	
