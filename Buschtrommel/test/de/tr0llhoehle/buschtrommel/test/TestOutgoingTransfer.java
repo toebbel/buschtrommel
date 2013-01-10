@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -68,14 +69,14 @@ public class TestOutgoingTransfer {
 		
 		sendingSocket = new Socket("localhost", mock.getPort());
 		Thread.sleep(1000);
-		out = new OutgoingTransfer(m, sendingSocket.getOutputStream(), shares, null);
+		out = new OutgoingTransfer(m, sendingSocket.getOutputStream(), shares, new InetSocketAddress("host", 123));
 	}
 	
 	@Test
 	public void testGetFilelist() throws IOException, InterruptedException {
 		//establish
 		Socket s = new Socket("localhost", mock.getPort());
-		OutgoingTransfer out = new OutgoingTransfer(new GetFilelistMessage(), s.getOutputStream(), shares, null);
+		OutgoingTransfer out = new OutgoingTransfer(new GetFilelistMessage(), s.getOutputStream(), shares, new InetSocketAddress("host", 123));
 		Thread.sleep(100);
 		
 		//connect
