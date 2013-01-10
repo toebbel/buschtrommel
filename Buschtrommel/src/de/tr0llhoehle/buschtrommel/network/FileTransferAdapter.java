@@ -89,11 +89,11 @@ public class FileTransferAdapter extends MessageMonitor {
 				final OutputStream out = s.getOutputStream();
 				ITransferProgress p = null;
 				if (m instanceof GetFileMessage) {
-					OutgoingFileTransfer transfer = new OutgoingFileTransfer((GetFileMessage) m, out, myShares);
+					OutgoingTransfer transfer = new OutgoingTransfer((GetFileMessage) m, out, myShares);
 					transfer.start();
 					p = transfer;
 				} else if (m instanceof GetFilelistMessage) {
-					OutgoingFilelistTransfer transfer = new OutgoingFilelistTransfer(out, myShares);
+					OutgoingTransfer transfer = new OutgoingTransfer((GetFilelistMessage) m, out, myShares);
 					transfer.start();
 					p = transfer;
 				}
