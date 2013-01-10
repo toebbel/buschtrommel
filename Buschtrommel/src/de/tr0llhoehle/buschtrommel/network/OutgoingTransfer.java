@@ -1,17 +1,16 @@
 package de.tr0llhoehle.buschtrommel.network;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Handler;
+import java.util.logging.Level;
 
-import de.tr0llhoehle.buschtrommel.LoggerWrapper;
 import de.tr0llhoehle.buschtrommel.ShareCache;
 import de.tr0llhoehle.buschtrommel.models.GetFileMessage;
 import de.tr0llhoehle.buschtrommel.models.FileRequestResponseMessage;
@@ -42,12 +41,16 @@ public class OutgoingTransfer extends Thread implements ITransferProgress {
 	boolean transferIsActive;
 	private String hash;
 	private InetSocketAddress partner;
+	
+	java.util.logging.Logger logger;
 
 	public OutgoingTransfer(Message m, OutputStream out, ShareCache myShares, InetSocketAddress partner) {
 		assert m instanceof GetFilelistMessage || m instanceof GetFileMessage;
+		assert partner != null;
 		this.net_out = out;
 		this.myShares = myShares;
 		this.partner = partner;
+		
 		
 		transferIsActive = true;
 		keepThreadAlive = true;
@@ -62,10 +65,12 @@ public class OutgoingTransfer extends Thread implements ITransferProgress {
 			hash = "filelist";
 		}
 		
+		logger = java.util.logging.Logger.getLogger("outgoing " + hash + " " + partner.toString());
+		
 		try {
 			openInputStream(m);
 		} catch (UnsupportedEncodingException e1) {
-			LoggerWrapper.logError("Unsupported encoding");
+			logger.log(Level.SEVERE, "Unsupported encoding");
 			ressourceStream = null;
 		}
 		handleRequestedRanges(m);
@@ -73,7 +78,7 @@ public class OutgoingTransfer extends Thread implements ITransferProgress {
 		try {
 			doTransfer();
 		} catch (IOException e) { //catch *all* errors and do nothing, because we don't give a shit if someone doesn't get his candy
-			LoggerWrapper.logError("Could not handle outgoing file transfer: " + e.getMessage());
+			logger.log(Level.SEVERE, "Could not handle outgoing file transfer: " + e.getMessage());
 			cancel();
 		}
 		transferIsActive = false;
@@ -95,7 +100,7 @@ public class OutgoingTransfer extends Thread implements ITransferProgress {
 		} else  if (m instanceof GetFileMessage){
 			// do I know the file?
 			if (!myShares.has(((GetFileMessage) m).getHash())) {
-				LoggerWrapper.logInfo("Requested file is not in share cache");
+				logger.log(Level.INFO, "Requested file is not in share cache");
 				ressourceStream = null; // file not available
 				return;
 			}
@@ -103,18 +108,18 @@ public class OutgoingTransfer extends Thread implements ITransferProgress {
 			// does the file exist?
 			java.io.File file = new java.io.File(myShares.get(((GetFileMessage) m).getHash()).getPath());
 			if (!file.exists()) {
-				LoggerWrapper.logInfo("Requested file is not found");
+				logger.log(Level.INFO, "Requested file is not found");
 				ressourceStream = null;
 				return;
 			}
 			numAvailableData = file.length();
 
 			// open file for read
-			LoggerWrapper.logInfo("Open file for outgoing file transfer");
+			logger.log(Level.INFO, "Open file for outgoing file transfer");
 			try {
 				ressourceStream = new java.io.FileInputStream(file);
 			} catch (FileNotFoundException e) {
-				LoggerWrapper.logInfo("Requested file could not be opend");
+				logger.log(Level.INFO, "Requested file could not be opend");
 				ressourceStream = null;
 			}
 			return;
@@ -145,7 +150,7 @@ public class OutgoingTransfer extends Thread implements ITransferProgress {
 			net_out.close();
 		} else {
 			if (offset > numAvailableData) { // offset not in file
-				LoggerWrapper.logInfo("Requested offset is not valid: requested " + offset + ", length of file: "
+				logger.log(Level.INFO, "Requested offset is not valid: requested " + offset + ", length of file: "
 						+ numAvailableData);
 				
 				if(sendHeader)
@@ -162,7 +167,7 @@ public class OutgoingTransfer extends Thread implements ITransferProgress {
 																	// large?
 																	// Shorten
 																	// it!
-				LoggerWrapper.logInfo("Requested length of " + numDataToTransfer + " was too large, shortened  it to "
+				logger.log(Level.INFO, "Requested length of " + numDataToTransfer + " was too large, shortened  it to "
 						+ numDataToTransfer);
 				numDataToTransfer = numAvailableData - offset;
 			}
@@ -256,5 +261,15 @@ public class OutgoingTransfer extends Thread implements ITransferProgress {
 	@Override
 	public InetSocketAddress getTransferPartner() {
 		return partner;
+	}
+	
+	@Override
+	public void RegisterLogHander(Handler h) {
+		logger.addHandler(h);
+	}
+
+	@Override
+	public void RemoveLogHander(Handler h) {
+		logger.removeHandler(h);
 	}
 }

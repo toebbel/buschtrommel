@@ -111,6 +111,9 @@ public interface ITransferProgress {
 	 */
 	public List<ITransferProgress> getSubTransfers();
 	
+	public void RegisterLogHander(java.util.logging.Handler h);
+	public void RemoveLogHander(java.util.logging.Handler h);
+	
 	public enum TransferType {
 		Multisource,
 		Singlesource,
