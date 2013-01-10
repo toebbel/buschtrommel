@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.util.Hashtable;
 
 import de.tr0llhoehle.buschtrommel.models.ByeMessage;
+import de.tr0llhoehle.buschtrommel.models.LocalShare;
 import de.tr0llhoehle.buschtrommel.models.RemoteShare;
 import de.tr0llhoehle.buschtrommel.models.Host;
 import de.tr0llhoehle.buschtrommel.network.FileTransferAdapter;
@@ -50,7 +51,7 @@ public class Buschtrommel {
 		
 	}
 	
-	public void RemoveFileFromShare(RemoteShare file) {
+	public void RemoveFileFromShare(LocalShare file) {
 		
 	}
 	
@@ -62,8 +63,8 @@ public class Buschtrommel {
 		return null;
 	}
 	
-	public Hashtable<String, RemoteShare> getShares() {
-		return null;
+	public Hashtable<String, RemoteShare> getRemoteShares() {
+		return this.netCache.getShares();
 	}
 	
 	public Hashtable<InetAddress, Host> getHosts() {

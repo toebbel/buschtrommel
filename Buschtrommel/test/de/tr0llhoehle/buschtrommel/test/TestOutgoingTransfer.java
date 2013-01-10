@@ -15,7 +15,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import de.tr0llhoehle.buschtrommel.ShareCache;
+import de.tr0llhoehle.buschtrommel.LocalShareCache;
 import de.tr0llhoehle.buschtrommel.models.GetFileMessage;
 import de.tr0llhoehle.buschtrommel.models.GetFilelistMessage;
 import de.tr0llhoehle.buschtrommel.models.LocalShare;
@@ -30,7 +30,7 @@ public class TestOutgoingTransfer {
 	NetworkMock mock;
 	OutgoingTransfer out;
 	Socket sendingSocket;
-	private ShareCache shares;
+	private LocalShareCache shares;
 	static java.io.File readFile;
 	
 	@BeforeClass
@@ -49,7 +49,7 @@ public class TestOutgoingTransfer {
 	@Before
 	public void setUp() throws Exception {
 		mock = new NetworkMock(8080);
-		shares = new ShareCache();
+		shares = new LocalShareCache();
 		shares.newShare(new LocalShare("ABC", 10, -1, "this is a file", "meta", "/fileA"));
 		shares.newShare(new LocalShare("DEFGH", 512, 20, "this is a file, too", "meta2", "/fileB"));
 	}
