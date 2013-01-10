@@ -39,5 +39,12 @@ public class LocalShare extends Share {
 		return meta;
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof LocalShare))
+			return false;
+		return ((LocalShare)obj).getHash() == getHash();
+	}
+	
 
 }
