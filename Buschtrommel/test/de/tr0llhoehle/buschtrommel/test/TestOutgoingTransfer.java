@@ -17,6 +17,7 @@ import org.junit.Test;
 import de.tr0llhoehle.buschtrommel.ShareCache;
 import de.tr0llhoehle.buschtrommel.models.GetFileMessage;
 import de.tr0llhoehle.buschtrommel.models.GetFilelistMessage;
+import de.tr0llhoehle.buschtrommel.models.LocalShare;
 import de.tr0llhoehle.buschtrommel.models.Message;
 import de.tr0llhoehle.buschtrommel.models.Share;
 import de.tr0llhoehle.buschtrommel.network.OutgoingTransfer;
@@ -48,8 +49,8 @@ public class TestOutgoingTransfer {
 	public void setUp() throws Exception {
 		mock = new NetworkMock(8080);
 		shares = new ShareCache();
-		shares.newShare(new Share("ABC", 10, -1, "this is a file", "meta", "/fileA"));
-		shares.newShare(new Share("DEFGH", 512, 20, "this is a file, too", "meta2", "/fileB"));
+		shares.newShare(new LocalShare("ABC", 10, -1, "this is a file", "meta", "/fileA"));
+		shares.newShare(new LocalShare("DEFGH", 512, 20, "this is a file, too", "meta2", "/fileB"));
 	}
 
 	@After

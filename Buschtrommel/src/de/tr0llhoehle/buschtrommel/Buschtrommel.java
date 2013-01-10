@@ -22,7 +22,7 @@ public class Buschtrommel {
 		if (!HashFuncWrapper.check()) {
 			//cancel bootstrap: Hashfunction is not available!
 			this.gui = gui;
-			this.netCache = new NetCache();
+			this.netCache = new NetCache(this.udpAdapter);
 		}
 	}
 	

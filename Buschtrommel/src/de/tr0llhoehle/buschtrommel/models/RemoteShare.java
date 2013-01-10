@@ -5,9 +5,6 @@ import java.util.Vector;
 
 public class RemoteShare extends Share {
 
-	
-
-	
 	private Vector<FileAvailability> sources;
 
 	/**
@@ -36,5 +33,18 @@ public class RemoteShare extends Share {
 		FileAvailability tmp = new FileAvailability(host, this, ttl, displayName, meta);
 		this.sources.add(tmp);
 		return tmp;
+	}
+	/**
+	 * Returns the highest ttl among all known sources
+	 * @return the highest ttl
+	 */
+	public int getMaxTTL() {
+		int ttl = 0;
+		for(FileAvailability tmp : this.sources) {
+			if(tmp.getTtl() > ttl) {
+				ttl = tmp.getTtl();
+			}
+		}
+		return ttl;
 	}
 }
