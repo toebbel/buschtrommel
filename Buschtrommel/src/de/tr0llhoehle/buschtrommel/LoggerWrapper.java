@@ -7,7 +7,7 @@ import java.util.logging.Logger;
  * 
  * Provides a single logger for the complete application. Use methods logInfo and logError for convenient use.
  * 
- * @author tobi
+ * @author Tobias Stum
  *
  */
 public class LoggerWrapper {
@@ -16,7 +16,7 @@ public class LoggerWrapper {
 	
 	/**
 	 * Writes info message into the logger
-	 * @param message
+	 * @param message the message to log
 	 */
 	public final static void logInfo(String message) {
 		LOGGER.info(message);
@@ -24,7 +24,7 @@ public class LoggerWrapper {
 	
 	/**
 	 * Writes warning message into the logger.
-	 * @param message
+	 * @param message the message to log
 	 */
 	public final static void logError(String message) {
 		LOGGER.warning(message);

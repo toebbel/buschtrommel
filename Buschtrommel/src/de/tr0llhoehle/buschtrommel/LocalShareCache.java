@@ -216,4 +216,9 @@ public class LocalShareCache {
 		}
 		return true;
 	}
+
+	public void remove(String hash) {
+		// TODO Auto-generated method stub
+		
+	}
 }
