@@ -164,7 +164,10 @@ public class FileTransferAdapter extends MessageMonitor {
 	}
 
 	public ITransferProgress downloadFilelist(Host host) {
-		ITransferProgress result = new IncomingFilelistTransfer(host);
+		IncomingFilelistTransfer result = new IncomingFilelistTransfer(host);
+		
+		for(IMessageObserver observer : observers)
+			result.registerObserver(observer);
 		result.start();
 		return result;
 	}
