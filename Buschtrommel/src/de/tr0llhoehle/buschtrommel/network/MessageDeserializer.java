@@ -55,7 +55,7 @@ public class MessageDeserializer {
 		try {
 			return new GetFileMessage(fixBrokenHash(fields[0]), Long.valueOf(fields[1]), Long.valueOf(fields[2].substring(0, fields[2].length() - 1)));
 		} catch(IllegalArgumentException e) { //NumberFormatException is subtype
-			LoggerWrapper.logError("Could not parse the GetFileMessage body: '" + msgContent + "'. Excpetion: " + e.getMessage());
+			LoggerWrapper.logError("Could not parse the GetFileMessage body: '" + fields[0] + "|" + fields[1] + "|" + fields[2] + "\\. Excpetion: " + e.getMessage());
 		}
 		
 		return result;
