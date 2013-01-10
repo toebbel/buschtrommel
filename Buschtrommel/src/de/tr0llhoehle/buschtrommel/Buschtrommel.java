@@ -112,8 +112,15 @@ public class Buschtrommel {
 		udpAdapter.sendMulticast(new FileAnnouncementMessage(share));
 	}
 	
-	public void RemoveFileFromShare(LocalShare file) {
-		
+	/**
+	 * Removes a file from the shares and announces, that it is not available any more via multicast
+	 * @param file the file to remove
+	 */
+	public void RemoveFileFromShare(String hash) {
+		LocalShare share = shareCache.get(hash);
+		if(share == null)
+			return;
+		shareCache.remove(hash);
 	}
 	
 	public Hashtable<String, ITransferProgress> getIncomingTransfers() {

@@ -9,6 +9,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Formatter;
 
+/**
+ * This class wraps the hash function that is used in buschtrommel.
+ * @author Tobias Sturm
+ *
+ */
 public class HashFuncWrapper {
 
 	private static final String HASH_FUNCTION = "SHA-1";
