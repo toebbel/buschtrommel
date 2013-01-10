@@ -12,6 +12,9 @@ package de.tr0llhoehle.buschtrommel.gui;
 import javax.swing.table.DefaultTableModel;
 import java.awt.Window.Type;
 import java.awt.Toolkit;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
 /**
  *
@@ -35,27 +38,30 @@ public class MainFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jFileChooser1 = new javax.swing.JFileChooser();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         downloadFilesBtn = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
-        jButton2 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
+        addShare = new javax.swing.JButton();
+        removeShare = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable2 = new javax.swing.JTable();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList();
-        jButton3 = new javax.swing.JButton();
+        abortTransfer = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
+        saveSettings = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
-        jButton5 = new javax.swing.JButton();
+        loadSettings = new javax.swing.JButton();
         jTextField2 = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
+
+        jFileChooser1.setDialogTitle("Datei wählen");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -111,7 +117,7 @@ public class MainFrame extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 502, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 583, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(downloadFilesBtn)
                 .addContainerGap())
@@ -121,13 +127,19 @@ public class MainFrame extends javax.swing.JFrame {
 
         jPanel3.setName("sharesTab"); // NOI18N
 
-        jButton2.setText("Add new Share");
-        jButton2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-
-        jButton4.setText("Remove Share");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
+        addShare.setText("Add new Share");
+        addShare.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        addShare.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
+                addShareActionPerformed(evt);
+            }
+        });
+
+        removeShare.setText("Remove Share");
+        removeShare.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                removeShareActionPerformed(evt);
+                removeShareActionPerformed1(evt);
             }
         });
 
@@ -167,8 +179,8 @@ public class MainFrame extends javax.swing.JFrame {
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 655, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(removeShare, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(addShare, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -176,11 +188,11 @@ public class MainFrame extends javax.swing.JFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 538, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 619, Short.MAX_VALUE)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jButton2)
+                        .addComponent(addShare)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton4)))
+                        .addComponent(removeShare)))
                 .addContainerGap())
         );
 
@@ -190,7 +202,12 @@ public class MainFrame extends javax.swing.JFrame {
 
         jScrollPane1.setViewportView(jList1);
 
-        jButton3.setText("Abort");
+        abortTransfer.setText("Abort");
+        abortTransfer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                abortTransferActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -199,7 +216,7 @@ public class MainFrame extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 720, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jButton3)
+                .addComponent(abortTransfer)
                 .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
@@ -208,8 +225,8 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jButton3))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 550, Short.MAX_VALUE))
+                        .addComponent(abortTransfer))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 631, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -217,20 +234,20 @@ public class MainFrame extends javax.swing.JFrame {
 
         jPanel5.setName("settingsTab"); // NOI18N
 
-        jButton1.setText("save Settings");
-        jButton1.setName("saveSettings_btn"); // NOI18N
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        saveSettings.setText("save Settings");
+        saveSettings.setName("saveSettings_btn"); // NOI18N
+        saveSettings.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                saveSettingsActionPerformed(evt);
             }
         });
 
         jLabel1.setText("Path to Share-Settings");
 
-        jButton5.setText("load Settings");
-        jButton5.addActionListener(new java.awt.event.ActionListener() {
+        loadSettings.setText("load Settings");
+        loadSettings.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton5ActionPerformed(evt);
+                loadSettingsActionPerformed(evt);
             }
         });
 
@@ -248,9 +265,9 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addGap(0, 545, Short.MAX_VALUE)
-                        .addComponent(jButton5)
+                        .addComponent(loadSettings)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton1))
+                        .addComponent(saveSettings))
                     .addGroup(jPanel5Layout.createSequentialGroup()
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel1)
@@ -272,14 +289,14 @@ public class MainFrame extends javax.swing.JFrame {
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 436, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 517, Short.MAX_VALUE)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton5))
+                    .addComponent(saveSettings)
+                    .addComponent(loadSettings))
                 .addContainerGap())
         );
 
-        jButton1.getAccessibleContext().setAccessibleName("save_Settings");
+        saveSettings.getAccessibleContext().setAccessibleName("save_Settings");
 
         jTabbedPane1.addTab("Settings", jPanel5);
 
@@ -301,21 +318,50 @@ public class MainFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+private void saveSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveSettingsActionPerformed
 // TODO add your handling code here:
-}//GEN-LAST:event_jButton1ActionPerformed
+}//GEN-LAST:event_saveSettingsActionPerformed
 
 private void downloadFilesBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadFilesBtnActionPerformed
 // TODO add your handling code here:
 }//GEN-LAST:event_downloadFilesBtnActionPerformed
 
-private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+private void removeShareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeShareActionPerformed
 // TODO add your handling code here:
-}//GEN-LAST:event_jButton4ActionPerformed
+}//GEN-LAST:event_removeShareActionPerformed
 
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+    private void loadSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadSettingsActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton5ActionPerformed
+    }//GEN-LAST:event_loadSettingsActionPerformed
+
+    private void abortTransferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_abortTransferActionPerformed
+        // TODO add your handling code here:
+       
+   
+    }//GEN-LAST:event_abortTransferActionPerformed
+
+    private void removeShareActionPerformed1(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeShareActionPerformed1
+
+   
+    }//GEN-LAST:event_removeShareActionPerformed1
+
+    private void addShareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addShareActionPerformed
+        // TODO add your handling code here:
+                  int returnVal = jFileChooser1.showOpenDialog(this); 
+        if (returnVal == jFileChooser1.APPROVE_OPTION) {
+        File file = jFileChooser1.getSelectedFile();
+       // try {
+          // What to do with the file, e.g. display it in a TextArea
+          //textarea.read( new FileReader( file.getAbsolutePath() ), null );
+            System.out.println(file.getAbsolutePath());
+            //System.out.println( new FileReader( file.getAbsolutePath() ), null );
+      //  } catch (IOException ex) {
+       //   System.out.println("problem accessing file"+file.getAbsolutePath());
+       // }
+    } else {
+        System.out.println("File access cancelled by user.");
+    }
+    }//GEN-LAST:event_addShareActionPerformed
 
     /**
      * @param args the command line arguments
@@ -358,12 +404,10 @@ private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton abortTransfer;
+    private javax.swing.JButton addShare;
     private javax.swing.JButton downloadFilesBtn;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
+    private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JList jList1;
@@ -379,6 +423,9 @@ private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
     private javax.swing.JTable jTable2;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
+    private javax.swing.JButton loadSettings;
+    private javax.swing.JButton removeShare;
+    private javax.swing.JButton saveSettings;
     // End of variables declaration//GEN-END:variables
 
 
