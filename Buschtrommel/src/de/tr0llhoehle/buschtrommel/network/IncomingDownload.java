@@ -27,7 +27,7 @@ import de.tr0llhoehle.buschtrommel.models.Message;
  * @author tobi
  * 
  */
-public class IncomingDownload extends MessageMonitor implements ITransferProgress, Runnable {
+public class IncomingDownload extends MessageMonitor implements ITransferProgress {
 
 	private String hash;
 	private long offset, totalTransferedVolume;
@@ -59,19 +59,6 @@ public class IncomingDownload extends MessageMonitor implements ITransferProgres
 		hash = "";
 	}
 
-	@Override
-	public void run() {
-		try {
-			if(status == TransferStatus.AssembleParts || status == TransferStatus.CheckingHash || status == TransferStatus.Connecting || status == TransferStatus.Finished || status == TransferStatus.Transfering)
-				LoggerWrapper.logError("Can't start download, state is " + status);
-			else
-				doTransfer();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		self = null;
-	}
 
 	protected void doTransfer() throws UnsupportedEncodingException {
 		LoggerWrapper.logInfo("Starting download");
@@ -338,14 +325,36 @@ public class IncomingDownload extends MessageMonitor implements ITransferProgres
 			LoggerWrapper.logError("target filestream doesn't exist anymore!");
 			status = TransferStatus.LocalIOError;
 		}
-		self = new Thread(this);
+		
+		self = getCreateOwnThread();
 		self.start();
 	}
 	
 	
 	public void start() {
-		self = new Thread(this);
+		self = getCreateOwnThread();
 		self.start();
+	}
+	
+	private Thread getCreateOwnThread() {
+		IncomingDownload me = this;
+		Thread t = new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				try {
+					if(status == TransferStatus.AssembleParts || status == TransferStatus.CheckingHash || status == TransferStatus.Connecting || status == TransferStatus.Finished || status == TransferStatus.Transfering)
+						LoggerWrapper.logError("Can't start download, state is " + status);
+					else
+						doTransfer();
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				self = null;
+			}
+		});
+		return t;
 	}
 
 	@Override
