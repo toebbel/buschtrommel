@@ -10,7 +10,7 @@ import java.io.FileOutputStream;
 public class Config {
 	
 	public static int defaultTTL;
-	public static int minimumYoResponseTime;
+	public static int maximumYoResponseTime; //in milliseconds
 	public static int TTLRenewalTimer;
 	public static String shareCachePath;
 	public static String alias;

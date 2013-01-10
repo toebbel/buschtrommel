@@ -110,9 +110,12 @@ public class NetCache implements IMessageObserver {
 		switch (message.getType()) {
 		case PeerDiscoveryMessage.TYPE_FIELD_HI:
 			try {
+				Thread.currentThread().sleep((int) (Math.random() * Config.maximumYoResponseTime));
 				this.udpAdapter.sendUnicast(
 						new PeerDiscoveryMessage(DiscoveryMessageType.YO, Config.alias, message.getPort()), host);
 			} catch (IOException e) {
+				LoggerWrapper.logError(e.getMessage());
+			} catch (InterruptedException e) {
 				LoggerWrapper.logError(e.getMessage());
 			}
 			break;
