@@ -9,12 +9,20 @@
  * Created on 02.01.2013, 19:15:29
  */
 package de.tr0llhoehle.buschtrommel.gui;
+import de.tr0llhoehle.buschtrommel.network.ITransferProgress;
+import de.tr0llhoehle.buschtrommel.network.ITransferProgress.TransferStatus;
+import de.tr0llhoehle.buschtrommel.network.ITransferProgress.TransferType;
+import de.tr0llhoehle.buschtrommel.network.IncomingDownload;
+import de.tr0llhoehle.buschtrommel.network.OutgoingTransfer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.Window.Type;
 import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.util.List;
+import java.util.logging.Handler;
 
 /**
  *
@@ -53,7 +61,7 @@ public class MainFrame extends javax.swing.JFrame {
         jTable2 = new javax.swing.JTable();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList();
+        activeTransferList = new javax.swing.JList();
         abortTransfer = new javax.swing.JButton();
         resetTransfer = new javax.swing.JButton();
         resumeTransfer = new javax.swing.JButton();
@@ -204,7 +212,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         jPanel4.setName("activeTransfersTab"); // NOI18N
 
-        jScrollPane1.setViewportView(jList1);
+        jScrollPane1.setViewportView(activeTransferList);
 
         abortTransfer.setText("Abort");
         abortTransfer.addActionListener(new java.awt.event.ActionListener() {
@@ -393,6 +401,8 @@ private void removeShareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
 
     private void abortTransferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_abortTransferActionPerformed
         // TODO add your handling code here:
+        //TODO add testtransfer
+       // activeTransferList.add(bla);
 
     }//GEN-LAST:event_abortTransferActionPerformed
 
@@ -442,12 +452,12 @@ private void removeShareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton abortTransfer;
+    private javax.swing.JList activeTransferList;
     private javax.swing.JButton addShare;
     private javax.swing.JButton downloadFilesBtn;
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JList jList1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
