@@ -17,7 +17,7 @@ public class TestNetCache {
 
 	@Test
 	public void testHostExists() throws UnknownHostException {
-		NetCache tmp = new NetCache(null, null);
+		NetCache tmp = new NetCache(null, null, null);
 		Host host = new Host(InetAddress.getByName("localhost"), "troll", 1234);
 		PeerDiscoveryMessage message = new PeerDiscoveryMessage(PeerDiscoveryMessage.DiscoveryMessageType.HI, "troll",
 				1234);
@@ -36,7 +36,7 @@ public class TestNetCache {
 
 	@Test
 	public void testFileAnnouncment() throws UnknownHostException {
-		NetCache tmp = new NetCache(null, null);
+		NetCache tmp = new NetCache(null, null, null);
 		Host host = new Host(InetAddress.getByName("localhost"), "troll", 1234);
 		FileAnnouncementMessage message = new FileAnnouncementMessage(new LocalShare("testhash", 42, 600, "katze",
 				"katzenbilder!!!", "/home/katze.jpg"));
@@ -50,7 +50,7 @@ public class TestNetCache {
 	
 	@Test
 	public void testTTLExpiration() throws UnknownHostException, InterruptedException {
-		NetCache tmp = new NetCache(null, null);
+		NetCache tmp = new NetCache(null, null, null);
 		FileAnnouncementMessage message = new FileAnnouncementMessage(new LocalShare("testhash", 42, 10, "katze",
 				"katzenbilder!!!", "/home/katze.jpg"));
 		message.setSource(InetAddress.getByName("localhost"));
