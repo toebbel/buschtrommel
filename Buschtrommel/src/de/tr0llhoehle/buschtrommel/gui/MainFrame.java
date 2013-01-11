@@ -14,7 +14,15 @@ import de.tr0llhoehle.buschtrommel.network.ITransferProgress.TransferStatus;
 import de.tr0llhoehle.buschtrommel.network.ITransferProgress.TransferType;
 import de.tr0llhoehle.buschtrommel.network.IncomingDownload;
 import de.tr0llhoehle.buschtrommel.network.OutgoingTransfer;
+import de.tr0llhoehle.buschtrommel.test.mockups.ITransferMock;
+
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.ListModel;
 import javax.swing.table.DefaultTableModel;
+
+import java.awt.Component;
 import java.awt.Window.Type;
 import java.awt.Toolkit;
 import java.io.File;
@@ -402,8 +410,19 @@ private void removeShareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
     private void abortTransferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_abortTransferActionPerformed
         // TODO add your handling code here:
         //TODO add testtransfer
-       // activeTransferList.add(bla);
-
+    	
+    	JOptionPane.showMessageDialog(this, "Pressed", "Nachricht", JOptionPane.INFORMATION_MESSAGE);
+    	
+  
+    	
+    	ITransferMock mock = new ITransferMock("Test", true, 2000, 1000);
+    	//new Component
+       
+      ListModel<ITransferProgress> listmodel = new DefaultListModel<ITransferProgress>();
+      ((DefaultListModel<ITransferProgress>) listmodel).addElement(mock);
+      activeTransferList = new JList<ITransferProgress>(listmodel);
+      activeTransferList.setCellRenderer(new DownloadItem());
+      
     }//GEN-LAST:event_abortTransferActionPerformed
 
 

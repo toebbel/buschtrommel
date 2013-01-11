@@ -11,6 +11,7 @@ import java.awt.Color;
 import java.awt.Component;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
+import javax.swing.UIManager;
 
 /**
  *
@@ -19,6 +20,11 @@ import javax.swing.ListCellRenderer;
 public class DownloadItem extends javax.swing.JPanel implements ListCellRenderer<ITransferProgress>{
 
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
      * Creates new form DownloadItem
      */
     public DownloadItem() {
@@ -42,18 +48,18 @@ public class DownloadItem extends javax.swing.JPanel implements ListCellRenderer
                  && !dropLocation.isInsert()
                  && dropLocation.getIndex() == index) {
 
-             background = Color.BLUE;
-             foreground = Color.WHITE;
+             background = UIManager.getColor("List.background");
+             foreground = UIManager.getColor("List.foreground");
 
          // check if this cell is selected
          } else if (isSelected) {
-             background = Color.RED;
-             foreground = Color.WHITE;
+             background = UIManager.getColor("List.selectionBackground");
+             foreground = UIManager.getColor("List.selectionForeground");
 
          // unselected, and not the DnD drop location
          } else {
-             background = Color.WHITE;
-             foreground = Color.BLACK;
+             background = UIManager.getColor("List.background");
+             foreground = UIManager.getColor("List.foreground");
          };
          
          
