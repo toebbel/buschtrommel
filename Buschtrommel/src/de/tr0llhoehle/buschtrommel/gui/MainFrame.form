@@ -275,6 +275,10 @@
                       <StringArray count="0"/>
                     </Property>
                   </Properties>
+                  <AuxValues>
+                    <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JList(listmodel)"/>
+                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="activeTransferList.setCellRenderer(downloadCellRenderer);"/>
+                  </AuxValues>
                 </Component>
               </SubComponents>
             </Container>
