@@ -11,8 +11,9 @@ import de.tr0llhoehle.buschtrommel.models.Host;
 import de.tr0llhoehle.buschtrommel.models.Message;
 
 /**
+ * The UDP adapter holds the line to the multicast group. It receives UDP multicast- and unicast messages from the group and is able to send messages like file annoucements, HI, YO and BYE messages.
  * 
- * @author moritz
+ * @author Moritz Winter
  *
  */
 public class UDPAdapter extends MessageMonitor {

@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class FileTransferAdapter extends MessageMonitor {
 	private ServerSocket listeningSocket;
 	private Thread receiveThread;
 	private boolean keepAlive;
-	private Hashtable<java.net.InetAddress, ITransferProgress> outgoingTransfers;
+	private ArrayList<ITransferProgress> outgoingTransfers;
 	private Hashtable<String, ITransferProgress> incomingTransfers;
 
 	/**
@@ -40,7 +41,7 @@ public class FileTransferAdapter extends MessageMonitor {
 		this.port = port;
 		myShares = s;
 		incomingTransfers = new Hashtable<>();
-		outgoingTransfers = new Hashtable<>();
+		outgoingTransfers = new ArrayList<>();
 		startListening();
 	}
 
@@ -98,7 +99,7 @@ public class FileTransferAdapter extends MessageMonitor {
 				}
 				
 				if(p != null)
-					outgoingTransfers.put(m.getSource(), p);
+					outgoingTransfers.add(p);
 				
 			} catch (IOException e) {
 				LoggerWrapper.logError(e.getMessage());
@@ -107,7 +108,10 @@ public class FileTransferAdapter extends MessageMonitor {
 	}
 	
 	public ITransferProgress DownloadFile(String hash, Host host, long length, java.io.File target) {
-		return new IncomingDownload(new GetFileMessage(hash, 0, length), host, target);
+		ITransferProgress result = new IncomingDownload(new GetFileMessage(hash, 0, length), host, target);
+		incomingTransfers.put(hash, result);
+		result.start();
+		return result;
 	}
 	
 	/**
@@ -128,8 +132,8 @@ public class FileTransferAdapter extends MessageMonitor {
 	 * @return all outgoing transfers
 	 */
 	@SuppressWarnings("unchecked")
-	public Hashtable<java.net.InetAddress, ITransferProgress> getOutgoingTransfers() {
-		return (Hashtable<InetAddress, ITransferProgress>) outgoingTransfers.clone();
+	public ArrayList<ITransferProgress> getOutgoingTransfers() {
+		return (ArrayList<ITransferProgress>) outgoingTransfers.clone();
 	}
 	
 	/**
@@ -157,9 +161,18 @@ public class FileTransferAdapter extends MessageMonitor {
 	public void close() {
 		keepAlive = false;
 		receiveThread.interrupt();
-		for(InetAddress k : outgoingTransfers.keySet())
-			outgoingTransfers.get(k).cancel();
+		for(ITransferProgress t : outgoingTransfers)
+			t.cancel();
 		for(String k : incomingTransfers.keySet())
 			incomingTransfers.get(k).cancel();
+	}
+
+	public ITransferProgress downloadFilelist(Host host) {
+		IncomingFilelistTransfer result = new IncomingFilelistTransfer(host);
+		
+		for(IMessageObserver observer : observers)
+			result.registerObserver(observer);
+		result.start();
+		return result;
 	}
 }

@@ -3,6 +3,13 @@ package de.tr0llhoehle.buschtrommel.network;
 import java.net.InetSocketAddress;
 import java.util.List;
 
+/**
+ * This interface gives acces to the progress of a transfer and some controll methods like cancel and resume.
+ * 
+ * All implementations MUST make these controll methods async.
+ * 
+ *
+ */
 public interface ITransferProgress {
 	/**
 	 * Type of the download. 

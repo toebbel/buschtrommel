@@ -25,7 +25,7 @@ import de.tr0llhoehle.buschtrommel.models.Message;
  * It runs in an independend thread, restarts the process if neccesaray and
  * creates all local resources (such as target file and a new socket).
  * 
- * @author tobi
+ * @author Tobias Sturm
  * 
  */
 public class IncomingDownload extends MessageMonitor implements ITransferProgress {

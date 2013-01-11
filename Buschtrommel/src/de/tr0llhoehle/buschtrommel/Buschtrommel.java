@@ -3,6 +3,7 @@ package de.tr0llhoehle.buschtrommel;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.Hashtable;
 
 import de.tr0llhoehle.buschtrommel.models.ByeMessage;
@@ -51,7 +52,7 @@ public class Buschtrommel {
 	public void start() throws IOException {
 		fileTransferAdapter = new FileTransferAdapter(shareCache);
 		this.udpAdapter = new UDPAdapter();
-		this.netCache = new NetCache(this.udpAdapter, this.guiCallbacks);
+		this.netCache = new NetCache(this.udpAdapter, fileTransferAdapter, this.guiCallbacks);
 		this.udpAdapter.registerObserver(netCache);
 		udpAdapter.sendMulticast(new PeerDiscoveryMessage(PeerDiscoveryMessage.DiscoveryMessageType.HI, alias, fileTransferAdapter.getPort()));
 	}
@@ -155,7 +156,7 @@ public class Buschtrommel {
 	 * All currently outgoing transfers (active and inactive)
 	 * @return transfers
 	 */
-	public Hashtable<InetAddress, ITransferProgress> getOutgoingTransfers() {
+	public ArrayList<ITransferProgress> getOutgoingTransfers() {
 		return fileTransferAdapter.getOutgoingTransfers();
 	}
 
