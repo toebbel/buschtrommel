@@ -451,7 +451,7 @@ public class MainFrame extends javax.swing.JFrame {
 		// JOptionPane.INFORMATION_MESSAGE);
 
 		// ITransferMock mock[] = new ITransferMock[1];
-		ITransferMock mock = new ITransferMock("Test" + Math.random(), true, new Long(2000), new Long(1000),
+		ITransferMock mock = new ITransferMock("Test", true, new Long(100), new Long((int)(Math.random()*100)),
 				TransferStatus.Transfering);
 
 		listmodel.addElement(mock);
