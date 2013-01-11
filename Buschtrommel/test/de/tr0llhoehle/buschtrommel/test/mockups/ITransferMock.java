@@ -14,14 +14,18 @@ public class ITransferMock implements ITransferProgress {
 	public boolean active;
 	public long length;
 	public long transfered;
+
+
+	public TransferStatus status;
 	
 	
-	public ITransferMock(String name, boolean active, long length, long transfered) {
+	public ITransferMock(String name, boolean active, long length, long transfered, TransferStatus status) {
 		super();
 		this.name = name;
 		this.active = active;
 		this.length = length;
 		this.transfered = transfered;
+		this.status = status;
 	}
 
 	@Override
@@ -57,7 +61,7 @@ public class ITransferMock implements ITransferProgress {
 	@Override
 	public TransferStatus getStatus() {
 		// TODO Auto-generated method stub
-		return null;
+		return status;
 	}
 
 	@Override

@@ -411,17 +411,18 @@ private void removeShareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-F
         // TODO add your handling code here:
         //TODO add testtransfer
     	
-    	JOptionPane.showMessageDialog(this, "Pressed", "Nachricht", JOptionPane.INFORMATION_MESSAGE);
-    	
+    	//JOptionPane.showMessageDialog(this, "Pressed", "Nachricht", JOptionPane.INFORMATION_MESSAGE);
   
     	
-    	ITransferMock mock = new ITransferMock("Test", true, 2000, 1000);
+    	ITransferMock mock[] = new ITransferMock[1];
+    	mock[0] = new ITransferMock("Test", true, new Long(2000), new Long(1000), TransferStatus.Transfering);
     	//new Component
        
       ListModel<ITransferProgress> listmodel = new DefaultListModel<ITransferProgress>();
-      ((DefaultListModel<ITransferProgress>) listmodel).addElement(mock);
-      activeTransferList = new JList<ITransferProgress>(listmodel);
+      //((DefaultListModel<ITransferProgress>) listmodel).addElement(mock);
       activeTransferList.setCellRenderer(new DownloadItem());
+	activeTransferList.setListData(mock);// = new JList<ITransferProgress>(listmodel);
+      
       
     }//GEN-LAST:event_abortTransferActionPerformed
 

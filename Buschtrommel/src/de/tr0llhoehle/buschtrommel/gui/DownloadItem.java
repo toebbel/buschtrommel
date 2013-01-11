@@ -63,20 +63,24 @@ public class DownloadItem extends javax.swing.JPanel implements ListCellRenderer
          };
          
          
+         
          //set state
          TransferStatus.setText(statusToString(value.getStatus()));
          
          Filename.setText(value.getTargetFile());
          
-         long length = value.getLength();
-         long transferred = value.getTransferedAmount();
+         Long length = value.getLength();
          
-         int percent = (int) (length/transferred)*100;
+         Long transferred = value.getTransferedAmount();
+         
+         double percent =  (transferred.floatValue()/length.floatValue())*100;
+        // System.out.println(percent);
          Progress.setMaximum(100);
-         Progress.setValue(percent);
+         Progress.setValue((int)percent);
          
          setBackground(background);
          setForeground(foreground);
+         this.setOpaque(true);
 
          return this;
      }
@@ -140,6 +144,9 @@ public class DownloadItem extends javax.swing.JPanel implements ListCellRenderer
     // End of variables declaration//GEN-END:variables
 
     public static String statusToString(TransferStatus transfer){
+    	if(transfer == null){
+    		return "42";
+    	}
        String status = "42";
         
         switch (transfer){
