@@ -24,7 +24,8 @@ public class RemoteShare extends Share {
 	 *            any information about the file (description or path) as UTF8-String. MUST NOT contain any character with ascii code < 32 (space). Any of these characters will be replaced with spaces
 	 */
 	public RemoteShare(String hash, long length) {
-		super(hash, length);		
+		super(hash, length);
+		this.sources = new Vector<ShareAvailability>();
 	}
 	
 	public Vector<ShareAvailability> getSources() {
