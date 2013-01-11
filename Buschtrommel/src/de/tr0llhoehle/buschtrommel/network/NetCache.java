@@ -24,7 +24,7 @@ import de.tr0llhoehle.buschtrommel.models.ShareAvailability;
  * 
  */
 public class NetCache implements IMessageObserver {
-	
+
 	private static int TTL_REFRESH_RATE = 5;
 
 	protected Hashtable<InetAddress, Host> knownHosts;
@@ -38,6 +38,9 @@ public class NetCache implements IMessageObserver {
 	public NetCache(UDPAdapter udpAdapter, IGUICallbacks guiCallbacks) {
 		this.udpAdapter = udpAdapter;
 		this.guiCallbacks = guiCallbacks;
+		
+		this.knownHosts = new Hashtable<InetAddress, Host>();
+		this.knownShares = new Hashtable<String, RemoteShare>();
 
 		this.ttlChecker = new Timer();
 		TimerTask task = new TimerTask() {
@@ -45,7 +48,7 @@ public class NetCache implements IMessageObserver {
 				checkTTL();
 			}
 		};
-		ttlChecker.scheduleAtFixedRate(task, TTL_REFRESH_RATE*1000, TTL_REFRESH_RATE*1000);
+		ttlChecker.scheduleAtFixedRate(task, TTL_REFRESH_RATE * 1000, TTL_REFRESH_RATE * 1000);
 	}
 
 	/**
@@ -89,7 +92,9 @@ public class NetCache implements IMessageObserver {
 				// ttl
 				if (host.getSharedFiles().containsKey(hash)) {
 					host.getSharedFiles().get(hash).setTTL(ttl);
-					this.guiCallbacks.updatedTTL(host.getSharedFiles().get(hash));
+					if (this.guiCallbacks != null) {
+						this.guiCallbacks.updatedTTL(host.getSharedFiles().get(hash));
+					}
 				}
 
 				// if the share share isn't already associated, associate it to
@@ -97,7 +102,9 @@ public class NetCache implements IMessageObserver {
 				else {
 					host.addFileToSharedFiles(tempShare.addFileSource(host, ttl, message.getFile().getDisplayName(),
 							message.getFile().getMeta()));
-					this.guiCallbacks.newShareAvailable(host.getSharedFiles().get(hash));
+					if (this.guiCallbacks != null) {
+						this.guiCallbacks.newShareAvailable(host.getSharedFiles().get(hash));
+					}
 				}
 
 				// case: share cached but new host
@@ -105,8 +112,10 @@ public class NetCache implements IMessageObserver {
 				this.knownHosts.put(host.getAddress(), host);
 				host.addFileToSharedFiles(tempShare.addFileSource(host, ttl, message.getFile().getDisplayName(),
 						message.getFile().getMeta()));
-				this.guiCallbacks.newHostDiscovered(host);
-				this.guiCallbacks.newShareAvailable(host.getSharedFiles().get(hash));
+				if (this.guiCallbacks != null) {
+					this.guiCallbacks.newHostDiscovered(host);
+					this.guiCallbacks.newShareAvailable(host.getSharedFiles().get(hash));
+				}
 			}
 
 		} else {
@@ -116,7 +125,9 @@ public class NetCache implements IMessageObserver {
 				this.knownShares.put(hash, tmp);
 				host.addFileToSharedFiles(tmp.addFileSource(host, ttl, message.getFile().getDisplayName(), message
 						.getFile().getMeta()));
-				this.guiCallbacks.newShareAvailable(host.getSharedFiles().get(hash));
+				if (this.guiCallbacks != null) {
+					this.guiCallbacks.newShareAvailable(host.getSharedFiles().get(hash));
+				}
 			}
 
 			// case: neither host nor share cached
@@ -126,8 +137,10 @@ public class NetCache implements IMessageObserver {
 				this.knownShares.put(hash, tmp);
 				host.addFileToSharedFiles(tmp.addFileSource(host, ttl, message.getFile().getDisplayName(), message
 						.getFile().getMeta()));
-				this.guiCallbacks.newHostDiscovered(host);
-				this.guiCallbacks.newShareAvailable(host.getSharedFiles().get(hash));
+				if (this.guiCallbacks != null) {
+					this.guiCallbacks.newHostDiscovered(host);
+					this.guiCallbacks.newShareAvailable(host.getSharedFiles().get(hash));
+				}
 			}
 		}
 	}
@@ -141,7 +154,9 @@ public class NetCache implements IMessageObserver {
 		} else {
 			// add new host
 			this.knownHosts.put(host.getAddress(), host);
-			this.guiCallbacks.newHostDiscovered(host);
+			if (this.guiCallbacks != null) {
+				this.guiCallbacks.newHostDiscovered(host);
+			}
 		}
 		switch (message.getType()) {
 		case PeerDiscoveryMessage.TYPE_FIELD_HI:
@@ -169,7 +184,9 @@ public class NetCache implements IMessageObserver {
 		Host host = new Host(message.getSource(), message.getSource().toString(), UDPAdapter.DEFAULT_PORT);
 		if (this.hostExists(host)) {
 			RemoteShare tmp;
-			this.guiCallbacks.hostWentOffline(host);
+			if (this.guiCallbacks != null) {
+				this.guiCallbacks.hostWentOffline(host);
+			}
 			for (String hash : host.getSharedFiles().keySet()) {
 				tmp = this.knownShares.get(hash);
 				tmp.removeFileSource(host.getSharedFiles().get(hash));
@@ -199,7 +216,7 @@ public class NetCache implements IMessageObserver {
 	 *            the specified host
 	 * @return true if the specified host was found
 	 */
-	private boolean hostExists(Host host) {
+	public boolean hostExists(Host host) {
 		for (InetAddress address : this.knownHosts.keySet()) {
 			if (host.equals(this.knownHosts.get(address))) {
 				host = this.knownHosts.get(address);
@@ -210,28 +227,38 @@ public class NetCache implements IMessageObserver {
 		return false;
 	}
 	
+	public void removeHost(Host host) {
+		this.knownHosts.remove(host.getAddress());
+	}
+	
+	public boolean shareExists(String hash) {
+		return knownShares.get(hash) != null;
+	}
+
 	private void checkTTL() {
 		Host host;
 		ShareAvailability shareAvailability;
 		int tmpTTL = 0;
-		for(InetAddress address : knownHosts.keySet()) {
+		for (InetAddress address : knownHosts.keySet()) {
 			host = knownHosts.get(address);
-			for(String hash : host.getSharedFiles().keySet()) {
+			for (String hash : host.getSharedFiles().keySet()) {
 				shareAvailability = host.getSharedFiles().get(hash);
 				tmpTTL = shareAvailability.getTtl();
-				if(tmpTTL <= 4) {
+				if (tmpTTL <= TTL_REFRESH_RATE) {
 					host.removeFileFromSharedFiles(hash);
 					shareAvailability.getFile().removeFileSource(shareAvailability);
-					if(shareAvailability.getFile().noSourcesAvailable()) {
+					if (shareAvailability.getFile().noSourcesAvailable()) {
 						knownShares.remove(hash);
 					}
-					guiCallbacks.removeShare(shareAvailability);
+					if (guiCallbacks != null) {
+						guiCallbacks.removeShare(shareAvailability);
+					}
 				} else {
 					shareAvailability.setTTL(tmpTTL - TTL_REFRESH_RATE);
 				}
 			}
 		}
-		
+
 	}
 
 }
