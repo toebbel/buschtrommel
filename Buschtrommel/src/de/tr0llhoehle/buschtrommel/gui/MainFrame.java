@@ -397,15 +397,15 @@ public class MainFrame extends javax.swing.JFrame {
 	}// </editor-fold>//GEN-END:initComponents
 
 	private void saveSettingsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_saveSettingsActionPerformed
-	// TODO add your handling code here:
+		// TODO add your handling code here:
 	}// GEN-LAST:event_saveSettingsActionPerformed
 
 	private void downloadFilesBtnActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_downloadFilesBtnActionPerformed
-	// TODO add your handling code here:
+		// TODO add your handling code here:
 	}// GEN-LAST:event_downloadFilesBtnActionPerformed
 
 	private void removeShareActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_removeShareActionPerformed
-	// TODO add your handling code here:
+		// TODO add your handling code here:
 	}// GEN-LAST:event_removeShareActionPerformed
 
 	private void loadSettingsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_loadSettingsActionPerformed
@@ -441,6 +441,23 @@ public class MainFrame extends javax.swing.JFrame {
 
 	private void resetTransferActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_resetTransferActionPerformed
 		// TODO add your handling code here:
+		int items_to_delete[] = null;
+		if (!activeTransferList.isSelectionEmpty())
+			items_to_delete = activeTransferList.getSelectedIndices();
+		else
+			return;
+
+		if (items_to_delete != null)
+
+		{
+
+			for (int i = items_to_delete.length - 1; i >= 0; i--) {
+				//System.out.println("deleting: " + items_to_delete[i]);
+				listmodel.remove(items_to_delete[i]);
+			}
+			// list.setListData(items);
+		}
+
 	}// GEN-LAST:event_resetTransferActionPerformed
 
 	private void abortTransferActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_abortTransferActionPerformed
@@ -451,7 +468,7 @@ public class MainFrame extends javax.swing.JFrame {
 		// JOptionPane.INFORMATION_MESSAGE);
 
 		// ITransferMock mock[] = new ITransferMock[1];
-		ITransferMock mock = new ITransferMock("Test", true, new Long(100), new Long((int)(Math.random()*100)),
+		ITransferMock mock = new ITransferMock("Test", true, new Long(100), new Long((int) (Math.random() * 100)),
 				TransferStatus.Transfering);
 
 		listmodel.addElement(mock);
