@@ -62,342 +62,381 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	 */
 	@SuppressWarnings("unchecked")
 	// <editor-fold defaultstate="collapsed"
-	// desc="Generated Code">//GEN-BEGIN:initComponents
-	private void initComponents() {
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
 
-		jFileChooser1 = new javax.swing.JFileChooser();
-		jTabbedPane1 = new javax.swing.JTabbedPane();
-		jPanel1 = new javax.swing.JPanel();
-		jScrollPane3 = new javax.swing.JScrollPane();
-		jTable1 = new javax.swing.JTable();
-		downloadFilesBtn = new javax.swing.JButton();
-		jPanel3 = new javax.swing.JPanel();
-		addShare = new javax.swing.JButton();
-		removeShare = new javax.swing.JButton();
-		jScrollPane2 = new javax.swing.JScrollPane();
-		jTable2 = new javax.swing.JTable();
-		jPanel4 = new javax.swing.JPanel();
-		jScrollPane1 = new javax.swing.JScrollPane();
-		activeTransferList = new javax.swing.JList(listmodel);
-		abortTransfer = new javax.swing.JButton();
-		resetTransfer = new javax.swing.JButton();
-		resumeTransfer = new javax.swing.JButton();
-		jPanel5 = new javax.swing.JPanel();
-		saveSettings = new javax.swing.JButton();
-		jTextField1 = new javax.swing.JTextField();
-		jLabel1 = new javax.swing.JLabel();
-		loadSettings = new javax.swing.JButton();
-		jTextField2 = new javax.swing.JTextField();
-		jLabel2 = new javax.swing.JLabel();
+        jFileChooser1 = new javax.swing.JFileChooser();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jPanel1 = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        filesHostsTable = new javax.swing.JTable();
+        downloadFilesBtn = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        allFilesTable = new javax.swing.JTable();
+        downloadFilesBtn1 = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
+        addShare = new javax.swing.JButton();
+        removeShare = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTable2 = new javax.swing.JTable();
+        jPanel4 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        activeTransferList = new javax.swing.JList(listmodel);
+        abortTransfer = new javax.swing.JButton();
+        resetTransfer = new javax.swing.JButton();
+        resumeTransfer = new javax.swing.JButton();
+        jPanel5 = new javax.swing.JPanel();
+        saveSettings = new javax.swing.JButton();
+        jTextField1 = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+        loadSettings = new javax.swing.JButton();
+        jTextField2 = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
 
-		jFileChooser1.setDialogTitle("Datei wählen");
+        jFileChooser1.setDialogTitle("Datei wählen");
 
-		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-		jTabbedPane1.setName("files-table"); // NOI18N
+        jTabbedPane1.setName("files-table"); // NOI18N
 
-		jPanel1.setName("filesTab"); // NOI18N
+        jPanel1.setName("filesTab"); // NOI18N
 
-		jTable1.setModel(new javax.swing.table.DefaultTableModel(new Object[][] {
+        filesHostsTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
 
-		}, new String[] { "Filename", "Meta-Information", "Size", "Host", "Hash", "TTL" }) {
-			Class[] types = new Class[] { java.lang.String.class, java.lang.String.class, java.lang.String.class,
-					java.lang.String.class, java.lang.String.class, java.lang.String.class };
-			boolean[] canEdit = new boolean[] { false, false, false, false, false, false };
+            },
+            new String [] {
+                "Filename", "Meta-Information", "Size", "Host", "Hash", "TTL"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false
+            };
 
-			public Class getColumnClass(int columnIndex) {
-				return types[columnIndex];
-			}
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
 
-			public boolean isCellEditable(int rowIndex, int columnIndex) {
-				return canEdit[columnIndex];
-			}
-		});
-		jScrollPane3.setViewportView(jTable1);
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane3.setViewportView(filesHostsTable);
 
-		downloadFilesBtn.setText("Download selected");
-		downloadFilesBtn.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				downloadFilesBtnActionPerformed(evt);
-			}
-		});
+        downloadFilesBtn.setText("Download selected");
+        downloadFilesBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                downloadFilesBtnActionPerformed(evt);
+            }
+        });
 
-		javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-		jPanel1.setLayout(jPanel1Layout);
-		jPanel1Layout.setHorizontalGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGroup(
-						jPanel1Layout
-								.createSequentialGroup()
-								.addGroup(
-										jPanel1Layout
-												.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-												.addGroup(
-														jPanel1Layout.createSequentialGroup().addContainerGap()
-																.addComponent(downloadFilesBtn))
-												.addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING,
-														javax.swing.GroupLayout.DEFAULT_SIZE, 780, Short.MAX_VALUE))
-								.addContainerGap()));
-		jPanel1Layout.setVerticalGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGroup(
-						javax.swing.GroupLayout.Alignment.TRAILING,
-						jPanel1Layout.createSequentialGroup().addContainerGap()
-								.addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 583, Short.MAX_VALUE)
-								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addComponent(downloadFilesBtn).addContainerGap()));
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(downloadFilesBtn))
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 780, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 583, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(downloadFilesBtn)
+                .addContainerGap())
+        );
 
-		jTabbedPane1.addTab("Files", jPanel1);
+        jTabbedPane1.addTab("Hosts & Files", jPanel1);
 
-		jPanel3.setName("sharesTab"); // NOI18N
+        jPanel2.setName("filesTab"); // NOI18N
 
-		addShare.setText("Add new Share");
-		addShare.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-		addShare.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				addShareActionPerformed(evt);
-			}
-		});
+        allFilesTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
 
-		removeShare.setText("Remove Share");
-		removeShare.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				removeShareActionPerformed(evt);
-				removeShareActionPerformed1(evt);
-			}
-		});
+            },
+            new String [] {
+                "Filename", "Meta-Information", "Size", "Hash", "TTL"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false
+            };
 
-		jScrollPane2.setName("shares-table"); // NOI18N
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
 
-		jTable2.setModel(new javax.swing.table.DefaultTableModel(new Object[][] {
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane4.setViewportView(allFilesTable);
 
-		}, new String[] { "Filename", "Meta-Information", "Path", "Size", "TTL" }) {
-			Class[] types = new Class[] { java.lang.String.class, java.lang.String.class, java.lang.String.class,
-					java.lang.String.class, java.lang.Integer.class };
-			boolean[] canEdit = new boolean[] { true, true, false, false, true };
+        downloadFilesBtn1.setText("Download selected");
+        downloadFilesBtn1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                downloadFilesBtn1ActionPerformed(evt);
+            }
+        });
 
-			public Class getColumnClass(int columnIndex) {
-				return types[columnIndex];
-			}
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(downloadFilesBtn1))
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 780, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 583, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(downloadFilesBtn1)
+                .addContainerGap())
+        );
 
-			public boolean isCellEditable(int rowIndex, int columnIndex) {
-				return canEdit[columnIndex];
-			}
-		});
-		jTable2.setName("shares-table"); // NOI18N
-		jScrollPane2.setViewportView(jTable2);
+        jTabbedPane1.addTab("Files", jPanel2);
 
-		javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-		jPanel3.setLayout(jPanel3Layout);
-		jPanel3Layout.setHorizontalGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGroup(
-						javax.swing.GroupLayout.Alignment.TRAILING,
-						jPanel3Layout
-								.createSequentialGroup()
-								.addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 655, Short.MAX_VALUE)
-								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addGroup(
-										jPanel3Layout
-												.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-												.addComponent(removeShare, javax.swing.GroupLayout.DEFAULT_SIZE,
-														javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-												.addComponent(addShare, javax.swing.GroupLayout.DEFAULT_SIZE,
-														javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-								.addContainerGap()));
-		jPanel3Layout
-				.setVerticalGroup(jPanel3Layout
-						.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-						.addGroup(
-								jPanel3Layout
-										.createSequentialGroup()
-										.addContainerGap()
-										.addGroup(
-												jPanel3Layout
-														.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-														.addComponent(jScrollPane2,
-																javax.swing.GroupLayout.DEFAULT_SIZE, 619,
-																Short.MAX_VALUE)
-														.addGroup(
-																jPanel3Layout
-																		.createSequentialGroup()
-																		.addComponent(addShare)
-																		.addPreferredGap(
-																				javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-																		.addComponent(removeShare))).addContainerGap()));
+        jPanel3.setName("sharesTab"); // NOI18N
 
-		jTabbedPane1.addTab("Shares", jPanel3);
+        addShare.setText("Add new Share");
+        addShare.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        addShare.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addShareActionPerformed(evt);
+            }
+        });
 
-		jPanel4.setName("activeTransfersTab"); // NOI18N
+        removeShare.setText("Remove Share");
+        removeShare.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                removeShareActionPerformed(evt);
+                removeShareActionPerformed1(evt);
+            }
+        });
 
-		activeTransferList.setCellRenderer(downloadCellRenderer);
-		jScrollPane1.setViewportView(activeTransferList);
+        jScrollPane2.setName("shares-table"); // NOI18N
 
-		abortTransfer.setText("Abort");
-		abortTransfer.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				abortTransferActionPerformed(evt);
-			}
-		});
+        jTable2.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
 
-		resetTransfer.setText("Reset");
-		resetTransfer.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				resetTransferActionPerformed(evt);
-			}
-		});
+            },
+            new String [] {
+                "Filename", "Meta-Information", "Path", "Size", "TTL"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class
+            };
+            boolean[] canEdit = new boolean [] {
+                true, true, false, false, true
+            };
 
-		resumeTransfer.setText("Resume");
-		resumeTransfer.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				resumeTransferActionPerformed(evt);
-			}
-		});
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
 
-		javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-		jPanel4.setLayout(jPanel4Layout);
-		jPanel4Layout.setHorizontalGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGroup(
-						javax.swing.GroupLayout.Alignment.TRAILING,
-						jPanel4Layout
-								.createSequentialGroup()
-								.addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 706, Short.MAX_VALUE)
-								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addGroup(
-										jPanel4Layout
-												.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-												.addComponent(resumeTransfer, javax.swing.GroupLayout.DEFAULT_SIZE,
-														javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-												.addComponent(resetTransfer, javax.swing.GroupLayout.DEFAULT_SIZE,
-														javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-												.addComponent(abortTransfer, javax.swing.GroupLayout.DEFAULT_SIZE,
-														javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-								.addContainerGap()));
-		jPanel4Layout
-				.setVerticalGroup(jPanel4Layout
-						.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-						.addGroup(
-								jPanel4Layout
-										.createSequentialGroup()
-										.addGroup(
-												jPanel4Layout
-														.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-														.addGroup(
-																jPanel4Layout
-																		.createSequentialGroup()
-																		.addContainerGap()
-																		.addComponent(abortTransfer)
-																		.addPreferredGap(
-																				javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-																		.addComponent(resetTransfer)
-																		.addPreferredGap(
-																				javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-																		.addComponent(resumeTransfer)
-																		.addGap(0, 0, Short.MAX_VALUE))
-														.addComponent(jScrollPane1,
-																javax.swing.GroupLayout.DEFAULT_SIZE, 631,
-																Short.MAX_VALUE)).addContainerGap()));
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jTable2.setName("shares-table"); // NOI18N
+        jScrollPane2.setViewportView(jTable2);
 
-		jTabbedPane1.addTab("active Transfers", jPanel4);
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 655, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(removeShare, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(addShare, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 619, Short.MAX_VALUE)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(addShare)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(removeShare)))
+                .addContainerGap())
+        );
 
-		jPanel5.setName("settingsTab"); // NOI18N
+        jTabbedPane1.addTab("Shares", jPanel3);
 
-		saveSettings.setText("save Settings");
-		saveSettings.setName("saveSettings_btn"); // NOI18N
-		saveSettings.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				saveSettingsActionPerformed(evt);
-			}
-		});
+        jPanel4.setName("activeTransfersTab"); // NOI18N
 
-		jLabel1.setText("Path to Share-Settings");
+        activeTransferList.setCellRenderer(downloadCellRenderer);
+        jScrollPane1.setViewportView(activeTransferList);
 
-		loadSettings.setText("load Settings");
-		loadSettings.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				loadSettingsActionPerformed(evt);
-			}
-		});
+        abortTransfer.setText("Abort");
+        abortTransfer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                abortTransferActionPerformed(evt);
+            }
+        });
 
-		jTextField2.setText("-1");
-		jTextField2.setToolTipText("-1 = unlimited");
+        resetTransfer.setText("Reset");
+        resetTransfer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resetTransferActionPerformed(evt);
+            }
+        });
 
-		jLabel2.setText("Default TTL");
+        resumeTransfer.setText("Resume");
+        resumeTransfer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resumeTransferActionPerformed(evt);
+            }
+        });
 
-		javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-		jPanel5.setLayout(jPanel5Layout);
-		jPanel5Layout
-				.setHorizontalGroup(jPanel5Layout
-						.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-						.addGroup(
-								jPanel5Layout
-										.createSequentialGroup()
-										.addContainerGap()
-										.addGroup(
-												jPanel5Layout
-														.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-														.addGroup(
-																jPanel5Layout
-																		.createSequentialGroup()
-																		.addGap(0, 545, Short.MAX_VALUE)
-																		.addComponent(loadSettings)
-																		.addPreferredGap(
-																				javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-																		.addComponent(saveSettings))
-														.addGroup(
-																jPanel5Layout
-																		.createSequentialGroup()
-																		.addGroup(
-																				jPanel5Layout
-																						.createParallelGroup(
-																								javax.swing.GroupLayout.Alignment.LEADING)
-																						.addComponent(jLabel1)
-																						.addComponent(jLabel2))
-																		.addPreferredGap(
-																				javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-																		.addGroup(
-																				jPanel5Layout
-																						.createParallelGroup(
-																								javax.swing.GroupLayout.Alignment.LEADING)
-																						.addComponent(jTextField2)
-																						.addComponent(jTextField1))))
-										.addContainerGap()));
-		jPanel5Layout.setVerticalGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGroup(
-						javax.swing.GroupLayout.Alignment.TRAILING,
-						jPanel5Layout
-								.createSequentialGroup()
-								.addGap(22, 22, 22)
-								.addGroup(
-										jPanel5Layout
-												.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-												.addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE,
-														javax.swing.GroupLayout.DEFAULT_SIZE,
-														javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(jLabel1))
-								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addGroup(
-										jPanel5Layout
-												.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-												.addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE,
-														javax.swing.GroupLayout.DEFAULT_SIZE,
-														javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(jLabel2))
-								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 517,
-										Short.MAX_VALUE)
-								.addGroup(
-										jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-												.addComponent(saveSettings).addComponent(loadSettings))
-								.addContainerGap()));
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 706, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(resumeTransfer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(resetTransfer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(abortTransfer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(abortTransfer)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(resetTransfer)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(resumeTransfer)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 631, Short.MAX_VALUE))
+                .addContainerGap())
+        );
 
-		saveSettings.getAccessibleContext().setAccessibleName("save_Settings");
+        jTabbedPane1.addTab("active Transfers", jPanel4);
 
-		jTabbedPane1.addTab("Settings", jPanel5);
+        jPanel5.setName("settingsTab"); // NOI18N
 
-		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-		getContentPane().setLayout(layout);
-		layout.setHorizontalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
-				layout.createSequentialGroup().addContainerGap().addComponent(jTabbedPane1)));
-		layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
-				layout.createSequentialGroup().addContainerGap().addComponent(jTabbedPane1)));
+        saveSettings.setText("save Settings");
+        saveSettings.setName("saveSettings_btn"); // NOI18N
+        saveSettings.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveSettingsActionPerformed(evt);
+            }
+        });
 
-		pack();
-	}// </editor-fold>//GEN-END:initComponents
+        jLabel1.setText("Path to Share-Settings");
+
+        loadSettings.setText("load Settings");
+        loadSettings.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadSettingsActionPerformed(evt);
+            }
+        });
+
+        jTextField2.setText("-1");
+        jTextField2.setToolTipText("-1 = unlimited");
+
+        jLabel2.setText("Default TTL");
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGap(0, 545, Short.MAX_VALUE)
+                        .addComponent(loadSettings)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(saveSettings))
+                    .addGroup(jPanel5Layout.createSequentialGroup()
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel2))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTextField2)
+                            .addComponent(jTextField1))))
+                .addContainerGap())
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+                .addGap(22, 22, 22)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 517, Short.MAX_VALUE)
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(saveSettings)
+                    .addComponent(loadSettings))
+                .addContainerGap())
+        );
+
+        saveSettings.getAccessibleContext().setAccessibleName("save_Settings");
+
+        jTabbedPane1.addTab("Settings", jPanel5);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jTabbedPane1))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jTabbedPane1))
+        );
+
+        jTabbedPane1.getAccessibleContext().setAccessibleName("");
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void downloadFilesBtn1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downloadFilesBtn1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_downloadFilesBtn1ActionPerformed
 
 	private void saveSettingsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_saveSettingsActionPerformed
 		// TODO add your handling code here:
@@ -531,32 +570,36 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		});
 	}
 
-	// Variables declaration - do not modify//GEN-BEGIN:variables
-	private javax.swing.JButton abortTransfer;
-	private javax.swing.JList activeTransferList;
-	private javax.swing.JButton addShare;
-	private javax.swing.JButton downloadFilesBtn;
-	private javax.swing.JFileChooser jFileChooser1;
-	private javax.swing.JLabel jLabel1;
-	private javax.swing.JLabel jLabel2;
-	private javax.swing.JPanel jPanel1;
-	private javax.swing.JPanel jPanel3;
-	private javax.swing.JPanel jPanel4;
-	private javax.swing.JPanel jPanel5;
-	private javax.swing.JScrollPane jScrollPane1;
-	private javax.swing.JScrollPane jScrollPane2;
-	private javax.swing.JScrollPane jScrollPane3;
-	private javax.swing.JTabbedPane jTabbedPane1;
-	private javax.swing.JTable jTable1;
-	private javax.swing.JTable jTable2;
-	private javax.swing.JTextField jTextField1;
-	private javax.swing.JTextField jTextField2;
-	private javax.swing.JButton loadSettings;
-	private javax.swing.JButton removeShare;
-	private javax.swing.JButton resetTransfer;
-	private javax.swing.JButton resumeTransfer;
-	private javax.swing.JButton saveSettings;
-	// End of variables declaration//GEN-END:variables
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton abortTransfer;
+    private javax.swing.JList activeTransferList;
+    private javax.swing.JButton addShare;
+    private javax.swing.JTable allFilesTable;
+    private javax.swing.JButton downloadFilesBtn;
+    private javax.swing.JButton downloadFilesBtn1;
+    private javax.swing.JTable filesHostsTable;
+    private javax.swing.JFileChooser jFileChooser1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JTable jTable2;
+    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField2;
+    private javax.swing.JButton loadSettings;
+    private javax.swing.JButton removeShare;
+    private javax.swing.JButton resetTransfer;
+    private javax.swing.JButton resumeTransfer;
+    private javax.swing.JButton saveSettings;
+    // End of variables declaration//GEN-END:variables
 
     @Override
     public void newHostDiscovered(Host host) {
