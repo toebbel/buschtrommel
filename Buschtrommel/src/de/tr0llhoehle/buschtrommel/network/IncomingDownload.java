@@ -104,7 +104,7 @@ public class IncomingDownload extends MessageMonitor implements ITransferProgres
 		// check response
 		FileRequestResponseMessage rsp = handleResponse(in);
 		if (rsp != null && status == TransferStatus.Connecting) {
-			rsp.setSource(host.getAddress());
+			rsp.setSource(new InetSocketAddress(host.getAddress(), host.getPort()));
 			sendMessageToObservers(rsp);
 		} else {
 			closeSocket();

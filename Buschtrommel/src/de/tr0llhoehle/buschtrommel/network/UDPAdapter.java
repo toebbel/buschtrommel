@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
+import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 
 import de.tr0llhoehle.buschtrommel.LoggerWrapper;
@@ -78,7 +79,7 @@ public class UDPAdapter extends MessageMonitor {
 			multicastSocket.receive(receivePacket);
 			message = MessageDeserializer.Deserialize(new String(receivePacket.getData(), Message.ENCODING));
 			if (message != null) {
-				message.setSource(receivePacket.getAddress());
+				message.setSource(new InetSocketAddress(receivePacket.getAddress(), receivePacket.getPort()));
 				this.sendMessageToObservers(message);
 			}
 		}
@@ -105,10 +106,12 @@ public class UDPAdapter extends MessageMonitor {
 	/**
 	 * Sends the specified message to the specified host via unicast.
 	 * 
+	 * The given port-value in the host model will be ignored, because it is for TCP communication only. Using the UDP-Default port instead.
+	 * 
 	 * @param message
 	 *            the specified message
 	 * @param host
-	 *            the specified host
+	 *            the specified host.
 	 * @throws IOException 
 	 */
 	public void sendUnicast(Message message, Host host) throws IOException {

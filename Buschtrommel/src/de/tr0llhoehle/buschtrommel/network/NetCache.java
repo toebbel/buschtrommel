@@ -78,7 +78,7 @@ public class NetCache implements IMessageObserver {
 	}
 
 	private void fileAnnouncmentHandler(FileAnnouncementMessage message) {
-		Host host = new Host(message.getSource(), message.getSource().toString(), UDPAdapter.DEFAULT_PORT);
+		Host host = new Host(message.getSource().getAddress(), message.getSource().getHostName(), 0);
 		int ttl = message.getFile().getTTL();
 		String hash = message.getFile().getHash();
 
@@ -148,7 +148,7 @@ public class NetCache implements IMessageObserver {
 	}
 
 	private void peerDiscoveryHandler(PeerDiscoveryMessage message) {
-		Host host = new Host(message.getSource(), message.getAlias(), message.getPort());
+		Host host = new Host(message.getSource().getAddress(), message.getSource().getHostName(), 0);
 		if (this.hostExists(host)) {
 			// update values
 			host.setDisplayName(message.getAlias());
@@ -180,7 +180,7 @@ public class NetCache implements IMessageObserver {
 	}
 
 	private void byeHandler(ByeMessage message) {
-		Host host = new Host(message.getSource(), message.getSource().toString(), UDPAdapter.DEFAULT_PORT);
+		Host host = new Host(message.getSource().getAddress(), message.getSource().getHostName(), 0);
 		if (this.hostExists(host)) {
 			RemoteShare tmp;
 			if (this.guiCallbacks != null) {
@@ -225,6 +225,7 @@ public class NetCache implements IMessageObserver {
 		}
 		return false;
 	}
+
 	
 	public void removeHost(Host host) {
 		this.knownHosts.remove(host.getAddress());

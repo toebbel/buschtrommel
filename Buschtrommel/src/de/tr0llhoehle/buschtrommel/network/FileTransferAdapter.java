@@ -85,7 +85,7 @@ public class FileTransferAdapter extends MessageMonitor {
 				final Message m = MessageDeserializer.Deserialize(new String(raw_message).trim());
 				if(m != null)
 					sendMessageToObservers(m);
-				m.setSource(s.getInetAddress());
+				m.setSource(new InetSocketAddress(s.getInetAddress(), s.getPort()));
 				final OutputStream out = s.getOutputStream();
 				ITransferProgress p = null;
 				if (m instanceof GetFileMessage) {
