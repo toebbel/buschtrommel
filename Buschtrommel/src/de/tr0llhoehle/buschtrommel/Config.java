@@ -20,6 +20,7 @@ public class Config {
 	public static int TTLRenewalTimer;
 	public static String shareCachePath;
 	public static String alias;
+	public static long minDiscoveryMulticastIddle; //min. time between two broadcast-YO messages
 
 	public static Config readFromFile(File f) throws FileNotFoundException {
 		java.beans.XMLDecoder decoder = new XMLDecoder(new FileInputStream(f));

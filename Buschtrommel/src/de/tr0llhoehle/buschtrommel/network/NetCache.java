@@ -164,16 +164,11 @@ public class NetCache implements IMessageObserver {
 		case PeerDiscoveryMessage.TYPE_FIELD_HI:
 			try {
 				if (this.udpAdapter != null) {
-					Thread.sleep((int) (Math.random() * Config.maximumYoResponseTime));
-					this.udpAdapter.sendUnicast(
-							new PeerDiscoveryMessage(DiscoveryMessageType.YO, Config.alias, message.getPort()), host);
-					Thread.sleep(5000);
+					Thread.sleep((int) (Math.random() * Config.maximumYoResponseTime) + 5000);
 					fileTransferAdapter.downloadFilelist(host);
 				} else {
 					LoggerWrapper.logError("Could not find UDP Adapter");
 				}
-			} catch (IOException e) {
-				LoggerWrapper.logError(e.getMessage());
 			} catch (InterruptedException e) {
 				LoggerWrapper.logError(e.getMessage());
 			}

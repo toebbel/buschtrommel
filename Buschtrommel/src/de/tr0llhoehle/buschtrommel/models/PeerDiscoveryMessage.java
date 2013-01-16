@@ -14,19 +14,21 @@ public class PeerDiscoveryMessage extends Message {
 	
 	private int port;
 	private String alias;
+	private DiscoveryMessageType docoveryTypetype;
 
 	/**
 	 * Creates a HI or YO message.
 	 * 
-	 * @param type
+	 * @param messageType
 	 *            type of message
 	 * @param alias
 	 *            the human readable alias of the peer. Illegal Chacaters (field and message seperator) will be removed with spaces
 	 * @param transferPort
 	 *            the open port of this peer for file transfers
 	 */
-	public PeerDiscoveryMessage(DiscoveryMessageType type, String alias, int transferPort) {
-		switch (type) {
+	public PeerDiscoveryMessage(DiscoveryMessageType messageType, String alias, int transferPort) {
+		this.docoveryTypetype = messageType;
+		switch (messageType) {
 		case HI:
 			this.type = TYPE_FIELD_HI;
 			break;
@@ -64,5 +66,9 @@ public class PeerDiscoveryMessage extends Message {
 
 	public String getAlias() {
 		return alias;
+	}
+	
+	public DiscoveryMessageType getDiscoveryMessageType() {
+		return docoveryTypetype;
 	}
 }
