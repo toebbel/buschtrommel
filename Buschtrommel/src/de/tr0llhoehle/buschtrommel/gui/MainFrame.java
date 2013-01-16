@@ -10,6 +10,9 @@
  */
 package de.tr0llhoehle.buschtrommel.gui;
 
+import de.tr0llhoehle.buschtrommel.IGUICallbacks;
+import de.tr0llhoehle.buschtrommel.models.Host;
+import de.tr0llhoehle.buschtrommel.models.ShareAvailability;
 import de.tr0llhoehle.buschtrommel.network.ITransferProgress;
 import de.tr0llhoehle.buschtrommel.network.ITransferProgress.TransferStatus;
 import de.tr0llhoehle.buschtrommel.network.ITransferProgress.TransferType;
@@ -38,7 +41,7 @@ import java.util.logging.Handler;
  * 
  * @author benjamin
  */
-public class MainFrame extends javax.swing.JFrame {
+public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
 	private DefaultListModel<ITransferProgress> listmodel = new DefaultListModel<ITransferProgress>();
 	private DownloadItem downloadCellRenderer = new DownloadItem();
@@ -554,5 +557,40 @@ public class MainFrame extends javax.swing.JFrame {
 	private javax.swing.JButton resumeTransfer;
 	private javax.swing.JButton saveSettings;
 	// End of variables declaration//GEN-END:variables
+
+    @Override
+    public void newHostDiscovered(Host host) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void hostWentOffline(Host host) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void removeShare(ShareAvailability file) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void fileTransferComplete(ITransferProgress transferProgress) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void fileTransferFailed(ITransferProgress transferProgress) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void newShareAvailable(ShareAvailability file) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void updatedTTL(ShareAvailability file) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 
 }
