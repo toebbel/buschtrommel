@@ -70,6 +70,7 @@ public class TestOutgoingTransfer {
 		sendingSocket = new Socket("localhost", mock.getPort());
 		Thread.sleep(1000);
 		out = new OutgoingTransfer(m, sendingSocket.getOutputStream(), shares, new InetSocketAddress("host", 123));
+		out.start();
 	}
 	
 	@Test
@@ -77,6 +78,7 @@ public class TestOutgoingTransfer {
 		//establish
 		Socket s = new Socket("localhost", mock.getPort());
 		OutgoingTransfer out = new OutgoingTransfer(new GetFilelistMessage(), s.getOutputStream(), shares, new InetSocketAddress("host", 123));
+		out.start();
 		Thread.sleep(100);
 		
 		//connect
