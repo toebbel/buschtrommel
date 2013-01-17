@@ -80,7 +80,8 @@ public class HashFuncWrapper {
 		for (byte b : hash) {
 			formatter.format("%02x", b);
 		}
+		String result = formatter.toString().toUpperCase();
 		formatter.close();
-		return formatter.toString().toUpperCase();
+		return result;
 	}
 }
