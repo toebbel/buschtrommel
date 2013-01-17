@@ -58,7 +58,7 @@ public class TestTransferSystem {
 	}
 
 	@Test(timeout=150000)
-	public void test() throws IOException, InterruptedException {
+	public void testNormalTransfer() throws IOException, InterruptedException {
 		Host senderHost = new Host(InetAddress.getLocalHost(), "sender", sender.getPort());
 		
 		ITransferProgress progress = receiver.DownloadFile(hashA, senderHost , FileContentMock.contentA.length(), tmpFile);
