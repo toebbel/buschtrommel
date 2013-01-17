@@ -216,4 +216,8 @@ public class LocalShareCache {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public Hashtable<String, LocalShare> getLocalShares() {
+		return this.shares;
+	}
 }

@@ -60,10 +60,11 @@ public class Buschtrommel implements IMessageObserver {
 	 * @throws IOException
 	 */
 	public void start() throws IOException {
-		fileTransferAdapter = new FileTransferAdapter(shareCache);
+		fileTransferAdapter = new FileTransferAdapter(shareCache, 4747);
 		this.udpAdapter = new UDPAdapter();
 		this.netCache = new NetCache(this.udpAdapter, fileTransferAdapter, this.guiCallbacks);
 		this.udpAdapter.registerObserver(netCache);
+		this.udpAdapter.registerObserver(this);
 		udpAdapter.sendMulticast(new PeerDiscoveryMessage(PeerDiscoveryMessage.DiscoveryMessageType.HI, alias,
 				fileTransferAdapter.getPort()));
 		lastDiscoveryMulticast = System.currentTimeMillis();
@@ -80,6 +81,7 @@ public class Buschtrommel implements IMessageObserver {
 		fileTransferAdapter = null;
 		this.udpAdapter.closeConnection();
 		this.udpAdapter.removeObserver(netCache);
+		this.udpAdapter.removeObserver(this);
 		this.udpAdapter = null;
 	}
 
@@ -206,6 +208,15 @@ public class Buschtrommel implements IMessageObserver {
 	 */
 	public Hashtable<String, RemoteShare> getRemoteShares() {
 		return this.netCache.getShares();
+	}
+	
+	/**
+	 * Returns all local shares
+	 * 
+	 * @return all local shares
+	 */
+	public Hashtable<String, LocalShare> getLocalShares() {
+		return this.shareCache.getLocalShares();
 	}
 
 	/**
