@@ -1,0 +1,152 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package de.tr0llhoehle.buschtrommel.gui;
+
+import de.tr0llhoehle.buschtrommel.models.Host;
+import de.tr0llhoehle.buschtrommel.models.RemoteShare;
+import de.tr0llhoehle.buschtrommel.models.ShareAvailability;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Vector;
+import javax.swing.table.AbstractTableModel;
+
+/**
+ *
+ * @author benjamin
+ */
+public class FilesTableModel extends AbstractTableModel {
+
+    private Vector<String[]> shares = new Vector<String[]>();
+    ;
+    
+    private String[] names = new String[]{
+        "Filename", "Meta-Information", "Size", "Host-Name","IP", "Hash", "TTL"
+    };
+    private Class[] types = new Class[]{
+        java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+    };
+    private boolean[] canEdit = new boolean[]{
+        false, false, false, false, false
+    };
+
+    public String getColumnName(int col) {
+        return names[col].toString();
+    }
+
+    public Class getColumnClass(int columnIndex) {
+        //return types [columnIndex];
+        return java.lang.String.class;
+    }
+
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        //return canEdit [columnIndex];
+        return false;
+    }
+
+    @Override
+    public int getRowCount() {
+        return shares.size();
+        //throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public int getColumnCount() {
+        return names.length;
+        //throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public String getValueAt(int rowIndex, int columnIndex) {
+        return shares.get(rowIndex)[columnIndex];
+        //throw new UnsupportedOperationException("Not supported yet.");
+
+    }
+
+    public void addShare(ShareAvailability avail) {
+        if (avail == null) {
+            return;
+        }
+        String eintragVector[] = new String[names.length];
+
+        //"Filename", "Meta-Information", "Size", "Host-Name","IP", "Hash", "TTL"
+        
+        eintragVector[0] = avail.getDisplayName();
+        eintragVector[1] = avail.getMeta();
+        eintragVector[3] = avail.getHost().getDisplayName();
+        eintragVector[4] = avail.getHost().getAddress().toString();
+        
+        eintragVector[6] = String.valueOf(avail.getTtl());
+        //get a share
+
+        // avail.getFile().getHash()
+        RemoteShare tempfile = avail.getFile();
+        if (tempfile != null) {
+            eintragVector[2] = String.valueOf(tempfile.getLength());
+
+            eintragVector[5] = tempfile.getHash();
+        }
+
+        this.shares.add(eintragVector);
+    }
+
+//    public FilesTableModell(Hashtable<String, RemoteShare> remoteShares) {
+//        // this.shares = new Vector<String[]>();//[remoteShares.keySet().size()][names.length];
+//
+//
+//
+//        for (String key : remoteShares.keySet()) {
+//            RemoteShare temp = remoteShares.get(key);
+//
+//            for (ShareAvailability avail : temp.getSources()) {
+//                //"Filename", "Meta-Information", "Size", "Host", "Hash", "TTL"
+//
+//                String eintragVector[] = new String[names.length];
+//                if (avail != null) {
+//                    eintragVector[0] = avail.getDisplayName();
+//                    eintragVector[1] = avail.getMeta();
+//                    eintragVector[3] = avail.getHost().getDisplayName();
+//                    eintragVector[5] = String.valueOf(avail.getTtl());
+//                } else {
+//                    eintragVector[0] = "No name";
+//                    eintragVector[1] = "No meta";
+//                    eintragVector[3] = "no display name";
+//                    eintragVector[5] = "no meta";
+//                }
+//
+//                eintragVector[2] = String.valueOf(temp.getLength());
+//
+//                eintragVector[4] = key;
+//
+//
+//
+//                this.shares.add(eintragVector);
+//
+//            }
+//
+//
+//
+//
+//        }
+//    }
+
+    void removeShare(ShareAvailability file) {
+        
+        for(String[] col : shares){
+            //"Filename", "Meta-Information", "Size", "Host-Name","IP", "Hash", "TTL"
+            if(col[5].equals(file.getFile().getHash()) && col[4].equals(file.getHost().getAddress().toString())){
+             shares.remove(col);   
+            }
+        }
+        //throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    void hostWentOffline(Host host) {
+        //throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    void newHostDiscovered(Host host) {
+        //throw new UnsupportedOperationException("Not yet implemented");
+    }
+}
