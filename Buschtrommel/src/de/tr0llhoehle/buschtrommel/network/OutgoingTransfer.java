@@ -25,17 +25,24 @@ import de.tr0llhoehle.buschtrommel.models.FileRequestResponseMessage.ResponseCod
  *
  */
 public class OutgoingTransfer extends Transfer {
-	OutputStream networkOutputStream; // network stream to the requester
-	java.io.InputStream ressourceInputStream; // stream from filelist / file
-	LocalShareCache myShares; // all my shares
+	private OutputStream networkOutputStream; // network stream to the requester
+	private java.io.InputStream ressourceInputStream; // stream from filelist / file
+	private LocalShareCache myShares; // all my shares
 
-	long numAvailableData; // max possible number of bytes to send
-	boolean sendHeaderInRsp;
-	String localeFilename;
-	Message requestMessage; //the message that contains the request
+	private long numAvailableData; // max possible number of bytes to send
+	private boolean sendHeaderInRsp;
+	private String localeFilename;
+	private Message requestMessage; //the message that contains the request
+	private int bufferSize;
 	
 	
-
+	/**
+	 * Creates an uploading file transfer of a file
+	 * @param m the request message. Has to be either a GetFile or GetFileList message
+	 * @param out the network stream to write to
+	 * @param myShares all known, local shares
+	 * @param partner the communication partner, that receives the file
+	 */
 	public OutgoingTransfer(Message m, OutputStream out, LocalShareCache myShares, InetSocketAddress partner) {
 		super(partner);
 		assert m instanceof GetFilelistMessage || m instanceof GetFileMessage;
@@ -44,6 +51,7 @@ public class OutgoingTransfer extends Transfer {
 		this.networkOutputStream = out;
 		this.myShares = myShares;
 		this.transferType = TransferType.Outgoing;
+		bufferSize = 1;
 		
 		logger = java.util.logging.Logger.getLogger("outgoing " + partner.toString());
 		keepTransferAlive = true;
@@ -58,6 +66,21 @@ public class OutgoingTransfer extends Transfer {
 			hash = "filelist";
 		}
 	}
+	
+	/**
+	 * Creates an uploading file transfer of a file
+	 * @param m the request message. Has to be either a GetFile or GetFileList message
+	 * @param out the network stream to write to
+	 * @param myShares all known, local shares
+	 * @param partner the communication partner, that receives the file
+	 * @param bufferSize the size of the sending buffer ( > 0). Default is 1
+	 */
+	public OutgoingTransfer(Message m, OutputStream out, LocalShareCache myShares, InetSocketAddress partner, int bufferSize) {
+		this(m, out, myShares, partner);
+		assert bufferSize > 0;
+		this.bufferSize = bufferSize;
+	}
+	
 
 	/**
 	 * Creates a stream that holds the data to send (filecontent or filelist) or
@@ -125,6 +148,7 @@ public class OutgoingTransfer extends Transfer {
 				networkOutputStream.write((new FileRequestResponseMessage(ResponseCode.NEVER_TRY_AGAIN, 0).Serialize()).getBytes());
 			
 			networkOutputStream.close();
+			return;
 		} else {
 			if (offset > numAvailableData) { // offset not in file
 				logger.log(Level.INFO, "Requested offset is not valid: requested " + offset + ", length of file: "
@@ -149,17 +173,25 @@ public class OutgoingTransfer extends Transfer {
 				expectedTransferVolume = numAvailableData - offset;
 			}
 
-			// send the file
-			if(sendHeaderInRsp)
-				networkOutputStream.write((new FileRequestResponseMessage(ResponseCode.OK, expectedTransferVolume).Serialize()).getBytes());
-			
-			int next; // Todo make buffer bigger
-			ressourceInputStream.skip(offset);
+			// send the header
 			transferState = TransferStatus.Transfering;
-			while (keepTransferAlive && totalTransferedVolume < expectedTransferVolume && (next = ressourceInputStream.read()) != -1) {
-				networkOutputStream.write(next);
-				totalTransferedVolume++;
+			if(sendHeaderInRsp)
+				networkOutputStream.write((new FileRequestResponseMessage(ResponseCode.OK, expectedTransferVolume).Serialize()).getBytes(Message.ENCODING));
+			
+			//send the file
+			ressourceInputStream.skip(offset);
+			int bytesRead = 0;
+			int bytesToRead = bufferSize;
+			byte[] buffer = new byte[bufferSize];
+			while (bytesToRead > 0 && keepTransferAlive && totalTransferedVolume < expectedTransferVolume && (bytesRead = ressourceInputStream.read(buffer, 0, bytesToRead)) != -1) {
+				System.out.println(new String(buffer, Message.ENCODING));
+				networkOutputStream.write(buffer, 0, bytesRead);
+				totalTransferedVolume += bytesRead;
+				if(totalTransferedVolume + bytesToRead > expectedTransferVolume) {
+					bytesToRead = (int) (expectedTransferVolume - totalTransferedVolume); //it's ok, because buffer is an int, too
+				}
 			}
+			networkOutputStream.flush();
 			networkOutputStream.close();
 			ressourceInputStream.close();
 
