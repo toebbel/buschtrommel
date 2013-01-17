@@ -21,19 +21,18 @@ import de.tr0llhoehle.buschtrommel.models.FileRequestResponseMessage.ResponseCod
  * Implements any outgoing transfer from this host to other hosts.
  * 
  * The transfer can be a file or a filelist. The hash of a filelist is "filelist". Depending on the requested data this class will send a FileRequestResponse-header or not.
- * @author tobi
+ * @author Tobias Sturm
  *
  */
-public class OutgoingTransfer extends Transfer implements ITransferProgress {
-	OutputStream net_out; // network stream to the requester
-	java.io.InputStream ressourceStream; // stream from filelist / file
+public class OutgoingTransfer extends Transfer {
+	OutputStream networkOutputStream; // network stream to the requester
+	java.io.InputStream ressourceInputStream; // stream from filelist / file
 	LocalShareCache myShares; // all my shares
 
-	private boolean keepThreadAlive;
-	long numAvailableData; // max number of bytes to send
-	boolean sendHeader;
-	String filename;
-	Message requestMessage;
+	long numAvailableData; // max possible number of bytes to send
+	boolean sendHeaderInRsp;
+	String localeFilename;
+	Message requestMessage; //the message that contains the request
 	
 	
 
@@ -42,21 +41,20 @@ public class OutgoingTransfer extends Transfer implements ITransferProgress {
 		assert m instanceof GetFilelistMessage || m instanceof GetFileMessage;
 		assert partner != null;
 		requestMessage = m;
-		this.net_out = out;
+		this.networkOutputStream = out;
 		this.myShares = myShares;
 		this.transferType = TransferType.Outgoing;
 		
-		
+		logger = java.util.logging.Logger.getLogger("outgoing " + partner.toString());
 		keepTransferAlive = true;
-		keepThreadAlive = true;
 		transferState = TransferStatus.Initialized;
 		totalTransferedVolume = 0;
 		
 		if(m instanceof GetFileMessage) {
-			sendHeader = true;
+			sendHeaderInRsp = true;
 			hash = ((GetFileMessage)m).getHash();
 		} else if (m instanceof GetFilelistMessage){
-			sendHeader = false;
+			sendHeaderInRsp = false;
 			hash = "filelist";
 		}
 	}
@@ -73,22 +71,22 @@ public class OutgoingTransfer extends Transfer implements ITransferProgress {
 		if (m instanceof GetFilelistMessage) {
 			byte[] fileList = myShares.getAllShares().getBytes(Message.ENCODING);
 			numAvailableData = fileList.length;
-			ressourceStream = new ByteArrayInputStream(fileList);
-			filename = "filelist";
+			ressourceInputStream = new ByteArrayInputStream(fileList);
+			localeFilename = "filelist";
 		} else  if (m instanceof GetFileMessage){
 			// do I know the file?
 			if (!myShares.has(((GetFileMessage) m).getHash())) {
 				logger.log(Level.INFO, "Requested file is not in share cache");
-				ressourceStream = null; // file not available
+				ressourceInputStream = null; // file not available
 				return;
 			}
 
 			// does the file exist?
 			java.io.File file = new java.io.File(myShares.get(((GetFileMessage) m).getHash()).getPath());
-			filename = file.getName();
+			localeFilename = file.getName();
 			if (!file.exists()) {
 				logger.log(Level.INFO, "Requested file is not found");
-				ressourceStream = null;
+				ressourceInputStream = null;
 				return;
 			}
 			numAvailableData = file.length();
@@ -96,10 +94,10 @@ public class OutgoingTransfer extends Transfer implements ITransferProgress {
 			// open file for read
 			logger.log(Level.INFO, "Open file for outgoing file transfer");
 			try {
-				ressourceStream = new java.io.FileInputStream(file);
+				ressourceInputStream = new java.io.FileInputStream(file);
 			} catch (FileNotFoundException e) {
 				logger.log(Level.INFO, "Requested file could not be opend");
-				ressourceStream = null;
+				ressourceInputStream = null;
 			}
 			return;
 		}
@@ -122,20 +120,20 @@ public class OutgoingTransfer extends Transfer implements ITransferProgress {
 	}
 
 	private void doTransfer() throws IOException {
-		if (ressourceStream == null) {
-			if(sendHeader)
-				net_out.write((new FileRequestResponseMessage(ResponseCode.NEVER_TRY_AGAIN, 0).Serialize()).getBytes());
+		if (ressourceInputStream == null) {
+			if(sendHeaderInRsp)
+				networkOutputStream.write((new FileRequestResponseMessage(ResponseCode.NEVER_TRY_AGAIN, 0).Serialize()).getBytes());
 			
-			net_out.close();
+			networkOutputStream.close();
 		} else {
 			if (offset > numAvailableData) { // offset not in file
 				logger.log(Level.INFO, "Requested offset is not valid: requested " + offset + ", length of file: "
 						+ numAvailableData);
 				
-				if(sendHeader)
-					net_out.write(new FileRequestResponseMessage(ResponseCode.OK, 0).Serialize().getBytes());
+				if(sendHeaderInRsp)
+					networkOutputStream.write(new FileRequestResponseMessage(ResponseCode.OK, 0).Serialize().getBytes());
 				
-				net_out.close();
+				networkOutputStream.close();
 				transferState = TransferStatus.Finished;
 				return;
 			}
@@ -152,23 +150,23 @@ public class OutgoingTransfer extends Transfer implements ITransferProgress {
 			}
 
 			// send the file
-			if(sendHeader)
-				net_out.write((new FileRequestResponseMessage(ResponseCode.OK, expectedTransferVolume).Serialize()).getBytes());
+			if(sendHeaderInRsp)
+				networkOutputStream.write((new FileRequestResponseMessage(ResponseCode.OK, expectedTransferVolume).Serialize()).getBytes());
 			
 			int next; // Todo make buffer bigger
-			ressourceStream.skip(offset);
+			ressourceInputStream.skip(offset);
 			transferState = TransferStatus.Transfering;
-			while (keepThreadAlive && totalTransferedVolume < expectedTransferVolume && (next = ressourceStream.read()) != -1) {
-				net_out.write(next);
+			while (keepTransferAlive && totalTransferedVolume < expectedTransferVolume && (next = ressourceInputStream.read()) != -1) {
+				networkOutputStream.write(next);
 				totalTransferedVolume++;
 			}
-			net_out.close();
-			ressourceStream.close();
+			networkOutputStream.close();
+			ressourceInputStream.close();
 
 			if (totalTransferedVolume == expectedTransferVolume)
 				transferState = TransferStatus.Finished;
 			else {
-				if (!keepThreadAlive)
+				if (!keepTransferAlive)
 					transferState = TransferStatus.Canceled;
 				else
 					transferState = TransferStatus.LostConnection;
@@ -179,20 +177,14 @@ public class OutgoingTransfer extends Transfer implements ITransferProgress {
 
 	@Override
 	public void cancel() {
-		keepThreadAlive = false;
+		keepTransferAlive = false;
 		transferState = TransferStatus.Canceled;
 		try {
-			net_out.close();
+			networkOutputStream.close();
 		} catch (IOException e) {
 			// ignore
 		}
 	}
-
-	@Override
-	public List<ITransferProgress> getSubTransfers() {
-		return new ArrayList<>();
-	}
-
 
 	@Override
 	public void reset() {
@@ -206,7 +198,7 @@ public class OutgoingTransfer extends Transfer implements ITransferProgress {
 
 	@Override
 	public String getTargetFile() {
-		return filename;
+		return localeFilename;
 	}
 
 	@Override
@@ -219,7 +211,7 @@ public class OutgoingTransfer extends Transfer implements ITransferProgress {
 					openInputStream(requestMessage);
 				} catch (UnsupportedEncodingException e1) {
 					logger.log(Level.SEVERE, "Unsupported encoding");
-					ressourceStream = null;
+					ressourceInputStream = null;
 				}
 				handleRequestedRanges(requestMessage);
 				try {

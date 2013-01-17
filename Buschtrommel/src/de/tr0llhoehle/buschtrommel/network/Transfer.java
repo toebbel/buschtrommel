@@ -21,7 +21,6 @@ public abstract class Transfer extends MessageMonitor implements ITransferProgre
 
 	public Transfer(InetSocketAddress partner) {
 		this.partner = partner;
-		logger = java.util.logging.Logger.getLogger("outgoing " + partner.toString());
 	}
 
 	@Override
