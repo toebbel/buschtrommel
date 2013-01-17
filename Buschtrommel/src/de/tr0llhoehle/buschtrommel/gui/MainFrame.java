@@ -544,7 +544,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
     @Override
     public void newHostDiscovered(Host host) {
-        tablemodell.newHostDiscovered(host)
+        tablemodell.newHostDiscovered(host);
         //throw new UnsupportedOperationException("Not supported yet.");
     }
 
