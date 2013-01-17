@@ -7,6 +7,12 @@
         <Property name="dialogTitle" type="java.lang.String" value="Datei w&#xe4;hlen"/>
       </Properties>
     </Component>
+    <Component class="javax.swing.JFileChooser" name="pathChooser">
+      <Properties>
+        <Property name="dialogTitle" type="java.lang.String" value="Ort w&#xe4;hlen"/>
+        <Property name="fileSelectionMode" type="int" value="1"/>
+      </Properties>
+    </Component>
   </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
@@ -227,7 +233,7 @@
                 <Property name="text" type="java.lang.String" value="activate Share"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="activateShareActionPerformed,activateShareActionPerformed1"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="activateShareActionPerformed"/>
               </Events>
             </Component>
           </SubComponents>
@@ -361,7 +367,7 @@
                                   <Group type="102" attributes="0">
                                       <Component id="downloadFolder" max="32767" attributes="0"/>
                                       <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="jButton1" min="-2" max="-2" attributes="0"/>
+                                      <Component id="selectDownloadFolder" min="-2" max="-2" attributes="0"/>
                                   </Group>
                                   <Component id="jTextField2" max="32767" attributes="0"/>
                                   <Component id="jTextField1" max="32767" attributes="0"/>
@@ -389,7 +395,7 @@
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="downloadFolder" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="selectDownloadFolder" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace pref="481" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
@@ -450,12 +456,12 @@
                 <Property name="text" type="java.lang.String" value="Download Folder"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JButton" name="jButton1">
+            <Component class="javax.swing.JButton" name="selectDownloadFolder">
               <Properties>
                 <Property name="text" type="java.lang.String" value="select"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="selectDownloadFolderActionPerformed"/>
               </Events>
             </Component>
           </SubComponents>

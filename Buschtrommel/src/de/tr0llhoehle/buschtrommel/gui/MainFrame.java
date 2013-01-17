@@ -32,6 +32,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.Component;
 import java.awt.Window.Type;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -52,7 +53,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	private Buschtrommel buschtrommel;
 	private FilesTableModel tablemodel = new FilesTableModel();
 	private LocalSharesTableModel sharesModel = new LocalSharesTableModel();
-	private String downloadPath = null;
+	private String downloadPath = "~/Downloads";
 	private String defaultTtl = "-1";
 
 	/**
@@ -73,6 +74,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		filesHostsTable.setAutoCreateRowSorter(true);
 		localSharesTable.setModel(sharesModel);
 		localSharesTable.setAutoCreateRowSorter(true);
+		downloadFolder.setText(downloadPath);
 		// filesHostsTable.setModel(tablemodel);
 		// tablemodel.addMock("bla", "meta-information", "42", "üch", "ff::ff",
 		// "trölf", "-1");
@@ -95,6 +97,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
     private void initComponents() {
 
         jFileChooser1 = new javax.swing.JFileChooser();
+        pathChooser = new javax.swing.JFileChooser();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
@@ -122,9 +125,12 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
         jLabel2 = new javax.swing.JLabel();
         downloadFolder = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        selectDownloadFolder = new javax.swing.JButton();
 
         jFileChooser1.setDialogTitle("Datei wählen");
+
+        pathChooser.setDialogTitle("Ort wählen");
+        pathChooser.setFileSelectionMode(javax.swing.JFileChooser.DIRECTORIES_ONLY);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -328,12 +334,10 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
         jLabel3.setText("Download Folder");
 
-        jButton1.setText("select");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        selectDownloadFolder.setText("select");
+        selectDownloadFolder.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	downloadFilesMultihostActionPerformed(evt);
-            	//addShareActionPerformed(evt);
-            
+                selectDownloadFolderActionPerformed(evt);
             }
         });
 
@@ -359,7 +363,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
                             .addGroup(jPanel5Layout.createSequentialGroup()
                                 .addComponent(downloadFolder)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton1))
+                                .addComponent(selectDownloadFolder))
                             .addComponent(jTextField2)
                             .addComponent(jTextField1))))
                 .addContainerGap())
@@ -379,7 +383,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(downloadFolder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3)
-                    .addComponent(jButton1))
+                    .addComponent(selectDownloadFolder))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 481, Short.MAX_VALUE)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(saveSettings)
@@ -410,6 +414,29 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+	
+	private void selectDownloadFolderActionPerformed(ActionEvent evt) {
+//		jFileChooser1.setDialogTitle("Ort wählen");
+//		jFileChooser1.setFileSelectionMode(jFileChooser1.DIRECTORIES_ONLY);
+		int returnVal = pathChooser.showOpenDialog(this);
+		if (returnVal == pathChooser.APPROVE_OPTION) {
+			File file = pathChooser.getSelectedFile();
+			// try {
+			// What to do with the file, e.g. display it in a TextArea
+			// textarea.read( new FileReader( file.getAbsolutePath() ), null );
+			downloadPath = file.getAbsolutePath();
+			downloadFolder.setText(downloadPath);
+
+			// System.out.println(file.getAbsolutePath());
+			// System.out.println( new FileReader( file.getAbsolutePath() ),
+			// null );
+			// } catch (IOException ex) {
+			// System.out.println("problem accessing file"+file.getAbsolutePath());
+			// }
+		} else {
+			System.out.println("File access cancelled by user.");
+		}
+	}
 
 	private void activateShareActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_activateShareActionPerformed
 		int selected[] = localSharesTable.getSelectedRows();
@@ -441,7 +468,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
 
 
-	private void downloadFileActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_downloadFilesBtn1ActionPerformed
+	private void downloadFilesActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_downloadFilesBtn1ActionPerformed
 		if (downloadPath == null) {
 			JOptionPane.showMessageDialog(null, "Please set a Download-Folder first");
 			return;
@@ -466,33 +493,6 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	}// GEN-LAST:event_downloadFilesBtn1ActionPerformed
 
 	private void downloadFilesMultihostActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jButton1ActionPerformed
-		jFileChooser1.setFileSelectionMode(jFileChooser1.DIRECTORIES_ONLY);
-		int returnVal = jFileChooser1.showOpenDialog(this);
-		if (returnVal == jFileChooser1.APPROVE_OPTION) {
-			File file = jFileChooser1.getSelectedFile();
-			// try {
-			// What to do with the file, e.g. display it in a TextArea
-			// textarea.read( new FileReader( file.getAbsolutePath() ), null );
-			downloadPath = file.getAbsolutePath();
-			downloadFolder.setText(downloadPath);
-
-			// System.out.println(file.getAbsolutePath());
-			// System.out.println( new FileReader( file.getAbsolutePath() ),
-			// null );
-			// } catch (IOException ex) {
-			// System.out.println("problem accessing file"+file.getAbsolutePath());
-			// }
-		} else {
-			System.out.println("File access cancelled by user.");
-		}
-
-	}// GEN-LAST:event_jButton1ActionPerformed
-
-	private void saveSettingsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_saveSettingsActionPerformed
-		// TODO add your handling code here:
-	}// GEN-LAST:event_saveSettingsActionPerformed
-
-	private void downloadFilesActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_downloadFilesBtnActionPerformed
 		if (downloadPath == null) {
 			JOptionPane.showMessageDialog(null, "Please set a Download-Folder first");
 			return;
@@ -504,7 +504,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 			// "Filename", "Meta-Information", "Size", "Host-Name","IP", "Hash",
 			// "TTL"
 			String hash = tablemodel.getValueAt(i, 5);
-			String ip = tablemodel.getValueAt(i, 4);
+			
 			String name = tablemodel.getValueAt(i, 0);
 			if (buschtrommel != null) {
 				
@@ -512,7 +512,34 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 				listmodel.addElement(progress);
 			}
 		}
-	}// GEN-LAST:event_downloadFilesBtnActionPerformed
+
+	}// GEN-LAST:event_jButton1ActionPerformed
+
+	private void saveSettingsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_saveSettingsActionPerformed
+		// TODO add your handling code here:
+	}// GEN-LAST:event_saveSettingsActionPerformed
+
+//	private void downloadFilesActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_downloadFilesBtnActionPerformed
+//		if (downloadPath == null) {
+//			JOptionPane.showMessageDialog(null, "Please set a Download-Folder first");
+//			return;
+//		}
+//
+//		int[] selected = filesHostsTable.getSelectedRows();
+//
+//		for (int i : selected) {
+//			// "Filename", "Meta-Information", "Size", "Host-Name","IP", "Hash",
+//			// "TTL"
+//			String hash = tablemodel.getValueAt(i, 5);
+//			String ip = tablemodel.getValueAt(i, 4);
+//			String name = tablemodel.getValueAt(i, 0);
+//			if (buschtrommel != null) {
+//				
+//				ITransferProgress progress = buschtrommel.DownloadFile(hash, downloadPath + "/" + name);
+//				listmodel.addElement(progress);
+//			}
+//		}
+//	}// GEN-LAST:event_downloadFilesBtnActionPerformed
 
 	private void removeShareActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_removeShareActionPerformed
 		int selected[] = localSharesTable.getSelectedRows();
@@ -536,7 +563,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
 	private void addShareActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_addShareActionPerformed
 
-		jFileChooser1.setCurrentDirectory(null);
+//		jFileChooser1.setCurrentDirectory(null);
 		jFileChooser1.setFileSelectionMode(jFileChooser1.FILES_ONLY);
 
 		int returnVal = jFileChooser1.showOpenDialog(this);
@@ -658,7 +685,6 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
     private javax.swing.JButton downloadFilesMultihost;
     private javax.swing.JTextField downloadFolder;
     private javax.swing.JTable filesHostsTable;
-    private javax.swing.JButton jButton1;
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -675,10 +701,12 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
     private javax.swing.JTextField jTextField2;
     private javax.swing.JButton loadSettings;
     private javax.swing.JTable localSharesTable;
+    private javax.swing.JFileChooser pathChooser;
     private javax.swing.JButton removeShare;
     private javax.swing.JButton resetTransfer;
     private javax.swing.JButton resumeTransfer;
     private javax.swing.JButton saveSettings;
+    private javax.swing.JButton selectDownloadFolder;
     // End of variables declaration//GEN-END:variables
 
 	@Override
