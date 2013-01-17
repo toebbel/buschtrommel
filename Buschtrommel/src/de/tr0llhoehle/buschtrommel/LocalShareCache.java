@@ -12,6 +12,7 @@ import de.tr0llhoehle.buschtrommel.models.LocalShare;
 import de.tr0llhoehle.buschtrommel.models.Message;
 import de.tr0llhoehle.buschtrommel.models.Share;
 import de.tr0llhoehle.buschtrommel.network.MessageDeserializer;
+import de.tr0llhoehle.buschtrommel.network.UDPAdapter;
 
 /**
  * All the Shared Files from the user are stored in this class
@@ -212,9 +213,13 @@ public class LocalShareCache {
 		return true;
 	}
 
-	public void remove(String hash) {
-		// TODO Auto-generated method stub
-		
+	public boolean remove(String hash) {
+		if(this.has(hash)) {
+			this.shares.remove(hash);
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	public Hashtable<String, LocalShare> getLocalShares() {
