@@ -26,6 +26,7 @@ import de.tr0llhoehle.buschtrommel.models.Message;
 import de.tr0llhoehle.buschtrommel.network.IncomingDownload;
 import de.tr0llhoehle.buschtrommel.network.MessageDeserializer;
 import de.tr0llhoehle.buschtrommel.network.ITransferProgress.TransferStatus;
+import de.tr0llhoehle.buschtrommel.test.mockups.FileContentMock;
 import de.tr0llhoehle.buschtrommel.test.mockups.MessageObserverMock;
 import de.tr0llhoehle.buschtrommel.test.mockups.NetworkMock;
 
@@ -109,7 +110,7 @@ public class TestIncomingDownload {
 		assertEquals(TransferStatus.Finished, in.getStatus());
 		mock.close();
 		
-		assertEquals("1ABCDEF" + Message.FIELD_SEPERATOR + Message.MESSAGE_SPERATOR, getFileContent("tmp"));
+		assertEquals("1ABCDEF" + Message.FIELD_SEPERATOR + Message.MESSAGE_SPERATOR, FileContentMock.getFileContent("tmp"));
 		(new java.io.File("tmp")).delete();
 		
 		Thread.sleep(500);
@@ -200,7 +201,7 @@ public class TestIncomingDownload {
 		assertEquals(14, in.getTransferedAmount());
 		assertEquals(TransferStatus.Finished, in.getStatus());
 		
-		assertEquals("DROP THIS SHIT", getFileContent("tmp"));
+		assertEquals("DROP THIS SHIT", FileContentMock.getFileContent("tmp"));
 		
 	}
 	
@@ -224,14 +225,7 @@ public class TestIncomingDownload {
 		assertEquals(TransferStatus.TemporaryNotAvailable, in.getStatus());
 	}
 	
-	private String getFileContent(String relPath) throws IOException {
-		java.io.BufferedReader reader = new BufferedReader(new FileReader(relPath));
-		StringBuilder result = new StringBuilder();
-		while(reader.ready())
-			result.append(reader.readLine());
-		reader.close();
-		return result.toString();
-	}
+	
 	
 	/**
 	 * Exposes some protected methods of the IncomingDownload-Class
