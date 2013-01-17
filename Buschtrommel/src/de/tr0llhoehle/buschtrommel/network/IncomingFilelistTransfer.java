@@ -23,55 +23,22 @@ import de.tr0llhoehle.buschtrommel.models.Message;
  * @author Tobias Sturm
  *
  */
-public class IncomingFilelistTransfer extends MessageMonitor implements ITransferProgress {
+public class IncomingFilelistTransfer extends Transfer implements ITransferProgress {
 
-	int length = 0;
-	int transferedAmount;
-	private TransferStatus status;
-	private boolean alive;
 	private java.util.logging.Logger logger;
-	private Host host;
+	
 	
 	public IncomingFilelistTransfer(Host host) {
+		super(new InetSocketAddress(host.getAddress(), host.getPort()));
 		assert host != null;
-		this.host = host;
 		logger = java.util.logging.Logger.getLogger("incoming filelist from " + host.toString());
+		offset = 0;
+		hash = "";
 	}
 	
 	@Override
-	public TransferType getType() {
-		return TransferType.Singlesource;
-	}
-
-	@Override
-	public long getLength() {
-		return length;
-	}
-
-	@Override
-	public long getOffset() {
-		return 0;
-	}
-
-	@Override
-	public long getTransferedAmount() {
-		return transferedAmount;
-	}
-
-	@Override
-	public String getExpectedHash() {
-		return "";
-	}
-
-	@Override
-	public TransferStatus getStatus() {
-		return status;
-	}
-
-	@Override
 	public void cancel() {
-		alive = false;
-		
+		keepTransferAlive = false;
 	}
 
 	@Override
@@ -94,11 +61,11 @@ public class IncomingFilelistTransfer extends MessageMonitor implements ITransfe
 			@Override
 			public void run() {
 				Socket s;
-				alive = true;
+				keepTransferAlive = true;
 				try {
-					status = TransferStatus.Connecting;
-					s = new Socket(host.getAddress(), host.getPort());
-					status = TransferStatus.Transfering;
+					transferState = TransferStatus.Connecting;
+					s = new Socket(partner.getAddress(), partner.getPort());
+					transferState = TransferStatus.Transfering;
 					s.getOutputStream().write(new GetFilelistMessage().Serialize().getBytes(Message.ENCODING));
 					processFilestream(s.getInputStream());
 					s.close();
@@ -113,7 +80,7 @@ public class IncomingFilelistTransfer extends MessageMonitor implements ITransfe
 		int next = 0;
 		int received = 0;
 		char[] buffer = new char[512];
-		while((next = in.read()) != -1 && alive) {
+		while((next = in.read()) != -1 && keepTransferAlive) {
 			if(next != Message.MESSAGE_SPERATOR) {
 				buffer[received++] = (char) next;
 				continue;
@@ -128,42 +95,17 @@ public class IncomingFilelistTransfer extends MessageMonitor implements ITransfe
 				received = 0;
 			}
 		}
-		if(!alive)
-			status = TransferStatus.Canceled;
+		if(!keepTransferAlive)
+			transferState = TransferStatus.Canceled;
 		else
-			status = TransferStatus.Finished;
-		alive = false;
+			transferState = TransferStatus.Finished;
+		keepTransferAlive = false;
 	}
 
-	@Override
-	public boolean isActive() {
-		return alive;
-	}
 
-	@Override
-	public InetSocketAddress getTransferPartner() {
-		return new InetSocketAddress(host.getAddress(), host.getPort());
-	}
 
 	@Override
 	public String getTargetFile() {
 		return "";
 	}
-
-	@Override
-	public List<ITransferProgress> getSubTransfers() {
-		return Collections.emptyList();
-	}
-
-	@Override
-	public void RegisterLogHander(Handler h) {
-		logger.addHandler(h);
-	}
-
-	@Override
-	public void RemoveLogHander(Handler h) {
-		logger.removeHandler(h);		
-	}
-
-	
 }

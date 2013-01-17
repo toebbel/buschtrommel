@@ -3,6 +3,7 @@ package de.tr0llhoehle.buschtrommel.test;
 import static org.junit.Assert.*;
 
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 
 import org.junit.Test;
@@ -24,7 +25,7 @@ public class TestNetCache {
 
 		assertFalse(tmp.hostExists(host));
 
-		message.setSource(InetAddress.getByName("localhost"));
+		message.setSource(new InetSocketAddress(InetAddress.getByName("localhost"), 4747));
 		tmp.receiveMessage(message);
 
 		assertTrue(tmp.hostExists(host));
@@ -40,7 +41,7 @@ public class TestNetCache {
 		Host host = new Host(InetAddress.getByName("localhost"), "troll", 1234);
 		FileAnnouncementMessage message = new FileAnnouncementMessage(new LocalShare("testhash", 42, 600, "katze",
 				"katzenbilder!!!", "/home/katze.jpg"));
-		message.setSource(InetAddress.getByName("localhost"));
+		message.setSource(new InetSocketAddress(InetAddress.getByName("localhost"), 4747));
 		tmp.receiveMessage(message);
 		
 		assertTrue(tmp.hostExists(host));
@@ -53,7 +54,7 @@ public class TestNetCache {
 		NetCache tmp = new NetCache(null, null, null);
 		FileAnnouncementMessage message = new FileAnnouncementMessage(new LocalShare("testhash", 42, 10, "katze",
 				"katzenbilder!!!", "/home/katze.jpg"));
-		message.setSource(InetAddress.getByName("localhost"));
+		message.setSource(new InetSocketAddress(InetAddress.getByName("localhost"), 4747));
 		tmp.receiveMessage(message);
 		
 		assertTrue(tmp.shareExists("testhash"));
