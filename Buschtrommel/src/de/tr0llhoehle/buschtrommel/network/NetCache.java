@@ -19,7 +19,11 @@ import de.tr0llhoehle.buschtrommel.models.PeerDiscoveryMessage;
 import de.tr0llhoehle.buschtrommel.models.ShareAvailability;
 
 /**
- * This class manages the state of the network. All known hosts and shares of other hosts are stored here. As soon as a new host is discovered, this object will start a filelist transfer and digest the results via the loose observer-interface.
+ * This class manages the state of the network. All known hosts and shares of
+ * other hosts are stored here. As soon as a new host is discovered, this object
+ * will start a filelist transfer and digest the results via the loose
+ * observer-interface.
+ * 
  * @author Moritz Winter
  * 
  */
@@ -38,12 +42,12 @@ public class NetCache implements IMessageObserver {
 	public NetCache(UDPAdapter udpAdapter, FileTransferAdapter fileAdapter, IGUICallbacks guiCallbacks) {
 		this.udpAdapter = udpAdapter;
 		this.guiCallbacks = guiCallbacks;
-		
+
 		this.knownHosts = new Hashtable<InetAddress, Host>();
 		this.knownShares = new Hashtable<String, RemoteShare>();
-		
+
 		this.fileTransferAdapter = fileAdapter;
-		
+
 		this.ttlChecker = new Timer();
 		TimerTask task = new TimerTask() {
 			public void run() {
@@ -84,13 +88,12 @@ public class NetCache implements IMessageObserver {
 
 		boolean foundHost = this.hostExists(host);
 
-		if (this.knownShares.containsKey(hash)) {
-			RemoteShare tempShare = this.knownShares.get(hash);
-
-			// case: host and share already cached
-			if (foundHost) {
-
-				// if the share is already associated to the host, just update
+		if (foundHost) {
+			if (this.knownShares.containsKey(hash)) {
+				RemoteShare tempShare = this.knownShares.get(hash);
+				
+				// if the share is already associated to the host, just
+				// update
 				// ttl
 				if (host.getSharedFiles().containsKey(hash)) {
 					host.getSharedFiles().get(hash).setTTL(ttl);
@@ -99,7 +102,8 @@ public class NetCache implements IMessageObserver {
 					}
 				}
 
-				// if the share share isn't already associated, associate it to
+				// if the share share isn't already associated, associate it
+				// to
 				// the host
 				else {
 					host.addFileToSharedFiles(tempShare.addFileSource(host, ttl, message.getFile().getDisplayName(),
@@ -109,41 +113,26 @@ public class NetCache implements IMessageObserver {
 					}
 				}
 
-				// case: share cached but new host
 			} else {
-				this.knownHosts.put(host.getAddress(), host);
-				host.addFileToSharedFiles(tempShare.addFileSource(host, ttl, message.getFile().getDisplayName(),
-						message.getFile().getMeta()));
+				// case: share not cached, but host already cached
+
+				RemoteShare tmp = new RemoteShare(hash, message.getFile().getLength());
+				this.knownShares.put(hash, tmp);
+				host.addFileToSharedFiles(tmp.addFileSource(host, ttl, message.getFile().getDisplayName(), message
+						.getFile().getMeta()));
 				if (this.guiCallbacks != null) {
-					this.guiCallbacks.newHostDiscovered(host);
 					this.guiCallbacks.newShareAvailable(host.getSharedFiles().get(hash));
 				}
-			}
 
+			}
 		} else {
-			// case: share not cached, but host already cached
-			if (foundHost) {
-				RemoteShare tmp = new RemoteShare(hash, message.getFile().getLength());
-				this.knownShares.put(hash, tmp);
-				host.addFileToSharedFiles(tmp.addFileSource(host, ttl, message.getFile().getDisplayName(), message
-						.getFile().getMeta()));
-				if (this.guiCallbacks != null) {
-					this.guiCallbacks.newShareAvailable(host.getSharedFiles().get(hash));
-				}
+			try {
+				this.udpAdapter.sendUnicast(new PeerDiscoveryMessage(PeerDiscoveryMessage.DiscoveryMessageType.HI,
+						Config.alias, fileTransferAdapter.getPort()), host);
+			} catch (IOException e) {
+				LoggerWrapper.logError(e.getMessage());
 			}
-
-			// case: neither host nor share cached
-			else {
-				this.knownHosts.put(host.getAddress(), host);
-				RemoteShare tmp = new RemoteShare(hash, message.getFile().getLength());
-				this.knownShares.put(hash, tmp);
-				host.addFileToSharedFiles(tmp.addFileSource(host, ttl, message.getFile().getDisplayName(), message
-						.getFile().getMeta()));
-				if (this.guiCallbacks != null) {
-					this.guiCallbacks.newHostDiscovered(host);
-					this.guiCallbacks.newShareAvailable(host.getSharedFiles().get(hash));
-				}
-			}
+			
 		}
 	}
 
@@ -228,12 +217,13 @@ public class NetCache implements IMessageObserver {
 
 	/**
 	 * Testing purposes
+	 * 
 	 * @param host
 	 */
 	public void removeHost(Host host) {
 		this.knownHosts.remove(host.getAddress());
 	}
-	
+
 	public boolean shareExists(String hash) {
 		return knownShares.get(hash) != null;
 	}
