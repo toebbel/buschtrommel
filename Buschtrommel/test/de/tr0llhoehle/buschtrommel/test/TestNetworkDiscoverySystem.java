@@ -59,6 +59,9 @@ public class TestNetworkDiscoverySystem {
 		assertNotNull(msg.getSource());
 		
 		assertEquals(2, cacheB.getHosts().size());
+		for(InetAddress k : cacheB.getHosts().keySet()) {
+			assertEquals(8080, cacheB.getHosts().get(k).getPort());
+		}
 		
 		//nodeA should NOT receive, because there is no Buschtrommel-Instance to respond
 	}
