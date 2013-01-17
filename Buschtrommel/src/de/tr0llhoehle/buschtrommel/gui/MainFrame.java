@@ -50,7 +50,9 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	private DownloadItem downloadCellRenderer = new DownloadItem();
 	private Buschtrommel buschtrommel;
 	private FilesTableModel tablemodel = new FilesTableModel();
+	private LocalSharesTableModel sharesModel = new LocalSharesTableModel();
 	private String downloadPath = null;
+	private String defaultTtl = "-1";
 
 	/**
 	 * Creates new form MainFrame
@@ -62,13 +64,14 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		initComponents();
 
 		buschtrommel = new Buschtrommel(this, "Bongo" + Math.random());
-		// try {
-		// buschtrommel.start();
-		// } catch (IOException ex) {
-		// Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null,
-		// ex);
-		// }
+		try {
+			buschtrommel.start();
+		} catch (IOException ex) {
+			Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+		}
 		filesHostsTable.setAutoCreateRowSorter(true);
+		localSharesTable.setModel(sharesModel);
+		localSharesTable.setAutoCreateRowSorter(true);
 		// filesHostsTable.setModel(tablemodel);
 		// tablemodel.addMock("bla", "meta-information", "42", "üch", "ff::ff",
 		// "trölf", "-1");
@@ -86,6 +89,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	// <editor-fold defaultstate="collapsed"
 	// <editor-fold defaultstate="collapsed"
 	// <editor-fold defaultstate="collapsed"
+	// <editor-fold defaultstate="collapsed"
 	// desc="Generated Code">//GEN-BEGIN:initComponents
 	private void initComponents() {
 
@@ -100,7 +104,8 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		addShare = new javax.swing.JButton();
 		removeShare = new javax.swing.JButton();
 		jScrollPane2 = new javax.swing.JScrollPane();
-		jTable2 = new javax.swing.JTable();
+		localSharesTable = new javax.swing.JTable();
+		activateShare = new javax.swing.JButton();
 		jPanel4 = new javax.swing.JPanel();
 		jScrollPane1 = new javax.swing.JScrollPane();
 		activeTransferList = new javax.swing.JList(listmodel);
@@ -202,23 +207,17 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
 		jScrollPane2.setName("shares-table"); // NOI18N
 
-		jTable2.setModel(new javax.swing.table.DefaultTableModel(new Object[][] {
+		localSharesTable.setModel(sharesModel);
+		localSharesTable.setName(""); // NOI18N
+		jScrollPane2.setViewportView(localSharesTable);
 
-		}, new String[] { "Filename", "Meta-Information", "Path", "Size", "TTL" }) {
-			Class[] types = new Class[] { java.lang.String.class, java.lang.String.class, java.lang.String.class,
-					java.lang.String.class, java.lang.Integer.class };
-			boolean[] canEdit = new boolean[] { true, true, false, false, true };
-
-			public Class getColumnClass(int columnIndex) {
-				return types[columnIndex];
-			}
-
-			public boolean isCellEditable(int rowIndex, int columnIndex) {
-				return canEdit[columnIndex];
+		activateShare.setText("activate Share");
+		activateShare.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				activateShareActionPerformed(evt);
+				activateShareActionPerformed1(evt);
 			}
 		});
-		jTable2.setName("shares-table"); // NOI18N
-		jScrollPane2.setViewportView(jTable2);
 
 		javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
 		jPanel3.setLayout(jPanel3Layout);
@@ -231,11 +230,20 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 								.addGroup(
 										jPanel3Layout
-												.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-												.addComponent(removeShare, javax.swing.GroupLayout.DEFAULT_SIZE,
-														javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-												.addComponent(addShare, javax.swing.GroupLayout.DEFAULT_SIZE,
-														javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+												.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+												.addGroup(
+														jPanel3Layout
+																.createParallelGroup(
+																		javax.swing.GroupLayout.Alignment.LEADING,
+																		false)
+																.addComponent(removeShare,
+																		javax.swing.GroupLayout.DEFAULT_SIZE,
+																		javax.swing.GroupLayout.DEFAULT_SIZE,
+																		Short.MAX_VALUE)
+																.addComponent(addShare,
+																		javax.swing.GroupLayout.DEFAULT_SIZE,
+																		javax.swing.GroupLayout.DEFAULT_SIZE,
+																		Short.MAX_VALUE)).addComponent(activateShare))
 								.addContainerGap()));
 		jPanel3Layout
 				.setVerticalGroup(jPanel3Layout
@@ -255,8 +263,11 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 																		.createSequentialGroup()
 																		.addComponent(addShare)
 																		.addPreferredGap(
-																				javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-																		.addComponent(removeShare))).addContainerGap()));
+																				javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+																		.addComponent(activateShare).addGap(18, 18, 18)
+																		.addComponent(removeShare)
+																		.addGap(0, 0, Short.MAX_VALUE)))
+										.addContainerGap()));
 
 		jTabbedPane1.addTab("Shares", jPanel3);
 
@@ -465,6 +476,35 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		pack();
 	}// </editor-fold>//GEN-END:initComponents
 
+	private void activateShareActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_activateShareActionPerformed
+		int selected[] = localSharesTable.getSelectedRows();
+		for (int i : selected) {
+			sharesModel.getValueAt(i, 0);
+
+			if (buschtrommel != null) {
+				// "Filename", "Meta-Information", "Path", "Size","TTL"
+				int ttl = Integer.parseInt(sharesModel.getValueAt(i, 4));
+
+				try {
+					buschtrommel.AddFileToShare(sharesModel.getValueAt(i, 3), sharesModel.getValueAt(i, 0),
+							sharesModel.getValueAt(i, 1), ttl);
+				} catch (IllegalArgumentException e) {
+					// TODO Auto-generated catch block
+					JOptionPane.showMessageDialog(null, "Woops, something went terribly wrong");
+					sharesModel.removeShare(i);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					JOptionPane.showMessageDialog(null, "Woops, something went terribly wrong");
+					sharesModel.removeShare(i);
+				}
+			}
+		}
+	}// GEN-LAST:event_activateShareActionPerformed
+
+	private void activateShareActionPerformed1(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_activateShareActionPerformed1
+		// TODO add your handling code here:
+	}// GEN-LAST:event_activateShareActionPerformed1
+
 	private void downloadFilesBtn1ActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_downloadFilesBtn1ActionPerformed
 		if (downloadPath == null) {
 			JOptionPane.showMessageDialog(null, "Please set a Download-Folder first");
@@ -538,7 +578,16 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	}// GEN-LAST:event_downloadFilesBtnActionPerformed
 
 	private void removeShareActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_removeShareActionPerformed
-		// TODO add your handling code here:
+		int selected[] = localSharesTable.getSelectedRows();
+		for (int i : selected) {
+			sharesModel.getValueAt(i, 0);
+
+			if (buschtrommel != null) {
+				sharesModel.removeShare(i);
+
+				
+			}
+		}
 	}// GEN-LAST:event_removeShareActionPerformed
 
 	private void loadSettingsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_loadSettingsActionPerformed
@@ -558,7 +607,9 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 			// try {
 			// What to do with the file, e.g. display it in a TextArea
 			// textarea.read( new FileReader( file.getAbsolutePath() ), null );
-			System.out.println(file.getAbsolutePath());
+
+			sharesModel.addShare(file.getName(), file.getAbsolutePath(), String.valueOf(file.length()), defaultTtl);
+			// System.out.println(file.getAbsolutePath());
 			// System.out.println( new FileReader( file.getAbsolutePath() ),
 			// null );
 			// } catch (IOException ex) {
@@ -662,6 +713,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
 	// Variables declaration - do not modify//GEN-BEGIN:variables
 	private javax.swing.JButton abortTransfer;
+	private javax.swing.JButton activateShare;
 	private javax.swing.JList activeTransferList;
 	private javax.swing.JButton addShare;
 	private javax.swing.JButton downloadFilesBtn;
@@ -681,10 +733,10 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	private javax.swing.JScrollPane jScrollPane2;
 	private javax.swing.JScrollPane jScrollPane3;
 	private javax.swing.JTabbedPane jTabbedPane1;
-	private javax.swing.JTable jTable2;
 	private javax.swing.JTextField jTextField1;
 	private javax.swing.JTextField jTextField2;
 	private javax.swing.JButton loadSettings;
+	private javax.swing.JTable localSharesTable;
 	private javax.swing.JButton removeShare;
 	private javax.swing.JButton resetTransfer;
 	private javax.swing.JButton resumeTransfer;
