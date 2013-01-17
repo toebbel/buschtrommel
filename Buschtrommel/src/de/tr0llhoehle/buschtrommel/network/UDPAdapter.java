@@ -18,7 +18,7 @@ import de.tr0llhoehle.buschtrommel.models.Message;
  *
  */
 public class UDPAdapter extends MessageMonitor {
-	public final static int DEFAULT_PORT = 7474;
+	public final static int DEFAULT_PORT = 4747;
 	private final static String MULTICAST_ADDRESS_V4 = "239.255.0.113";
 	private final static String MULTICAST_ADDRESS_V6 = "ff05::7171";
 
