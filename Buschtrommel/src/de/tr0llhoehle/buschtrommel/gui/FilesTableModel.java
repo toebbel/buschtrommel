@@ -154,6 +154,15 @@ public class FilesTableModel extends AbstractTableModel {
 
     void hostWentOffline(Host host) {
         //throw new UnsupportedOperationException("Not yet implemented");
+    	
+        for(String[] col : shares){
+            //"Filename", "Meta-Information", "Size", "Host-Name","IP", "Hash", "TTL"
+            if(col[4].equals(host.getAddress().toString())){
+             shares.remove(col); 
+             
+            }
+        }
+        this.fireTableDataChanged();
     }
 
     void newHostDiscovered(Host host) {
