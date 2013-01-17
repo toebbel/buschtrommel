@@ -13,80 +13,78 @@ import java.util.Vector;
 import javax.swing.table.AbstractTableModel;
 
 /**
- *
+ * 
  * @author benjamin
  */
 public class LocalSharesTableModel extends AbstractTableModel {
 
-    private Vector<String[]> shares = new Vector<String[]>();
-    ;
-    
-    private String[] names = new String[]{
-        "Filename", "Meta-Information", "Path", "Size","TTL"
-    };
-   private boolean[] canEdit = new boolean[]{
-        true, true, false, false, true
-    };
+	private Vector<String[]> shares = new Vector<String[]>();;
 
-    public String getColumnName(int col) {
-        return names[col].toString();
-    }
+	private String[] names = new String[] { "Filename", "Meta-Information", "Path", "Size", "TTL" };
+	private boolean[] canEdit = new boolean[] { true, true, false, false, true };
 
-    public Class getColumnClass(int columnIndex) {
-        //return types [columnIndex];
-        return java.lang.String.class;
-    }
+	public String getColumnName(int col) {
+		return names[col].toString();
+	}
 
-    public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return canEdit [columnIndex];
-        
-    }
+	public Class getColumnClass(int columnIndex) {
+		// return types [columnIndex];
+		return java.lang.String.class;
+	}
 
-    @Override
-    public int getRowCount() {
-        return shares.size();
-        //throw new UnsupportedOperationException("Not supported yet.");
-    }
+	public boolean isCellEditable(int rowIndex, int columnIndex) {
+		return canEdit[columnIndex];
 
-    @Override
-    public int getColumnCount() {
-        return names.length;
-        //throw new UnsupportedOperationException("Not supported yet.");
-    }
+	}
 
-    @Override
-    public String getValueAt(int rowIndex, int columnIndex) {
-        return shares.get(rowIndex)[columnIndex];
-        //throw new UnsupportedOperationException("Not supported yet.");
+	@Override
+	public int getRowCount() {
+		return shares.size();
+		// throw new UnsupportedOperationException("Not supported yet.");
+	}
 
-    }
+	@Override
+	public int getColumnCount() {
+		return names.length;
+		// throw new UnsupportedOperationException("Not supported yet.");
+	}
 
-    public void addShare(String name, String path, String size, String ttl) {
-        if (path == null) {
-        	System.out.print("path is null");
-            return;
-        }
-        String eintrag[] = new String[names.length];
-        //"Filename", "Meta-Information", "Path", "Size","TTL"
-        eintrag[0] = name;
-        eintrag[1] = "";
-        eintrag[2] = path;
-        eintrag[3] = size;
-        eintrag[4] = ttl;
-        if(ttl == ""){
-        	ttl = "-1";
-        }
+	@Override
+	public String getValueAt(int rowIndex, int columnIndex) {
+		if (rowIndex < shares.size()) {
+			return shares.get(rowIndex)[columnIndex];
+			// throw new UnsupportedOperationException("Not supported yet.");
+		} else
+			return null;
+	}
 
-        this.shares.add(eintrag);
-    }
-    public void addMeta(int index, String meta){
-    	shares.get(index)[1] = meta;
-    }
-    
+	public void addShare(String name, String path, String size, String ttl) {
+		if (path == null) {
+			System.out.print("path is null");
+			return;
+		}
+		String eintrag[] = new String[names.length];
+		// "Filename", "Meta-Information", "Path", "Size","TTL"
+		eintrag[0] = name;
+		eintrag[1] = "";
+		eintrag[2] = path;
+		eintrag[3] = size;
+		eintrag[4] = ttl;
+		if (ttl == "") {
+			ttl = "-1";
+		}
 
-    void removeShare(int index) {
-        shares.remove(index);
-   
-    }
+		this.shares.add(eintrag);
+	}
+
+	public void addMeta(int index, String meta) {
+		shares.get(index)[1] = meta;
+	}
+
+	void removeShare(int index) {
+		if (index < shares.size()) {
+			shares.remove(index);
+		}
+	}
 
 }
