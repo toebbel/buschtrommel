@@ -586,23 +586,61 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	}// GEN-LAST:event_addShareActionPerformed
 
 	private void resumeTransferActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_resumeTransferActionPerformed
-		// TODO add your handling code here:
-	}// GEN-LAST:event_resumeTransferActionPerformed
-
-	private void resetTransferActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_resetTransferActionPerformed
-		// TODO add your handling code here:
-		int items_to_delete[] = null;
+		int items_to_reset[] = null;
 		if (!activeTransferList.isSelectionEmpty()) {
-			items_to_delete = activeTransferList.getSelectedIndices();
+			items_to_reset = activeTransferList.getSelectedIndices();
 		} else {
 			return;
 		}
 
-		if (items_to_delete != null) {
+		if (items_to_reset != null) {
 
-			for (int i = items_to_delete.length - 1; i >= 0; i--) {
+			for (int i = items_to_reset.length - 1; i >= 0; i--) {
 				// System.out.println("deleting: " + items_to_delete[i]);
-				listmodel.remove(items_to_delete[i]);
+				listmodel.elementAt(i).resumeTransfer();
+				listmodel.notify();
+				
+				//remove from list
+//				listmodel.remove(items_to_reset[i]);
+			}
+			// list.setListData(items);
+		}
+	}// GEN-LAST:event_resumeTransferActionPerformed
+
+	private void resetTransferActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_resetTransferActionPerformed
+		// TODO add your handling code here:
+//		int items_to_delete[] = null;
+//		if (!activeTransferList.isSelectionEmpty()) {
+//			items_to_delete = activeTransferList.getSelectedIndices();
+//		} else {
+//			return;
+//		}
+//
+//		if (items_to_delete != null) {
+//
+//			for (int i = items_to_delete.length - 1; i >= 0; i--) {
+//				// System.out.println("deleting: " + items_to_delete[i]);
+//				listmodel.remove(items_to_delete[i]);
+//			}
+//			// list.setListData(items);
+//		}
+		
+		int items_to_reset[] = null;
+		if (!activeTransferList.isSelectionEmpty()) {
+			items_to_reset = activeTransferList.getSelectedIndices();
+		} else {
+			return;
+		}
+
+		if (items_to_reset != null) {
+
+			for (int i = items_to_reset.length - 1; i >= 0; i--) {
+				// System.out.println("deleting: " + items_to_delete[i]);
+				listmodel.elementAt(i).reset();
+				listmodel.notify();
+				
+				//remove from list
+//				listmodel.remove(items_to_reset[i]);
 			}
 			// list.setListData(items);
 		}
@@ -617,10 +655,31 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		// JOptionPane.INFORMATION_MESSAGE);
 
 		// ITransferMock mock[] = new ITransferMock[1];
-		ITransferMock mock = new ITransferMock("Test", true, new Long(100), new Long((int) (Math.random() * 100)),
-				TransferStatus.Transfering);
+//		ITransferMock mock = new ITransferMock("Test", true, new Long(100), new Long((int) (Math.random() * 100)),
+//				TransferStatus.Transfering);
+//
+//		listmodel.addElement(mock);
+		
+		int items_to_delete[] = null;
+		if (!activeTransferList.isSelectionEmpty()) {
+			items_to_delete = activeTransferList.getSelectedIndices();
+		} else {
+			return;
+		}
 
-		listmodel.addElement(mock);
+		if (items_to_delete != null) {
+
+			for (int i = items_to_delete.length - 1; i >= 0; i--) {
+				// System.out.println("deleting: " + items_to_delete[i]);
+				listmodel.elementAt(i).cancel();
+				
+				
+				//remove from list
+				listmodel.remove(items_to_delete[i]);
+			}
+			// list.setListData(items);
+		}
+		
 		// new Component
 
 		// DefaultListModel<ITransferProgress> listmodel = new
