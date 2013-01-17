@@ -28,68 +28,61 @@ import de.tr0llhoehle.buschtrommel.models.Message;
  * @author Tobias Sturm
  * 
  */
-public class IncomingDownload extends MessageMonitor implements ITransferProgress {
+public class IncomingDownload extends Transfer implements ITransferProgress {
 
-	private String hash;
-	private long offset, totalTransferedVolume;
-	private TransferStatus status;
-	private boolean keepAlive;
-	private long expectedTransferVolume;
-	Host host;
 	boolean checkIntegrity;
 	File targetFile;
 	GetFileMessage sourceFile;
 	FileOutputStream targetFilestream;
 	java.net.Socket socket;
 	Thread self;
-	InetSocketAddress partner;
-	java.util.logging.Logger logger;
-
+	
 	public IncomingDownload(GetFileMessage sourceFile, Host host, java.io.File target) {
+		super(new InetSocketAddress(host.getAddress(), host.getPort()));
 		this.offset = sourceFile.getOffset();
 		this.sourceFile = sourceFile;
 		this.hash = sourceFile.getHash();
-		this.host = host;
 		sourceFile.getLength();
 		expectedTransferVolume = sourceFile.getLength();
 		this.totalTransferedVolume = 0;
 		checkIntegrity = true;
 		this.targetFile = target;
-		status = TransferStatus.Initialized;
+		transferState = TransferStatus.Initialized;
 		this.partner = new InetSocketAddress(host.getAddress(), host.getPort());
 		logger = java.util.logging.Logger.getLogger("incoming " + hash + " " + partner.toString());
+		transferType  = TransferType.Singlesource;
 	}
 
 	public void DisableIntegrityCheck() {
-		hash = "";
+		hash = ""; //TODO use checkIntegrity = false instead
 	}
 
 
 	protected void doTransfer() throws UnsupportedEncodingException {
 		logger.log(Level.INFO, "Starting download");
 
-		if (status == TransferStatus.Initialized) {
+		if (transferState == TransferStatus.Initialized) {
 			try {
 				logger.log(Level.INFO, "open stream to '" + targetFile.getPath() + "'");
 				targetFilestream = new FileOutputStream(targetFile, false);
 			} catch (FileNotFoundException e) {
 				logger.log(Level.SEVERE, "Could not create target filestream: " + e.getMessage());
-				status = TransferStatus.LocalIOError;
+				transferState = TransferStatus.LocalIOError;
 				targetFilestream = null;
 				return;
 			}
 		}
 
 		// connect and send request
-		status = TransferStatus.Connecting;
-		logger.log(Level.INFO, "Connecting to " + host.getAddress() + ":" + host.getPort());
+		transferState = TransferStatus.Connecting;
+		logger.log(Level.INFO, "Connecting to " + partner.getAddress() + ":" + partner.getPort());
 		expectedTransferVolume = sourceFile.getLength() - totalTransferedVolume;
 		assert socket == null;
 		InputStream in = null;
 		OutputStream out = null;
 		try {
 			socket = new Socket();
-			socket.connect(new InetSocketAddress(host.getAddress(), host.getPort()));
+			socket.connect(new InetSocketAddress(partner.getAddress(), partner.getPort()));
 
 			out = socket.getOutputStream();
 			in = socket.getInputStream();
@@ -98,13 +91,13 @@ public class IncomingDownload extends MessageMonitor implements ITransferProgres
 			out.flush();
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, "could not connect to host '" + e.getMessage() + "'");
-			status = TransferStatus.ConnectionFailed;
+			transferState = TransferStatus.ConnectionFailed;
 		}
 
 		// check response
 		FileRequestResponseMessage rsp = handleResponse(in);
-		if (rsp != null && status == TransferStatus.Connecting) {
-			rsp.setSource(new InetSocketAddress(host.getAddress(), host.getPort()));
+		if (rsp != null && transferState == TransferStatus.Connecting) {
+			rsp.setSource(new InetSocketAddress(partner.getAddress(), partner.getPort()));
 			sendMessageToObservers(rsp);
 		} else {
 			closeSocket();
@@ -114,10 +107,10 @@ public class IncomingDownload extends MessageMonitor implements ITransferProgres
 		// not ready for transfer? abort
 		switch (rsp.getResponseCode()) {
 		case NEVER_TRY_AGAIN:
-			status = TransferStatus.PermanentlyNotAvailable;
+			transferState = TransferStatus.PermanentlyNotAvailable;
 			return;
 		case TRY_AGAIN_LATER:
-			status = TransferStatus.TemporaryNotAvailable;
+			transferState = TransferStatus.TemporaryNotAvailable;
 			return;
 		default:
 		}
@@ -125,7 +118,7 @@ public class IncomingDownload extends MessageMonitor implements ITransferProgres
 		// check returned expected transfer volume
 		if (rsp.getExpectedVolume() > expectedTransferVolume) {
 			logger.log(Level.INFO, "Host sent a bigger transferVolume than expected ");
-			status = TransferStatus.InvalidContent;
+			transferState = TransferStatus.InvalidContent;
 			closeSocket();
 			return;
 		} else if (rsp.getExpectedVolume() < expectedTransferVolume) {
@@ -135,19 +128,19 @@ public class IncomingDownload extends MessageMonitor implements ITransferProgres
 		}
 
 		// Transfer bytes
-		status = TransferStatus.Transfering;
+		transferState = TransferStatus.Transfering;
 		int next; // TODO make buffer bigger than 1 byte
-		keepAlive = true;
+		keepTransferAlive = true;
 		long transferedVolume = 0;
 		try {
-			while (transferedVolume < expectedTransferVolume && (next = in.read()) != -1 && keepAlive) {
+			while (transferedVolume < expectedTransferVolume && (next = in.read()) != -1 && keepTransferAlive) {
 				totalTransferedVolume++;
 				transferedVolume++;
 				try {
 					targetFilestream.write(next);
 				} catch (IOException e) {
 					logger.log(Level.SEVERE, "Could not write into target file: " + e.getMessage());
-					status = TransferStatus.LocalIOError;
+					transferState = TransferStatus.LocalIOError;
 					closeSocket();
 					closeFile(true);
 					return;
@@ -155,24 +148,24 @@ public class IncomingDownload extends MessageMonitor implements ITransferProgres
 			}
 			if (transferedVolume < expectedTransferVolume) {
 				logger.log(Level.SEVERE, "Lost connection");
-				status = TransferStatus.LostConnection;
+				transferState = TransferStatus.LostConnection;
 				closeSocket();
 				return;
 			} else { // download completed
-				status = TransferStatus.CheckingHash;
+				transferState = TransferStatus.CheckingHash;
 				logger.log(Level.INFO, "finished data transfer");
 				closeFile(false);
 				closeSocket();
 			}
 		} catch (IOException e2) {
 			logger.log(Level.SEVERE, "Other side closed connection");
-			status = TransferStatus.LostConnection;
+			transferState = TransferStatus.LostConnection;
 			closeSocket();
 			return;
 		}
 
 		// integrity check
-		if (status == TransferStatus.CheckingHash) {
+		if (transferState == TransferStatus.CheckingHash) {
 			integrityCheck(targetFile);
 		}
 	}
@@ -204,7 +197,7 @@ public class IncomingDownload extends MessageMonitor implements ITransferProgres
 				targetFilestream = null;
 			} catch (IOException e1) {
 				logger.log(Level.SEVERE, "Could not close target file");
-				status = TransferStatus.LocalIOError;
+				transferState = TransferStatus.LocalIOError;
 				return;
 			}
 		}
@@ -224,19 +217,19 @@ public class IncomingDownload extends MessageMonitor implements ITransferProgres
 	 */
 	protected void integrityCheck(File targetPath) {
 		if (getExpectedHash() == "") {
-			status = TransferStatus.Finished;
+			transferState = TransferStatus.Finished;
 		} else {
 			try {
 				if (HashFuncWrapper.hash(targetPath.getAbsolutePath()) == getExpectedHash()) {
 					logger.log(Level.INFO, "File has expected hash");
-					status = TransferStatus.Finished;
+					transferState = TransferStatus.Finished;
 				} else {
 					logger.log(Level.INFO, "File has invalid hash");
-					status = TransferStatus.InvalidContent;
+					transferState = TransferStatus.InvalidContent;
 				}
 			} catch (IOException e) {
 				logger.log(Level.SEVERE, "Could not check file integrity: " + e.getMessage());
-				status = TransferStatus.LocalIOError;
+				transferState = TransferStatus.LocalIOError;
 			}
 		}
 	}
@@ -279,7 +272,7 @@ public class IncomingDownload extends MessageMonitor implements ITransferProgres
 					str_expectedTransferVolume += new String(new byte[] { (byte) next }, Message.ENCODING);
 			} catch (IOException e) {
 				logger.log(Level.SEVERE, "Could not understand 'expected transfer volume' in response");
-				status = TransferStatus.LostConnection;
+				transferState = TransferStatus.LostConnection;
 				return null;
 			}
 			try {
@@ -311,7 +304,7 @@ public class IncomingDownload extends MessageMonitor implements ITransferProgres
 		}
 		closeSocket();
 		closeFile(targetFile.exists());
-		status = TransferStatus.Initialized;
+		transferState = TransferStatus.Initialized;
 	}
 
 	@Override
@@ -328,7 +321,7 @@ public class IncomingDownload extends MessageMonitor implements ITransferProgres
 
 		if (targetFilestream == null) {
 			logger.log(Level.SEVERE, "target filestream doesn't exist anymore!");
-			status = TransferStatus.LocalIOError;
+			transferState = TransferStatus.LocalIOError;
 		}
 		
 		self = getCreateOwnThread();
@@ -347,82 +340,33 @@ public class IncomingDownload extends MessageMonitor implements ITransferProgres
 			@Override
 			public void run() {
 				try {
-					if(status == TransferStatus.AssembleParts || status == TransferStatus.CheckingHash || status == TransferStatus.Connecting || status == TransferStatus.Finished || status == TransferStatus.Transfering)
-						logger.log(Level.SEVERE, "Can't start download, state is " + status);
-					else
+					if(transferState == TransferStatus.AssembleParts || transferState == TransferStatus.CheckingHash || transferState == TransferStatus.Connecting || transferState == TransferStatus.Finished || transferState == TransferStatus.Transfering)
+						logger.log(Level.SEVERE, "Can't start download, state is " + transferState);
+					else {
+						keepTransferAlive = true;
 						doTransfer();
+					}
 				} catch (UnsupportedEncodingException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				keepTransferAlive = false;
 				self = null;
 			}
 		});
 		return t;
 	}
-
-	@Override
-	public TransferType getType() {
-		return TransferType.Singlesource;
-	}
-
-	@Override
-	public long getLength() {
-		return expectedTransferVolume;
-	}
-
-	@Override
-	public long getOffset() {
-		return offset;
-	}
-
-	@Override
-	public long getTransferedAmount() {
-		return totalTransferedVolume;
-	}
-
-	@Override
-	public String getExpectedHash() {
-		return hash;
-	}
-
-	@Override
-	public TransferStatus getStatus() {
-		return status;
-	}
+	
 
 	@Override
 	public void cancel() {
-		keepAlive = false;
-	}
-
-	@Override
-	public List<ITransferProgress> getSubTransfers() {
-		return new ArrayList<>();
-	}
-
-	@Override
-	public boolean isActive() {
-		return self != null;
-	}
-
-	@Override
-	public InetSocketAddress getTransferPartner() {
-		return partner;
-	}
-
-	@Override
-	public void RegisterLogHander(Handler h) {
-		logger.addHandler(h);
-	}
-
-	@Override
-	public void RemoveLogHander(Handler h) {
-		logger.removeHandler(h);
+		keepTransferAlive = false;
 	}
 
 	@Override
 	public String getTargetFile() {
 		return targetFile.getName();
 	}
+
+
 }

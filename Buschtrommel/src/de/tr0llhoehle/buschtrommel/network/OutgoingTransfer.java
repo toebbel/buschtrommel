@@ -8,7 +8,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Handler;
 import java.util.logging.Level;
 
 import de.tr0llhoehle.buschtrommel.LocalShareCache;
@@ -25,39 +24,33 @@ import de.tr0llhoehle.buschtrommel.models.FileRequestResponseMessage.ResponseCod
  * @author tobi
  *
  */
-public class OutgoingTransfer extends Thread implements ITransferProgress {
+public class OutgoingTransfer extends Transfer implements ITransferProgress {
 	OutputStream net_out; // network stream to the requester
 	java.io.InputStream ressourceStream; // stream from filelist / file
 	LocalShareCache myShares; // all my shares
 
 	private boolean keepThreadAlive;
-	long offset; // number of bytes to skip in ressourceStream before send
-	long numTransferedData; // number of bytes transfered
-	long numDataToTransfer; // number of bytes to transfer
 	long numAvailableData; // max number of bytes to send
 	boolean sendHeader;
-
-	TransferStatus transferState;
-	boolean transferIsActive;
-	private String hash;
-	private InetSocketAddress partner;
-	
 	String filename;
+	Message requestMessage;
 	
-	java.util.logging.Logger logger;
+	
 
 	public OutgoingTransfer(Message m, OutputStream out, LocalShareCache myShares, InetSocketAddress partner) {
+		super(partner);
 		assert m instanceof GetFilelistMessage || m instanceof GetFileMessage;
 		assert partner != null;
+		requestMessage = m;
 		this.net_out = out;
 		this.myShares = myShares;
-		this.partner = partner;
+		this.transferType = TransferType.Outgoing;
 		
 		
-		transferIsActive = true;
+		keepTransferAlive = true;
 		keepThreadAlive = true;
 		transferState = TransferStatus.Initialized;
-		numTransferedData = 0;
+		totalTransferedVolume = 0;
 		
 		if(m instanceof GetFileMessage) {
 			sendHeader = true;
@@ -66,24 +59,6 @@ public class OutgoingTransfer extends Thread implements ITransferProgress {
 			sendHeader = false;
 			hash = "filelist";
 		}
-		
-		logger = java.util.logging.Logger.getLogger("outgoing " + hash + " " + partner.toString());
-		
-		try {
-			openInputStream(m);
-		} catch (UnsupportedEncodingException e1) {
-			logger.log(Level.SEVERE, "Unsupported encoding");
-			ressourceStream = null;
-		}
-		handleRequestedRanges(m);
-		
-		try {
-			doTransfer();
-		} catch (IOException e) { //catch *all* errors and do nothing, because we don't give a shit if someone doesn't get his candy
-			logger.log(Level.SEVERE, "Could not handle outgoing file transfer: " + e.getMessage());
-			cancel();
-		}
-		transferIsActive = false;
 	}
 
 	/**
@@ -139,10 +114,10 @@ public class OutgoingTransfer extends Thread implements ITransferProgress {
 	private void handleRequestedRanges(Message request) {
 		if (request instanceof GetFilelistMessage) {
 			offset = 0;
-			numDataToTransfer = numAvailableData;
+			expectedTransferVolume = numAvailableData;
 		} else if (request instanceof GetFileMessage) {
 			offset = ((GetFileMessage) request).getOffset();
-			numDataToTransfer = ((GetFileMessage) request).getLength();
+			expectedTransferVolume = ((GetFileMessage) request).getLength();
 		}
 	}
 
@@ -165,32 +140,32 @@ public class OutgoingTransfer extends Thread implements ITransferProgress {
 				return;
 			}
 
-			if (offset + numDataToTransfer > numAvailableData) { // requested
+			if (offset + expectedTransferVolume > numAvailableData) { // requested
 																	// Length
 																	// too
 																	// large?
 																	// Shorten
 																	// it!
-				logger.log(Level.INFO, "Requested length of " + numDataToTransfer + " was too large, shortened  it to "
-						+ numDataToTransfer);
-				numDataToTransfer = numAvailableData - offset;
+				logger.log(Level.INFO, "Requested length of " + expectedTransferVolume + " was too large, shortened  it to "
+						+ expectedTransferVolume);
+				expectedTransferVolume = numAvailableData - offset;
 			}
 
 			// send the file
 			if(sendHeader)
-				net_out.write((new FileRequestResponseMessage(ResponseCode.OK, numDataToTransfer).Serialize()).getBytes());
+				net_out.write((new FileRequestResponseMessage(ResponseCode.OK, expectedTransferVolume).Serialize()).getBytes());
 			
 			int next; // Todo make buffer bigger
 			ressourceStream.skip(offset);
 			transferState = TransferStatus.Transfering;
-			while (keepThreadAlive && numTransferedData < numDataToTransfer && (next = ressourceStream.read()) != -1) {
+			while (keepThreadAlive && totalTransferedVolume < expectedTransferVolume && (next = ressourceStream.read()) != -1) {
 				net_out.write(next);
-				numTransferedData++;
+				totalTransferedVolume++;
 			}
 			net_out.close();
 			ressourceStream.close();
 
-			if (numTransferedData == numDataToTransfer)
+			if (totalTransferedVolume == expectedTransferVolume)
 				transferState = TransferStatus.Finished;
 			else {
 				if (!keepThreadAlive)
@@ -201,25 +176,6 @@ public class OutgoingTransfer extends Thread implements ITransferProgress {
 		}
 	}
 
-	@Override
-	public TransferType getType() {
-		return TransferType.Outgoing;
-	}
-
-	@Override
-	public long getLength() {
-		return numDataToTransfer;
-	}
-
-	@Override
-	public long getOffset() {
-		return offset;
-	}
-
-	@Override
-	public String getExpectedHash() {
-		return hash;
-	}
 
 	@Override
 	public void cancel() {
@@ -237,15 +193,6 @@ public class OutgoingTransfer extends Thread implements ITransferProgress {
 		return new ArrayList<>();
 	}
 
-	@Override
-	public long getTransferedAmount() {
-		return numTransferedData;
-	}
-
-	@Override
-	public TransferStatus getStatus() {
-		return transferState;
-	}
 
 	@Override
 	public void reset() {
@@ -258,28 +205,31 @@ public class OutgoingTransfer extends Thread implements ITransferProgress {
 	}
 
 	@Override
-	public boolean isActive() {
-		return transferIsActive;
-	}
-
-	@Override
-	public InetSocketAddress getTransferPartner() {
-		return partner;
-	}
-	
-	@Override
-	public void RegisterLogHander(Handler h) {
-		logger.addHandler(h);
-	}
-
-	@Override
-	public void RemoveLogHander(Handler h) {
-		logger.removeHandler(h);
-	}
-
-	@Override
 	public String getTargetFile() {
-		// TODO Auto-generated method stub
-		return null;
+		return filename;
+	}
+
+	@Override
+	public void start() {
+		(new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				try {
+					openInputStream(requestMessage);
+				} catch (UnsupportedEncodingException e1) {
+					logger.log(Level.SEVERE, "Unsupported encoding");
+					ressourceStream = null;
+				}
+				handleRequestedRanges(requestMessage);
+				try {
+					doTransfer();
+					keepTransferAlive = false;
+				} catch (IOException e) { //catch *all* errors and do nothing, because we don't give a shit if someone doesn't get his candy
+					logger.log(Level.SEVERE, "Could not handle outgoing file transfer: " + e.getMessage());
+					cancel();
+				}
+			}
+		})).start();
 	}
 }

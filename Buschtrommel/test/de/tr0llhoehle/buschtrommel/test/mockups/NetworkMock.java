@@ -47,8 +47,10 @@ public class NetworkMock extends Thread{
 	}
 	
 	public void close() throws IOException{
-		s.close();
-		so.close();
+		if(s != null)
+			s.close();
+		if(so != null)
+			so.close();
 	}
 	
 	public InetAddress getAddr() {

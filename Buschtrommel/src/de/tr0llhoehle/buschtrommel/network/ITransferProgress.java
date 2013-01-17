@@ -113,7 +113,7 @@ public interface ITransferProgress {
 	public InetSocketAddress getTransferPartner();
 	
 	/**
-	 * incoming transfer: location of the file, which is downloading
+	 * incoming transfer: location of the file, which is downloading, or "filelist"
 	 * outgoing transfer: filename of the file or "filelist"
 	 * 
 	 * @return
