@@ -98,7 +98,7 @@ public class Buschtrommel implements IMessageObserver {
 	 */
 	public ITransferProgress DownloadFile(String hash, String targetFile, Host host) {
 		RemoteShare s = netCache.getShare(hash);
-		if (s == null)
+		if (s == null || host == null || targetFile == null)
 			return null;
 		return fileTransferAdapter.DownloadFile(hash, host, s.getLength(), new java.io.File(targetFile));
 	}
