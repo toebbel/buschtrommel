@@ -107,7 +107,7 @@ public class TestOutgoingTransfer {
 		Thread.sleep(100);
 		
 		//connect
-		byte[] buffer = new byte[79];
+		byte[] buffer = new byte[81];
 		mock.receive(buffer);
 		Thread.sleep(2000);
 		

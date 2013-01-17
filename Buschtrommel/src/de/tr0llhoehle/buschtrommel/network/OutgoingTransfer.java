@@ -184,7 +184,6 @@ public class OutgoingTransfer extends Transfer {
 			int bytesToRead = bufferSize;
 			byte[] buffer = new byte[bufferSize];
 			while (bytesToRead > 0 && keepTransferAlive && totalTransferedVolume < expectedTransferVolume && (bytesRead = ressourceInputStream.read(buffer, 0, bytesToRead)) != -1) {
-				System.out.println(new String(buffer, Message.ENCODING));
 				networkOutputStream.write(buffer, 0, bytesRead);
 				totalTransferedVolume += bytesRead;
 				if(totalTransferedVolume + bytesToRead > expectedTransferVolume) {
