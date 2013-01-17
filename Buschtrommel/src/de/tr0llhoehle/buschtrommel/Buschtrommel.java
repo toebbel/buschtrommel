@@ -98,8 +98,18 @@ public class Buschtrommel implements IMessageObserver {
 	 */
 	public ITransferProgress DownloadFile(String hash, String targetFile, Host host) {
 		RemoteShare s = netCache.getShare(hash);
-		if (s == null || host == null || targetFile == null)
+		if (s == null) {
+			LoggerWrapper.logError("Can't start download: The share with the hash " + hash  + " is not known");
 			return null;
+		}
+		if(host == null) {
+			LoggerWrapper.logError("Can't start download: The given host is null!");
+			return null;
+		}
+		if(targetFile == null) {
+			LoggerWrapper.logError("Can't start download: The given filepath is null");
+			return null;
+		}
 		return fileTransferAdapter.DownloadFile(hash, host, s.getLength(), new java.io.File(targetFile));
 	}
 
