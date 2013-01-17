@@ -1,6 +1,7 @@
 package de.tr0llhoehle.buschtrommel.network;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -46,7 +47,7 @@ public class FileTransferAdapter extends MessageMonitor {
 	}
 
 	public FileTransferAdapter(LocalShareCache s) throws IOException {
-		myShares = s;
+		myShares = s;//TODO fix error, when no port is given
 		startListening();
 	}
 
@@ -81,11 +82,36 @@ public class FileTransferAdapter extends MessageMonitor {
 			Socket s;
 			try {
 				s = listeningSocket.accept();
-				byte[] raw_message = new byte[512];
-				final Message m = MessageDeserializer.Deserialize(new String(raw_message).trim());
-				if(m != null)
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				InputStream networkInputStream = s.getInputStream();
+				byte[] buffer = new byte[512];
+				int next = 0;
+				int bytesRead = 0;
+				int iddleLoops = 0;
+				while((next = networkInputStream.read()) != Message.MESSAGE_SPERATOR && iddleLoops < 3) {
+					if(next == -1) {
+						try {
+							iddleLoops++;
+							Thread.sleep(100);
+						} catch (InterruptedException e) {}
+					} else {
+						buffer[bytesRead++] = (byte) next;
+					}
+				}
+				if(iddleLoops == 3)
+					return;
+				buffer[bytesRead++] = Message.MESSAGE_SPERATOR;
+				final Message m = MessageDeserializer.Deserialize(new String(buffer, 0, bytesRead));
+				if(m != null) {
+					m.setSource(new InetSocketAddress(s.getInetAddress(), s.getPort()));
 					sendMessageToObservers(m);
-				m.setSource(new InetSocketAddress(s.getInetAddress(), s.getPort()));
+				}
+				
 				final OutputStream out = s.getOutputStream();
 				ITransferProgress p = null;
 				if (m instanceof GetFileMessage) {
@@ -96,6 +122,8 @@ public class FileTransferAdapter extends MessageMonitor {
 					OutgoingTransfer transfer = new OutgoingTransfer((GetFilelistMessage) m, out, myShares, new InetSocketAddress(s.getInetAddress(), s.getPort()));
 					transfer.start();
 					p = transfer;
+				} else {
+					LoggerWrapper.logInfo("Received garbage on fileTransferAdapter");
 				}
 				
 				if(p != null)
@@ -107,6 +135,14 @@ public class FileTransferAdapter extends MessageMonitor {
 		}
 	}
 	
+	/**
+	 * Creates <b>and starts</b> a download from the given host
+	 * @param hash the hash of the file to download
+	 * @param host the source host
+	 * @param length of the file
+	 * @param target local target file
+	 * @return progress interface instance, that is connected with this download
+	 */
 	public ITransferProgress DownloadFile(String hash, Host host, long length, java.io.File target) {
 		ITransferProgress result = new IncomingDownload(new GetFileMessage(hash, 0, length), host, target);
 		incomingTransfers.put(hash, result);
@@ -157,14 +193,16 @@ public class FileTransferAdapter extends MessageMonitor {
 
 	/**
 	 * Stops the listening thread and all running transfers.
+	 * @throws IOException 
 	 */
-	public void close() {
+	public void close() throws IOException {
 		keepAlive = false;
 		receiveThread.interrupt();
 		for(ITransferProgress t : outgoingTransfers)
 			t.cancel();
 		for(String k : incomingTransfers.keySet())
 			incomingTransfers.get(k).cancel();
+		listeningSocket.close();
 	}
 
 	public ITransferProgress downloadFilelist(Host host) {
