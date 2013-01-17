@@ -90,6 +90,13 @@ public class FilesTableModel extends AbstractTableModel {
 
         this.shares.add(eintragVector);
     }
+    
+    public void addMock(String filename, String meta, String size, String hostName, String ip, String Hash, String ttl){
+    	String eintragVector[] = {filename, meta, size, hostName, ip, Hash, ttl};
+   shares.add(eintragVector);
+    	
+    	//"Filename", "Meta-Information", "Size", "Host-Name","IP", "Hash", "TTL"
+    }
 
 //    public FilesTableModell(Hashtable<String, RemoteShare> remoteShares) {
 //        // this.shares = new Vector<String[]>();//[remoteShares.keySet().size()][names.length];
@@ -121,7 +128,7 @@ public class FilesTableModel extends AbstractTableModel {
 //
 //
 //
-//                this.shares.add(eintragVector);
+//           ec     this.shares.add(eintragVector);
 //
 //            }
 //
