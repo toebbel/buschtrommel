@@ -60,7 +60,7 @@ public class Buschtrommel implements IMessageObserver {
 	 * @throws IOException
 	 */
 	public void start() throws IOException {
-		fileTransferAdapter = new FileTransferAdapter(shareCache, 4747);
+		fileTransferAdapter = new FileTransferAdapter(shareCache);
 		this.udpAdapter = new UDPAdapter();
 		this.netCache = new NetCache(this.udpAdapter, fileTransferAdapter, this.guiCallbacks);
 		this.udpAdapter.registerObserver(netCache);

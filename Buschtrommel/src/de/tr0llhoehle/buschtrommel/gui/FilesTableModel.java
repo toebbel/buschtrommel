@@ -89,11 +89,13 @@ public class FilesTableModel extends AbstractTableModel {
         }
 
         this.shares.add(eintragVector);
+        this.fireTableDataChanged();
     }
     
     public void addMock(String filename, String meta, String size, String hostName, String ip, String Hash, String ttl){
     	String eintragVector[] = {filename, meta, size, hostName, ip, Hash, ttl};
    shares.add(eintragVector);
+   this.fireTableDataChanged();
     	
     	//"Filename", "Meta-Information", "Size", "Host-Name","IP", "Hash", "TTL"
     }
@@ -143,7 +145,8 @@ public class FilesTableModel extends AbstractTableModel {
         for(String[] col : shares){
             //"Filename", "Meta-Information", "Size", "Host-Name","IP", "Hash", "TTL"
             if(col[5].equals(file.getFile().getHash()) && col[4].equals(file.getHost().getAddress().toString())){
-             shares.remove(col);   
+             shares.remove(col); 
+             this.fireTableDataChanged();
             }
         }
         //throw new UnsupportedOperationException("Not yet implemented");

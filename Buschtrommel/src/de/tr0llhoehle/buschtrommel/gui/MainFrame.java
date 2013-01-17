@@ -12,6 +12,7 @@ package de.tr0llhoehle.buschtrommel.gui;
 
 import de.tr0llhoehle.buschtrommel.Buschtrommel;
 import de.tr0llhoehle.buschtrommel.IGUICallbacks;
+import de.tr0llhoehle.buschtrommel.LoggerWrapper;
 import de.tr0llhoehle.buschtrommel.models.Host;
 import de.tr0llhoehle.buschtrommel.models.ShareAvailability;
 import de.tr0llhoehle.buschtrommel.network.ITransferProgress;
@@ -215,7 +216,6 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		activateShare.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				activateShareActionPerformed(evt);
-				activateShareActionPerformed1(evt);
 			}
 		});
 
@@ -483,11 +483,14 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
 			if (buschtrommel != null) {
 				// "Filename", "Meta-Information", "Path", "Size","TTL"
+				String name = sharesModel.getValueAt(i, 0);
+				String meta = sharesModel.getValueAt(i, 1);
+				String path = sharesModel.getValueAt(i, 2);
 				int ttl = Integer.parseInt(sharesModel.getValueAt(i, 4));
 
 				try {
-					buschtrommel.AddFileToShare(sharesModel.getValueAt(i, 3), sharesModel.getValueAt(i, 0),
-							sharesModel.getValueAt(i, 1), ttl);
+					LoggerWrapper.logInfo("Trying to add new share: " +" name: "+ name + " meta: "+ meta + " path: " +path +" ttl: " + ttl);
+					buschtrommel.AddFileToShare(path, name, meta, ttl);
 				} catch (IllegalArgumentException e) {
 					// TODO Auto-generated catch block
 					JOptionPane.showMessageDialog(null, "Woops, something went terribly wrong");
@@ -501,9 +504,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		}
 	}// GEN-LAST:event_activateShareActionPerformed
 
-	private void activateShareActionPerformed1(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_activateShareActionPerformed1
-		// TODO add your handling code here:
-	}// GEN-LAST:event_activateShareActionPerformed1
+
 
 	private void downloadFilesBtn1ActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_downloadFilesBtn1ActionPerformed
 		if (downloadPath == null) {
@@ -599,6 +600,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
 	private void addShareActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_addShareActionPerformed
 
+		jFileChooser1.setCurrentDirectory(null);
 		jFileChooser1.setFileSelectionMode(jFileChooser1.FILES_ONLY);
 
 		int returnVal = jFileChooser1.showOpenDialog(this);
