@@ -177,10 +177,14 @@ public class Buschtrommel implements IMessageObserver {
 	 *            the file to remove
 	 */
 	public void RemoveFileFromShare(String hash) {
-		LocalShare share = shareCache.get(hash);
-		if (share == null)
-			return;
-		shareCache.remove(hash);
+		LocalShare localShare = shareCache.get(hash);
+		if(shareCache.remove(hash) && localShare != null) {
+			try {
+				udpAdapter.sendMulticast(new FileAnnouncementMessage(new LocalShare(localShare.getHash(), localShare.getLength(), 0, localShare.getDisplayName(), localShare.getMeta(), localShare.getPath())));
+			} catch (IOException e) {
+				LoggerWrapper.logError("Could not announce file-unavailability: " + e.getMessage());
+			}
+		}
 	}
 
 	/**
