@@ -133,6 +133,12 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
         pathChooser.setFileSelectionMode(javax.swing.JFileChooser.DIRECTORIES_ONLY);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Bongo");
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         jTabbedPane1.setName("files-table"); // NOI18N
 
@@ -414,6 +420,20 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // TODO add your handling code here:
+        if(buschtrommel!=null){
+            LoggerWrapper.logInfo("Exiting");
+            try {
+				buschtrommel.stop();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				LoggerWrapper.logError("Buschtrommel could not be stopped");
+			}
+        }
+        
+    }//GEN-LAST:event_formWindowClosing
 	
 	private void selectDownloadFolderActionPerformed(ActionEvent evt) {
 //		jFileChooser1.setDialogTitle("Ort wählen");
