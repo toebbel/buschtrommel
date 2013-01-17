@@ -226,7 +226,10 @@ public class NetCache implements IMessageObserver {
 		return false;
 	}
 
-	
+	/**
+	 * Testing purposes
+	 * @param host
+	 */
 	public void removeHost(Host host) {
 		this.knownHosts.remove(host.getAddress());
 	}
