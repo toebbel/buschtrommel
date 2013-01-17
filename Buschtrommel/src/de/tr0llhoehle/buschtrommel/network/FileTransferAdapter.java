@@ -47,18 +47,15 @@ public class FileTransferAdapter extends MessageMonitor {
 	}
 
 	public FileTransferAdapter(LocalShareCache s) throws IOException {
-		myShares = s;//TODO fix error, when no port is given
-		startListening();
+		this(s, 0);
 	}
 
 	private void startListening() throws IOException {
 		keepAlive = true;
-		if (port == -1) {
-			listeningSocket = new ServerSocket();
-			port = listeningSocket.getLocalPort();
-		} else {
-			listeningSocket = new ServerSocket(port);
-		}
+
+		listeningSocket = new ServerSocket(port);
+		port = listeningSocket.getLocalPort();
+
 		listeningSocket.setReuseAddress(true);
 		receiveThread = new Thread(new Runnable() {
 
@@ -93,54 +90,62 @@ public class FileTransferAdapter extends MessageMonitor {
 				int next = 0;
 				int bytesRead = 0;
 				int iddleLoops = 0;
-				while((next = networkInputStream.read()) != Message.MESSAGE_SPERATOR && iddleLoops < 3) {
-					if(next == -1) {
+				while ((next = networkInputStream.read()) != Message.MESSAGE_SPERATOR && iddleLoops < 3) {
+					if (next == -1) {
 						try {
 							iddleLoops++;
 							Thread.sleep(100);
-						} catch (InterruptedException e) {}
+						} catch (InterruptedException e) {
+						}
 					} else {
 						buffer[bytesRead++] = (byte) next;
 					}
 				}
-				if(iddleLoops == 3)
+				if (iddleLoops == 3)
 					return;
 				buffer[bytesRead++] = Message.MESSAGE_SPERATOR;
 				final Message m = MessageDeserializer.Deserialize(new String(buffer, 0, bytesRead));
-				if(m != null) {
+				if (m != null) {
 					m.setSource(new InetSocketAddress(s.getInetAddress(), s.getPort()));
 					sendMessageToObservers(m);
 				}
-				
+
 				final OutputStream out = s.getOutputStream();
 				ITransferProgress p = null;
 				if (m instanceof GetFileMessage) {
-					OutgoingTransfer transfer = new OutgoingTransfer((GetFileMessage) m, out, myShares, new InetSocketAddress(s.getInetAddress(), s.getPort()));
+					OutgoingTransfer transfer = new OutgoingTransfer((GetFileMessage) m, out, myShares,
+							new InetSocketAddress(s.getInetAddress(), s.getPort()));
 					transfer.start();
 					p = transfer;
 				} else if (m instanceof GetFilelistMessage) {
-					OutgoingTransfer transfer = new OutgoingTransfer((GetFilelistMessage) m, out, myShares, new InetSocketAddress(s.getInetAddress(), s.getPort()));
+					OutgoingTransfer transfer = new OutgoingTransfer((GetFilelistMessage) m, out, myShares,
+							new InetSocketAddress(s.getInetAddress(), s.getPort()));
 					transfer.start();
 					p = transfer;
 				} else {
 					LoggerWrapper.logInfo("Received garbage on fileTransferAdapter");
 				}
-				
-				if(p != null)
+
+				if (p != null)
 					outgoingTransfers.add(p);
-				
+
 			} catch (IOException e) {
 				LoggerWrapper.logError(e.getMessage());
 			}
 		}
 	}
-	
+
 	/**
 	 * Creates <b>and starts</b> a download from the given host
-	 * @param hash the hash of the file to download
-	 * @param host the source host
-	 * @param length of the file
-	 * @param target local target file
+	 * 
+	 * @param hash
+	 *            the hash of the file to download
+	 * @param host
+	 *            the source host
+	 * @param length
+	 *            of the file
+	 * @param target
+	 *            local target file
 	 * @return progress interface instance, that is connected with this download
 	 */
 	public ITransferProgress DownloadFile(String hash, Host host, long length, java.io.File target) {
@@ -149,32 +154,40 @@ public class FileTransferAdapter extends MessageMonitor {
 		result.start();
 		return result;
 	}
-	
+
 	/**
 	 * Starts a multisource download
-	 * @param hash hash of requested file
-	 * @param hosts hosts that are offering the file
-	 * @param length expected length of download
+	 * 
+	 * @param hash
+	 *            hash of requested file
+	 * @param hosts
+	 *            hosts that are offering the file
+	 * @param length
+	 *            expected length of download
 	 * @return one ITransferProgress that may contain multiple children.
 	 */
 	public ITransferProgress DownloadFile(String hash, List<Host> hosts, long length, java.io.File target) {
 		assert hosts.size() > 0;
-		return DownloadFile(hash, hosts.get(0), length, target); //TODO implement multisource
+		return DownloadFile(hash, hosts.get(0), length, target); // TODO
+																	// implement
+																	// multisource
 	}
 
 	/**
-	 * Returns all outgoing Transfers that have been made.
-	 * This is a clone of the internal data structure.
+	 * Returns all outgoing Transfers that have been made. This is a clone of
+	 * the internal data structure.
+	 * 
 	 * @return all outgoing transfers
 	 */
 	@SuppressWarnings("unchecked")
 	public ArrayList<ITransferProgress> getOutgoingTransfers() {
 		return (ArrayList<ITransferProgress>) outgoingTransfers.clone();
 	}
-	
+
 	/**
-	 * Returns all incoming Transfers that have been made.
-	 * This is a copy of the internal data structure
+	 * Returns all incoming Transfers that have been made. This is a copy of the
+	 * internal data structure
+	 * 
 	 * @return all incoming transfers
 	 */
 	@SuppressWarnings("unchecked")
@@ -193,22 +206,23 @@ public class FileTransferAdapter extends MessageMonitor {
 
 	/**
 	 * Stops the listening thread and all running transfers.
-	 * @throws IOException 
+	 * 
+	 * @throws IOException
 	 */
 	public void close() throws IOException {
 		keepAlive = false;
 		receiveThread.interrupt();
-		for(ITransferProgress t : outgoingTransfers)
+		for (ITransferProgress t : outgoingTransfers)
 			t.cancel();
-		for(String k : incomingTransfers.keySet())
+		for (String k : incomingTransfers.keySet())
 			incomingTransfers.get(k).cancel();
 		listeningSocket.close();
 	}
 
 	public ITransferProgress downloadFilelist(Host host) {
 		IncomingFilelistTransfer result = new IncomingFilelistTransfer(host);
-		
-		for(IMessageObserver observer : observers)
+
+		for (IMessageObserver observer : observers)
 			result.registerObserver(observer);
 		result.start();
 		return result;
