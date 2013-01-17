@@ -9,6 +9,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.logging.ConsoleHandler;
 
 import org.junit.After;
@@ -112,6 +113,53 @@ public class TestIncomingDownload {
 		
 		assertEquals("1ABCDEF" + Message.FIELD_SEPERATOR + Message.MESSAGE_SPERATOR, FileContentMock.getFileContent("tmp"));
 		(new java.io.File("tmp")).delete();
+		
+		Thread.sleep(500);
+	}
+
+	/**
+	 * Request a file with length of 1024, offset 0, bufferSize 31.
+	 * Host announces, that the file will have only 1020 bytes, but will send 1024 bytes.
+	 * partial transfer, checks, transfer of the rest of the file, no integrity check.
+	 * 
+	 * @throws InterruptedException
+	 * @throws IOException
+	 */
+	@Test(timeout=15000)
+	public void testAbortWhenStreamTooLong() throws InterruptedException, IOException {
+		mock = new NetworkMock(8080);
+		IncomingDownload in = new IncomingDownload(new GetFileMessage("ABC", 0, 1024), new Host(mock.getAddr(), "mock", mock.getPort()),  new File("tmp.out"), 31);
+		in.DisableIntegrityCheck();
+		
+		//check if download request is correct
+		in.start();
+		
+		Thread.currentThread();
+		Thread.sleep(100);
+		
+		byte[] buffer = new byte[20];
+		mock.receive(buffer);
+		String strRequest = new String(buffer, Message.ENCODING);
+		assertEquals((new GetFileMessage("ABC", 0, 1024)), MessageDeserializer.Deserialize(strRequest));
+		assertEquals(1024, in.getLength());
+		
+		//send response
+		mock.send((new FileRequestResponseMessage(ResponseCode.OK, 1020)).Serialize().getBytes(Message.ENCODING));
+		Thread.sleep(100);
+		assertEquals(1020, in.getLength());
+		assertEquals(TransferStatus.Transfering, in.getStatus());
+		
+		//send the entire file
+		byte[] sendBuffer = FileContentMock.contentA.getBytes(Message.ENCODING);
+		mock.send(sendBuffer);
+		Thread.sleep(250);
+		assertEquals(1020, in.getTransferedAmount());
+		assertEquals(TransferStatus.Finished, in.getStatus());
+		mock.close();
+		
+		byte[] bufferSubset = Arrays.copyOfRange(sendBuffer, 0, 1020);
+		assertArrayEquals(bufferSubset, FileContentMock.getFileContent("tmp.out").getBytes(Message.ENCODING));
+		(new java.io.File("tmp.out")).delete();
 		
 		Thread.sleep(500);
 	}
