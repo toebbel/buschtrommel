@@ -600,6 +600,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
 	private void addShareActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_addShareActionPerformed
 
+		jFileChooser1.setCurrentDirectory(null);
 		jFileChooser1.setFileSelectionMode(jFileChooser1.FILES_ONLY);
 
 		int returnVal = jFileChooser1.showOpenDialog(this);

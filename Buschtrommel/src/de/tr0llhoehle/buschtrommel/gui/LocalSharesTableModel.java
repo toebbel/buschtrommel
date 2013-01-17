@@ -75,15 +75,18 @@ public class LocalSharesTableModel extends AbstractTableModel {
 		}
 
 		this.shares.add(eintrag);
+		this.fireTableDataChanged();
 	}
 
 	public void addMeta(int index, String meta) {
 		shares.get(index)[1] = meta;
+		this.fireTableDataChanged();
 	}
 
 	void removeShare(int index) {
 		if (index < shares.size()) {
 			shares.remove(index);
+			this.fireTableDataChanged();
 		}
 	}
 
