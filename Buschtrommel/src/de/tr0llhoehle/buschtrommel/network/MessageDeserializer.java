@@ -107,14 +107,14 @@ public class MessageDeserializer {
 		try{
 			int port = Integer.valueOf(fields[0]);
 			
-			String alias = fields[1].length() > 1 ? fields[1] : ""; //cut off message seperator
+			String alias = fields[1].length() > 1 ? fields[1].trim() : ""; //cut off message seperator
 			
 			
-			if(alias.length() > 1){ //alias is contains more than message seperator
-				alias = alias.substring(0, alias.length() - 1);
-			} else {
-				alias = "";
-			}
+//			if(alias.length() > 1){ //alias is contains more than message seperator
+//				alias = alias.substring(0, alias.length() - 1);
+//			} else {
+//				alias = "";
+//			}
 			
 			result = new PeerDiscoveryMessage(t, alias, port);
 		} catch(IllegalArgumentException e) { //NumberFormatException is subtype

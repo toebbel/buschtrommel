@@ -23,10 +23,7 @@ import de.tr0llhoehle.buschtrommel.models.Message;
  * @author Tobias Sturm
  *
  */
-public class IncomingFilelistTransfer extends Transfer implements ITransferProgress {
-
-	private java.util.logging.Logger logger;
-	
+public class IncomingFilelistTransfer extends Transfer {
 	
 	public IncomingFilelistTransfer(Host host) {
 		super(new InetSocketAddress(host.getAddress(), host.getPort()));
@@ -55,7 +52,6 @@ public class IncomingFilelistTransfer extends Transfer implements ITransferProgr
 
 	@Override
 	public void start() {
-		logger = java.util.logging.Logger.getLogger("getfilelist " + getTransferPartner().toString());
 		(new Thread(new Runnable() {
 			
 			@Override
@@ -67,7 +63,7 @@ public class IncomingFilelistTransfer extends Transfer implements ITransferProgr
 					s = new Socket(partner.getAddress(), partner.getPort());
 					transferState = TransferStatus.Transfering;
 					s.getOutputStream().write(new GetFilelistMessage().Serialize().getBytes(Message.ENCODING));
-					processFilestream(s.getInputStream());
+					processResponseFilestream(s.getInputStream());
 					s.close();
 				} catch (IOException e) {
 					logger.log(Level.SEVERE, "Can't get filelist: " + e.getMessage());
@@ -76,7 +72,7 @@ public class IncomingFilelistTransfer extends Transfer implements ITransferProgr
 		})).start();
 	}
 	
-	private void processFilestream(InputStream in) throws IOException {
+	private void processResponseFilestream(InputStream in) throws IOException {
 		int next = 0;
 		int received = 0;
 		char[] buffer = new char[512];
@@ -106,6 +102,6 @@ public class IncomingFilelistTransfer extends Transfer implements ITransferProgr
 
 	@Override
 	public String getTargetFile() {
-		return "";
+		return "filelist";
 	}
 }

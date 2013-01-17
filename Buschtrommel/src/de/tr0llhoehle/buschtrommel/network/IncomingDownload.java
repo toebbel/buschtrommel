@@ -28,7 +28,7 @@ import de.tr0llhoehle.buschtrommel.models.Message;
  * @author Tobias Sturm
  * 
  */
-public class IncomingDownload extends Transfer implements ITransferProgress {
+public class IncomingDownload extends Transfer {
 
 	boolean checkIntegrity;
 	File targetFile;
@@ -36,27 +36,64 @@ public class IncomingDownload extends Transfer implements ITransferProgress {
 	FileOutputStream targetFilestream;
 	java.net.Socket socket;
 	Thread self;
-	
+	int bufferSize;
+
+	/**
+	 * Creates an instance of an incoming file transfer
+	 * 
+	 * @param sourceFile
+	 *            the source of the file as request message
+	 * @param host
+	 *            the source host
+	 * @param target
+	 *            the target file to write to
+	 */
 	public IncomingDownload(GetFileMessage sourceFile, Host host, java.io.File target) {
+		// set general stuff
 		super(new InetSocketAddress(host.getAddress(), host.getPort()));
-		this.offset = sourceFile.getOffset();
+		this.partner = new InetSocketAddress(host.getAddress(), host.getPort());
+		logger = java.util.logging.Logger.getLogger("incoming " + hash + " " + partner.toString());
+		transferType = TransferType.Singlesource;
+		bufferSize = 1;
+
+		// file request
 		this.sourceFile = sourceFile;
+		this.offset = sourceFile.getOffset();
 		this.hash = sourceFile.getHash();
-		sourceFile.getLength();
 		expectedTransferVolume = sourceFile.getLength();
+
+		// initialize state variables
 		this.totalTransferedVolume = 0;
 		checkIntegrity = true;
 		this.targetFile = target;
 		transferState = TransferStatus.Initialized;
-		this.partner = new InetSocketAddress(host.getAddress(), host.getPort());
-		logger = java.util.logging.Logger.getLogger("incoming " + hash + " " + partner.toString());
-		transferType  = TransferType.Singlesource;
 	}
 
+	/**
+	 * Creates an instance of an incoming file transfer
+	 * 
+	 * @param sourceFile
+	 *            the source of the file as request message
+	 * @param host
+	 *            the source host
+	 * @param target
+	 *            the target file to write
+	 * @param bufferSize
+	 *            the buffersize (>0)
+	 */
+	public IncomingDownload(GetFileMessage sourceFile, Host host, java.io.File target, int bufferSize) {
+		this(sourceFile, host, target);
+		assert bufferSize > 0;
+		this.bufferSize = bufferSize;
+	}
+
+	/**
+	 * Disables the hash-check after the download is complete. This should be
+	 * deactivated for sub-downloads. The flag can't be activated again
+	 */
 	public void DisableIntegrityCheck() {
-		hash = ""; //TODO use checkIntegrity = false instead
+		checkIntegrity = false;
 	}
-
 
 	protected void doTransfer() throws UnsupportedEncodingException {
 		logger.log(Level.INFO, "Starting download");
@@ -78,24 +115,26 @@ public class IncomingDownload extends Transfer implements ITransferProgress {
 		logger.log(Level.INFO, "Connecting to " + partner.getAddress() + ":" + partner.getPort());
 		expectedTransferVolume = sourceFile.getLength() - totalTransferedVolume;
 		assert socket == null;
-		InputStream in = null;
-		OutputStream out = null;
+		InputStream networkInputStream = null;
+		OutputStream networkOutputStream = null;
 		try {
 			socket = new Socket();
 			socket.connect(new InetSocketAddress(partner.getAddress(), partner.getPort()));
 
-			out = socket.getOutputStream();
-			in = socket.getInputStream();
-			out.write(new GetFileMessage(sourceFile.getHash(), offset + totalTransferedVolume, sourceFile.getLength()
-					- totalTransferedVolume).Serialize().getBytes(Message.ENCODING));
-			out.flush();
+			networkOutputStream = socket.getOutputStream();
+			networkInputStream = socket.getInputStream();
+			String request = new GetFileMessage(sourceFile.getHash(), offset + totalTransferedVolume,
+					sourceFile.getLength() - totalTransferedVolume).Serialize();
+			networkOutputStream.write(request.getBytes(Message.ENCODING));
+			networkOutputStream.flush();
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, "could not connect to host '" + e.getMessage() + "'");
 			transferState = TransferStatus.ConnectionFailed;
+			return;
 		}
 
 		// check response
-		FileRequestResponseMessage rsp = handleResponse(in);
+		FileRequestResponseMessage rsp = handleResponse(networkInputStream);
 		if (rsp != null && transferState == TransferStatus.Connecting) {
 			rsp.setSource(new InetSocketAddress(partner.getAddress(), partner.getPort()));
 			sendMessageToObservers(rsp);
@@ -129,15 +168,32 @@ public class IncomingDownload extends Transfer implements ITransferProgress {
 
 		// Transfer bytes
 		transferState = TransferStatus.Transfering;
-		int next; // TODO make buffer bigger than 1 byte
 		keepTransferAlive = true;
+		int bytesRead;
+		byte buffer[] = new byte[bufferSize];
 		long transferedVolume = 0;
 		try {
-			while (transferedVolume < expectedTransferVolume && (next = in.read()) != -1 && keepTransferAlive) {
-				totalTransferedVolume++;
-				transferedVolume++;
+			while (transferedVolume < expectedTransferVolume && (bytesRead = networkInputStream.read(buffer)) != -1
+					&& keepTransferAlive) {
+				if (bytesRead + transferedVolume > expectedTransferVolume) {
+					logger.log(Level.INFO, "cutting some of last bytes: Reduce " + bytesRead + " to "
+							+ (expectedTransferVolume - transferedVolume));
+					bytesRead = (int) (expectedTransferVolume - transferedVolume); // that's
+																					// ok
+																					// because
+																					// bufferSize
+																					// is
+																					// int
+																					// as
+																					// well
+				}
 				try {
-					targetFilestream.write(next);
+					targetFilestream.write(buffer, 0, bytesRead);
+					totalTransferedVolume += bytesRead; // this has to be AFTER
+														// the write process ->
+														// recovery after IO
+														// exceptions
+					transferedVolume += bytesRead;
 				} catch (IOException e) {
 					logger.log(Level.SEVERE, "Could not write into target file: " + e.getMessage());
 					transferState = TransferStatus.LocalIOError;
@@ -175,7 +231,8 @@ public class IncomingDownload extends Transfer implements ITransferProgress {
 	 */
 	private void closeSocket() {
 		try {
-			socket.close();
+			if (socket != null)
+				socket.close();
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, "Could not close network socket: " + e.getMessage());
 		}
@@ -216,7 +273,7 @@ public class IncomingDownload extends Transfer implements ITransferProgress {
 	 * @param targetPath
 	 */
 	protected void integrityCheck(File targetPath) {
-		if (getExpectedHash() == "") {
+		if (!checkIntegrity) {
 			transferState = TransferStatus.Finished;
 		} else {
 			try {
@@ -268,10 +325,18 @@ public class IncomingDownload extends Transfer implements ITransferProgress {
 			String str_expectedTransferVolume = "";
 			int next;
 			try {
-				while ((next = in.read()) != -1 && next != Message.MESSAGE_SPERATOR)
-					str_expectedTransferVolume += new String(new byte[] { (byte) next }, Message.ENCODING);
+				while ((next = in.read()) != Message.MESSAGE_SPERATOR)
+					if (next == -1) {
+						Thread.sleep(500);
+					} else {
+						str_expectedTransferVolume += new String(new byte[] { (byte) next }, Message.ENCODING);
+					}
 			} catch (IOException e) {
 				logger.log(Level.SEVERE, "Could not understand 'expected transfer volume' in response");
+				transferState = TransferStatus.LostConnection;
+				return null;
+			} catch(InterruptedException e) {
+				logger.log(Level.SEVERE, "Could not wait for response head");
 				transferState = TransferStatus.LostConnection;
 				return null;
 			}
@@ -280,8 +345,8 @@ public class IncomingDownload extends Transfer implements ITransferProgress {
 				return new FileRequestResponseMessage(FileRequestResponseMessage.ResponseCode.OK,
 						expectedTransferVolume);
 			} catch (NumberFormatException ex) {
-				logger
-						.log(Level.SEVERE, "Response contained invalid 'expected transfer volume' - assuming 'TRY AGAIN LATER'");
+				logger.log(Level.SEVERE,
+						"Response contained invalid 'expected transfer volume' - assuming 'TRY AGAIN LATER'");
 				return try_again;
 			}
 		case FileRequestResponseMessage.TYPE_FIELD + Message.FIELD_SEPERATOR + "TRY":
@@ -298,7 +363,7 @@ public class IncomingDownload extends Transfer implements ITransferProgress {
 
 	@Override
 	public void reset() {
-		if(isActive()) {
+		if (isActive()) {
 			logger.log(Level.SEVERE, "Can't reset an active transfer. Cancel it before");
 			return;
 		}
@@ -309,7 +374,7 @@ public class IncomingDownload extends Transfer implements ITransferProgress {
 
 	@Override
 	public void resumeTransfer() {
-		if(isActive()) {
+		if (isActive()) {
 			logger.log(Level.SEVERE, "Can't resume an active transfer. Cancel it before");
 			return;
 		}
@@ -323,24 +388,25 @@ public class IncomingDownload extends Transfer implements ITransferProgress {
 			logger.log(Level.SEVERE, "target filestream doesn't exist anymore!");
 			transferState = TransferStatus.LocalIOError;
 		}
-		
+
 		self = getCreateOwnThread();
 		self.start();
 	}
-	
-	
+
 	public void start() {
 		self = getCreateOwnThread();
 		self.start();
 	}
-	
+
 	private Thread getCreateOwnThread() {
 		Thread t = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
 				try {
-					if(transferState == TransferStatus.AssembleParts || transferState == TransferStatus.CheckingHash || transferState == TransferStatus.Connecting || transferState == TransferStatus.Finished || transferState == TransferStatus.Transfering)
+					if (transferState == TransferStatus.AssembleParts || transferState == TransferStatus.CheckingHash
+							|| transferState == TransferStatus.Connecting || transferState == TransferStatus.Finished
+							|| transferState == TransferStatus.Transfering)
 						logger.log(Level.SEVERE, "Can't start download, state is " + transferState);
 					else {
 						keepTransferAlive = true;
@@ -356,7 +422,6 @@ public class IncomingDownload extends Transfer implements ITransferProgress {
 		});
 		return t;
 	}
-	
 
 	@Override
 	public void cancel() {
@@ -367,6 +432,5 @@ public class IncomingDownload extends Transfer implements ITransferProgress {
 	public String getTargetFile() {
 		return targetFile.getName();
 	}
-
 
 }

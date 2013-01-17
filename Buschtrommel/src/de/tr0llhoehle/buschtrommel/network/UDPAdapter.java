@@ -18,7 +18,7 @@ import de.tr0llhoehle.buschtrommel.models.Message;
  *
  */
 public class UDPAdapter extends MessageMonitor {
-	public final static int DEFAULT_PORT = 7474;
+	public final static int DEFAULT_PORT = 4747;
 	private final static String MULTICAST_ADDRESS_V4 = "239.255.0.113";
 	private final static String MULTICAST_ADDRESS_V6 = "ff05::7171";
 
@@ -26,13 +26,17 @@ public class UDPAdapter extends MessageMonitor {
 	private Inet6Address multicastv6Group;
 	private MulticastSocket multicastSocket;
 	private boolean running;
+	private int receive_port;
+	private int send_port;
 
 	private Thread receiveThread;
 
-	public UDPAdapter() throws IOException {
+	public UDPAdapter(int listenPort, int sendPort) throws IOException {
 
 		this.multicastv4Group = (Inet4Address) Inet4Address.getByName(MULTICAST_ADDRESS_V4);
 		this.multicastv6Group = (Inet6Address) Inet6Address.getByName(MULTICAST_ADDRESS_V6);
+		this.receive_port = listenPort;
+		this.send_port = sendPort;
 		this.openConnection();
 
 		receiveThread = new Thread(new Runnable() {
@@ -50,9 +54,13 @@ public class UDPAdapter extends MessageMonitor {
 		this.running = true;
 		receiveThread.start();
 	}
+	
+	public UDPAdapter() throws IOException {
+		this(DEFAULT_PORT, DEFAULT_PORT);
+	}
 
 	private void openConnection() throws IOException {
-		this.multicastSocket = new MulticastSocket(DEFAULT_PORT);
+		this.multicastSocket = new MulticastSocket(receive_port);
 		this.multicastSocket.joinGroup(multicastv4Group);
 		this.multicastSocket.joinGroup(multicastv6Group);
 	}
@@ -95,9 +103,9 @@ public class UDPAdapter extends MessageMonitor {
 	public void sendMulticast(Message message) throws IOException {
 		String data = message.Serialize();
 		DatagramPacket v4Packet = new DatagramPacket(data.getBytes(), data.length(), this.multicastv4Group,
-				DEFAULT_PORT);
+				send_port);
 		DatagramPacket v6Packet = new DatagramPacket(data.getBytes(), data.length(), this.multicastv6Group,
-				DEFAULT_PORT);
+				send_port);
 
 		this.multicastSocket.send(v4Packet);
 		this.multicastSocket.send(v6Packet);
@@ -116,7 +124,7 @@ public class UDPAdapter extends MessageMonitor {
 	 */
 	public void sendUnicast(Message message, Host host) throws IOException {
 		String data = message.Serialize();
-		DatagramPacket packet = new DatagramPacket(data.getBytes(Message.ENCODING), data.length(), host.getAddress(), DEFAULT_PORT);
+		DatagramPacket packet = new DatagramPacket(data.getBytes(Message.ENCODING), data.length(), host.getAddress(), send_port);
 
 		this.multicastSocket.send(packet);
 	}
