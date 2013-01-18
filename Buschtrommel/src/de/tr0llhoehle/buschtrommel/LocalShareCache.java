@@ -97,23 +97,6 @@ public class LocalShareCache {
 
 	}
 
-	protected boolean convertToShares(String shares) {
-		if (shares == null) {
-			return false;
-		}
-		Hashtable<String, LocalShare> temp_shares = new Hashtable<String, LocalShare>();
-		// TODO
-		String[] temp = shares.split("\n");
-		for (String i : temp) {
-			// TODO deserialize
-			LoggerWrapper.logError("Not yet implemented");
-
-			// temp_shares.put("hash", "share");
-		}
-
-		return true;
-
-	}
 
 	protected String convertSharesToString() {
 		StringBuilder allShares = new StringBuilder();
