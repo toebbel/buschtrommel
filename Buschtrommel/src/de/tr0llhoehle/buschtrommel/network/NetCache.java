@@ -242,7 +242,7 @@ public class NetCache implements IMessageObserver {
 			for (String hash : host.getSharedFiles().keySet()) {
 				shareAvailability = host.getSharedFiles().get(hash);
 				tmpTTL = shareAvailability.getTtl();
-				if (tmpTTL <= TTL_REFRESH_RATE) {
+				if (tmpTTL != -1 && tmpTTL <= TTL_REFRESH_RATE) { //TODO: change -1 to infinity value
 					host.removeFileFromSharedFiles(hash);
 					shareAvailability.getFile().removeFileSource(shareAvailability);
 					if (shareAvailability.getFile().noSourcesAvailable()) {
