@@ -33,6 +33,7 @@ public class IncomingFilelistTransfer extends Transfer {
 		hash = "";
 	}
 	
+	
 	@Override
 	public void cancel() {
 		keepTransferAlive = false;

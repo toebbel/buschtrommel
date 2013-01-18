@@ -39,6 +39,40 @@ public class IncomingDownload extends Transfer {
 	Thread self;
 	int bufferSize;
 
+	@Override
+	public void cleanup() {
+		if(transferState == TransferStatus.Cleaned) {
+			logger.log(Level.WARNING, "transfer is already cleaned!");
+			return;
+		}
+		super.cleanup();
+		sourceFile = null;
+
+		try {
+			if (targetFilestream != null)
+				targetFilestream.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		try {
+			if (socket != null)
+				socket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		if(self != null)
+			self.interrupt();
+		
+		if(targetFile != null && targetFile.exists())
+			targetFile.delete();
+		
+		transferState = TransferStatus.Cleaned;
+	}
+
 	/**
 	 * Creates an instance of an incoming file transfer
 	 * 
@@ -341,7 +375,7 @@ public class IncomingDownload extends Transfer {
 				logger.log(Level.SEVERE, "Could not understand 'expected transfer volume' in response");
 				transferState = TransferStatus.LostConnection;
 				return null;
-			} catch(InterruptedException e) {
+			} catch (InterruptedException e) {
 				logger.log(Level.SEVERE, "Could not wait for response head");
 				transferState = TransferStatus.LostConnection;
 				return null;
@@ -400,6 +434,7 @@ public class IncomingDownload extends Transfer {
 	}
 
 	public void start() {
+		assert self == null;
 		self = getCreateOwnThread();
 		self.start();
 	}
@@ -438,5 +473,4 @@ public class IncomingDownload extends Transfer {
 	public String getTargetFile() {
 		return targetFile.getName();
 	}
-
 }
