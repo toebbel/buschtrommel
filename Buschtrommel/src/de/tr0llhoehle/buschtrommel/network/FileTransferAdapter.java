@@ -25,8 +25,8 @@ public class FileTransferAdapter extends MessageMonitor {
 	private ServerSocket listeningSocket;
 	private Thread receiveThread;
 	private boolean keepAlive;
-	private ArrayList<ITransferProgress> outgoingTransfers;
-	private Hashtable<String, ITransferProgress> incomingTransfers;
+	private ArrayList<Transfer> outgoingTransfers;
+	private Hashtable<String, Transfer> incomingTransfers;
 	protected static final int DEFAULT_BUFFER_SIZE = 512;
 
 	/**
@@ -113,7 +113,7 @@ public class FileTransferAdapter extends MessageMonitor {
 				}
 
 				final OutputStream out = s.getOutputStream();
-				ITransferProgress p = null;
+				Transfer p = null;
 				if (m instanceof GetFileMessage) {
 					s.setReceiveBufferSize(DEFAULT_BUFFER_SIZE);
 					OutgoingTransfer transfer = new OutgoingTransfer((GetFileMessage) m, out, myShares,
@@ -154,8 +154,8 @@ public class FileTransferAdapter extends MessageMonitor {
 	 *            local target file
 	 * @return progress interface instance, that is connected with this download
 	 */
-	public ITransferProgress DownloadFile(String hash, Host host, long length, java.io.File target) {
-		ITransferProgress result = new IncomingDownload(new GetFileMessage(hash, 0, length), host, target, DEFAULT_BUFFER_SIZE);
+	public Transfer DownloadFile(String hash, Host host, long length, java.io.File target) {
+		Transfer result = new IncomingDownload(new GetFileMessage(hash, 0, length), host, target, DEFAULT_BUFFER_SIZE);
 		incomingTransfers.put(hash, result);
 		result.RemoveLogHander(new ConsoleHandler());
 		result.start();
@@ -173,7 +173,7 @@ public class FileTransferAdapter extends MessageMonitor {
 	 *            expected length of download
 	 * @return one ITransferProgress that may contain multiple children.
 	 */
-	public ITransferProgress DownloadFile(String hash, List<Host> hosts, long length, java.io.File target) {
+	public Transfer DownloadFile(String hash, List<Host> hosts, long length, java.io.File target) {
 		assert hosts.size() > 0;
 		return DownloadFile(hash, hosts.get(0), length, target); // TODO
 																	// implement
@@ -226,7 +226,7 @@ public class FileTransferAdapter extends MessageMonitor {
 		listeningSocket.close();
 	}
 
-	public ITransferProgress downloadFilelist(Host host) {
+	public Transfer downloadFilelist(Host host) {
 		IncomingFilelistTransfer result = new IncomingFilelistTransfer(host);
 
 		for (IMessageObserver observer : observers)
