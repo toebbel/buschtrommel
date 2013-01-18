@@ -154,7 +154,9 @@ public class NetCache implements IMessageObserver {
 			try {
 				if (this.fileTransferAdapter != null) {
 					Thread.sleep((int) (Math.random() * Config.maximumYoResponseTime) + 5000);
-					fileTransferAdapter.downloadFilelist(host);
+					if(host.getPort() != -1) {
+						fileTransferAdapter.downloadFilelist(host);
+					}
 				} else {
 					LoggerWrapper.logError("Could not find fileTransfer Adapter");
 				}
