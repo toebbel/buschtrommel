@@ -102,7 +102,7 @@ public class NetCache implements IMessageObserver {
 					}
 				}
 
-				// if the share share isn't already associated, associate it
+				// if the share share isn't already associated, associate it;
 				// to
 				// the host
 				else {
@@ -128,7 +128,7 @@ public class NetCache implements IMessageObserver {
 		} else {
 			try {
 				this.udpAdapter.sendUnicast(new PeerDiscoveryMessage(PeerDiscoveryMessage.DiscoveryMessageType.HI,
-						Config.alias, fileTransferAdapter.getPort()), host);
+						Config.alias, fileTransferAdapter.getPort()), host.getAddress());
 			} catch (IOException e) {
 				LoggerWrapper.logError(e.getMessage());
 			}
