@@ -267,6 +267,14 @@ public class Buschtrommel implements IMessageObserver {
 		}
 		fileTransferAdapter.removeCleanedOutgoingDownloads();
 	}
+	
+	/**
+	 * Cleans and removes an incoming transfer!
+	 * @param hash of the transfer to remove
+	 */
+	public void cleanIncomingTransfer(String hash) {
+		fileTransferAdapter.cleanDownloadedTransfer(hash);
+	}
 
 	/**
 	 * Returns all known shares of other hosts

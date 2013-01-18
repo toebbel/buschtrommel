@@ -175,7 +175,7 @@ public class FileTransferAdapter extends MessageMonitor {
 	/**
 	 * Removes an incomging filetransfer.
 	 * 
-	 * If the download has not already been cleaned up, it is canceled and cleaned. The transfer is removed from the list of incoming downloads. Warning! This will remove the target file.
+	 * If the download has not already been cleaned up, it is canceled and cleaned. The transfer is removed from the list of incoming downloads.
 	 * @param hash the hash of the file.
 	 */
 	public void cleanDownloadedTransfer(String hash) {
