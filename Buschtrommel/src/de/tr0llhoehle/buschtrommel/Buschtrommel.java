@@ -61,6 +61,8 @@ public class Buschtrommel implements IMessageObserver {
 		if(cfgFile.exists()) {
 			try {
 				Config.readFromFile(cfgFile);
+				if(Config.alias == null)
+					Config.alias = alias;
 				return;
 			} catch (FileNotFoundException e) {
 				LoggerWrapper.logError("Could not read config file: " + e.getMessage());

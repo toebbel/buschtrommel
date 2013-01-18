@@ -135,9 +135,9 @@ public class UDPAdapter extends MessageMonitor {
 	 *            the specified host.
 	 * @throws IOException
 	 */
-	public void sendUnicast(Message message, Host host) throws IOException {
+	public void sendUnicast(Message message, InetAddress host) throws IOException {
 		String data = message.Serialize();
-		DatagramPacket packet = new DatagramPacket(data.getBytes(Message.ENCODING), data.length(), host.getAddress(),
+		DatagramPacket packet = new DatagramPacket(data.getBytes(Message.ENCODING), data.length(), host,
 				send_port);
 
 		this.multicastSocket.send(packet);
