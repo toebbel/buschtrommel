@@ -21,6 +21,7 @@ public abstract class Transfer extends MessageMonitor implements ITransferProgre
 	protected long offset;
 	protected long totalTransferedVolume;
 	protected boolean keepTransferAlive;
+	protected static final int FALLBACK_BUFFER_SIZE = 256;
 
 	public Transfer(InetSocketAddress partner) {
 		this.partner = partner;

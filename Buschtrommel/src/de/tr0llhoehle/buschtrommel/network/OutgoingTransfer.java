@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -41,7 +42,6 @@ public class OutgoingTransfer extends Transfer {
 	private int bufferSize;
 	Thread transferThread;
 
-
 	/**
 	 * Creates an uploading file transfer of a file
 	 * 
@@ -63,7 +63,7 @@ public class OutgoingTransfer extends Transfer {
 		this.networkOutputStream = out;
 		this.myShares = myShares;
 		this.transferType = TransferType.Outgoing;
-		bufferSize = 1;
+		bufferSize = -1;
 
 		logger = java.util.logging.Logger.getLogger("outgoing " + partner.toString());
 		keepTransferAlive = true;
@@ -200,6 +200,13 @@ public class OutgoingTransfer extends Transfer {
 				networkOutputStream.write((new FileRequestResponseMessage(ResponseCode.OK, expectedTransferVolume)
 						.Serialize()).getBytes(Message.ENCODING));
 
+			// adjust buffer size
+			if (bufferSize == -1) {
+				bufferSize = FALLBACK_BUFFER_SIZE;
+				logger.log(Level.INFO, "Using fallback buffersize " + bufferSize);
+
+			}
+
 			// send the file
 			ressourceInputStream.skip(offset);
 			int bytesRead = 0;
@@ -288,15 +295,15 @@ public class OutgoingTransfer extends Transfer {
 		});
 		transferThread.start();
 	}
-	
+
 	@Override
 	public void cleanup() {
-		if(transferState == TransferStatus.Cleaned) {
+		if (transferState == TransferStatus.Cleaned) {
 			logger.log(Level.WARNING, "transfer is already cleaned!");
 			return;
 		}
 		super.cleanup();
-		
+
 		// remove references
 		myShares = null;
 		requestMessage = null;
@@ -315,8 +322,8 @@ public class OutgoingTransfer extends Transfer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		if(transferThread != null) 
+
+		if (transferThread != null)
 			transferThread.interrupt();
 	}
 }

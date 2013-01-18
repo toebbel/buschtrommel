@@ -88,7 +88,7 @@ public class IncomingDownload extends Transfer {
 		this.partner = new InetSocketAddress(host.getAddress(), host.getPort());
 		logger = java.util.logging.Logger.getLogger("incoming " + hash + " " + partner.toString());
 		transferType = TransferType.Singlesource;
-		bufferSize = 1;
+		bufferSize = -1;
 
 		// file request
 		this.sourceFile = sourceFile;
@@ -113,7 +113,7 @@ public class IncomingDownload extends Transfer {
 	 * @param target
 	 *            the target file to write
 	 * @param bufferSize
-	 *            the buffersize (>0)
+	 *            the buffersize (>0) or -1 to detect automatically
 	 */
 	public IncomingDownload(GetFileMessage sourceFile, Host host, java.io.File target, int bufferSize) {
 		this(sourceFile, host, target);
@@ -200,12 +200,17 @@ public class IncomingDownload extends Transfer {
 			expectedTransferVolume = rsp.getExpectedVolume();
 		}
 
-		// Transfer bytes
-		try {
-			socket.setReceiveBufferSize(bufferSize);
-		} catch (SocketException e1) {
-			logger.log(Level.INFO, "could not resize receive buffer size :-(");
+		// adjust buffer size
+		if(bufferSize == -1) {
+			try {
+				bufferSize = socket.getReceiveBufferSize();
+			} catch (SocketException e1) {
+				bufferSize = FALLBACK_BUFFER_SIZE;
+				logger.log(Level.INFO, "could not resize receive buffer size :-( Using fallback: " + bufferSize);
+			}
 		}
+		
+		//transfer bytes
 		transferState = TransferStatus.Transfering;
 		keepTransferAlive = true;
 		int bytesRead;
