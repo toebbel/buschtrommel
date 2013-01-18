@@ -664,6 +664,13 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	private void removeShareActionPerformed1(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_removeShareActionPerformed1
 	}// GEN-LAST:event_removeShareActionPerformed1
 
+	public static String humanReadableByteCount(long bytes, boolean si) {
+	    int unit = si ? 1000 : 1024;
+	    if (bytes < unit) return bytes + " B";
+	    int exp = (int) (Math.log(bytes) / Math.log(unit));
+	    String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp-1) + (si ? "" : "i");
+	    return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+	}
 	private void addShareActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_addShareActionPerformed
 
 		// jFileChooser1.setCurrentDirectory(null);
@@ -675,8 +682,10 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 			// try {
 			// What to do with the file, e.g. display it in a TextArea
 			// textarea.read( new FileReader( file.getAbsolutePath() ), null );
-
-			sharesModel.addShare(file.getName(), file.getAbsolutePath(), String.valueOf(file.length()), defaultTtl);
+			String size = humanReadableByteCount(file.length(), true);
+			//String.valueOf(file.length())
+			
+			sharesModel.addShare(file.getName(), file.getAbsolutePath(), size, defaultTtl);
 			// System.out.println(file.getAbsolutePath());
 			// System.out.println( new FileReader( file.getAbsolutePath() ),
 			// null );
@@ -870,8 +879,12 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	private javax.swing.JButton saveSettings;
 	private javax.swing.JButton selectDownloadFolder;
 
+	
+	
 	// End of variables declaration//GEN-END:variables
 
+	
+	
 	@Override
 	public void newHostDiscovered(Host host) {
 		tablemodel.newHostDiscovered(host);
@@ -909,6 +922,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
 	@Override
 	public void updatedTTL(ShareAvailability file) {
-		throw new UnsupportedOperationException("Not supported yet.");
+		//throw new UnsupportedOperationException("Not supported yet.");
+		tablemodel.updatedTTL(file);
 	}
 }

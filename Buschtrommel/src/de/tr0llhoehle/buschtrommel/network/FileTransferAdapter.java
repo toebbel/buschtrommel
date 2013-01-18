@@ -114,11 +114,13 @@ public class FileTransferAdapter extends MessageMonitor {
 				final OutputStream out = s.getOutputStream();
 				ITransferProgress p = null;
 				if (m instanceof GetFileMessage) {
+					s.setReceiveBufferSize(DEFAULT_BUFFER_SIZE);
 					OutgoingTransfer transfer = new OutgoingTransfer((GetFileMessage) m, out, myShares,
 							new InetSocketAddress(s.getInetAddress(), s.getPort()), DEFAULT_BUFFER_SIZE);
 					transfer.start();
 					p = transfer;
 				} else if (m instanceof GetFilelistMessage) {
+					s.setReceiveBufferSize(DEFAULT_BUFFER_SIZE);
 					OutgoingTransfer transfer = new OutgoingTransfer((GetFilelistMessage) m, out, myShares,
 							new InetSocketAddress(s.getInetAddress(), s.getPort()),DEFAULT_BUFFER_SIZE);
 					transfer.start();
