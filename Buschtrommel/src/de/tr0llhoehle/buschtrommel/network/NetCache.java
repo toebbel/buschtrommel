@@ -127,8 +127,10 @@ public class NetCache implements IMessageObserver {
 			}
 		} else {
 			try {
-				this.udpAdapter.sendUnicast(new PeerDiscoveryMessage(PeerDiscoveryMessage.DiscoveryMessageType.HI,
-						Config.alias, fileTransferAdapter.getPort()), host);
+				if (this.udpAdapter != null) {
+					this.udpAdapter.sendUnicast(new PeerDiscoveryMessage(PeerDiscoveryMessage.DiscoveryMessageType.HI,
+							Config.alias, fileTransferAdapter.getPort()), host);
+				}
 			} catch (IOException e) {
 				LoggerWrapper.logError(e.getMessage());
 			}
@@ -207,7 +209,7 @@ public class NetCache implements IMessageObserver {
 	 */
 	public Host getOrCreateHost(InetAddress address) {
 		Host host = new Host(address, "foo", -1);
-		if (this.knownHosts.contains(address)) {
+		if (this.knownHosts.containsKey(address)) {
 
 			host = this.knownHosts.get(address);
 			host.Seen();
@@ -227,7 +229,7 @@ public class NetCache implements IMessageObserver {
 	}
 
 	public boolean shareExists(String hash) {
-		return knownShares.get(hash) != null;
+		return knownShares.containsKey(hash);
 	}
 
 	private void checkTTL() {

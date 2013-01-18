@@ -42,13 +42,28 @@ public class TestNetCache {
 	}
 
 	@Test
-	public void testFileAnnouncment() throws UnknownHostException {
+	public void testFileAnnouncment() throws UnknownHostException, InterruptedException {
 		NetCache tmp = new NetCache(null, null, null);
+		
+		PeerDiscoveryMessage peermessage = new PeerDiscoveryMessage(PeerDiscoveryMessage.DiscoveryMessageType.HI, "troll",
+				1234);
+		peermessage.setSource(new InetSocketAddress(InetAddress.getByName("localhost"), 4747));
+		
 		Host host = new Host(InetAddress.getByName("localhost"), "troll", 1234);
+		
+		tmp.receiveMessage(peermessage);
+		
+		Thread.currentThread().sleep(100);
+		
 		LocalShare share = new LocalShare("testhash", 42, 600, "katze", "katzenbilder!!!", "/home/katze.jpg");
+		
 		FileAnnouncementMessage message = new FileAnnouncementMessage(share);
+		
 		message.setSource(new InetSocketAddress(InetAddress.getByName("localhost"), 4747));
+		
 		tmp.receiveMessage(message);
+		
+		Thread.currentThread().sleep(100);
 
 		assertTrue(tmp.hostExists(host.getAddress()));
 		
