@@ -57,6 +57,7 @@ public class LocalSharesTableModel extends AbstractTableModel {
 		} else
 			return null;
 	}
+	
 
 	public void addShare(String name, String path, String size, String ttl) {
 		if (path == null) {
