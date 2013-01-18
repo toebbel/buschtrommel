@@ -572,10 +572,8 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 			String name = tablemodel.getValueAt(i, 0);
 			if (buschtrommel != null) {
 				Host host = null;
-				try {
-					host = buschtrommel.getHosts().get(java.net.InetAddress.getByName(ip));
-				} catch (UnknownHostException e) {
-				}
+				host = buschtrommel.getHosts().get(ip);
+
 				if(host == null) {
 					LoggerWrapper.logError("Can't start download - the host is unknown");
 					return;

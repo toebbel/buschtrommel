@@ -75,7 +75,7 @@ public class FilesTableModel extends AbstractTableModel {
         eintragVector[0] = avail.getDisplayName();
         eintragVector[1] = avail.getMeta();
         eintragVector[3] = avail.getHost().getDisplayName();
-        eintragVector[4] = avail.getHost().getAddress().toString();
+        eintragVector[4] = avail.getHost().getAddress().getHostAddress();
         
         eintragVector[6] = String.valueOf(avail.getTtl());
         //get a share
