@@ -36,6 +36,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.List;
@@ -572,7 +573,9 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 			String name = tablemodel.getValueAt(i, 0);
 			if (buschtrommel != null) {
 				Host host = null;
-				host = buschtrommel.getHosts().get(ip);
+				try {
+					host = buschtrommel.getHosts().get(InetAddress.getByName(ip));
+				} catch (UnknownHostException e) {}
 
 				if(host == null) {
 					LoggerWrapper.logError("Can't start download - the host is unknown");
