@@ -171,8 +171,8 @@ public class FilesTableModel extends AbstractTableModel {
 			}
 		}
 		shares.removeAll(ids);
-		this.fireTableStructureChanged();
-		//this.fireTableDataChanged();
+		//this.fireTableStructureChanged();
+		this.fireTableDataChanged();
 	}
 
 	void newHostDiscovered(Host host) {
