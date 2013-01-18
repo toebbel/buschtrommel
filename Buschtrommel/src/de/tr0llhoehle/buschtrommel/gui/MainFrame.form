@@ -41,7 +41,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jTabbedPane1" pref="800" max="32767" attributes="0"/>
+              <Component id="jTabbedPane1" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -164,11 +164,11 @@
                       <Component id="jScrollPane2" pref="655" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                              <Component id="removeShare" max="32767" attributes="1"/>
-                              <Component id="addShare" alignment="0" max="32767" attributes="1"/>
+                          <Component id="addShare" alignment="0" min="-2" max="-2" attributes="1"/>
+                          <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
+                              <Component id="removeShare" alignment="0" max="32767" attributes="1"/>
+                              <Component id="activateShare" alignment="0" max="32767" attributes="1"/>
                           </Group>
-                          <Component id="activateShare" min="-2" max="-2" attributes="1"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
