@@ -82,16 +82,16 @@ public class NetCache implements IMessageObserver {
 	}
 
 	private void fileAnnouncmentHandler(FileAnnouncementMessage message) {
-		Host host = new Host(message.getSource().getAddress(), message.getSource().getHostName(), 0);
+
 		int ttl = message.getFile().getTTL();
 		String hash = message.getFile().getHash();
 
-		boolean foundHost = this.hostExists(host);
+		Host host = this.getOrCreateHost(message.getSource().getAddress());
 
-		if (foundHost) {
+		if (host.getPort() != -1) {
 			if (this.knownShares.containsKey(hash)) {
 				RemoteShare tempShare = this.knownShares.get(hash);
-				
+
 				// if the share is already associated to the host, just
 				// update
 				// ttl
@@ -132,13 +132,13 @@ public class NetCache implements IMessageObserver {
 			} catch (IOException e) {
 				LoggerWrapper.logError(e.getMessage());
 			}
-			
+
 		}
 	}
 
 	private void peerDiscoveryHandler(PeerDiscoveryMessage message) {
-		Host host = new Host(message.getSource().getAddress(), message.getSource().getHostName(), message.getPort());
-		if (this.hostExists(host)) {
+		Host host = this.getOrCreateHost(message.getSource().getAddress());
+		if (host.getPort() != -1) {
 			// update values
 			host.setDisplayName(message.getAlias());
 			host.setPort(message.getPort());
@@ -169,8 +169,8 @@ public class NetCache implements IMessageObserver {
 	}
 
 	private void byeHandler(ByeMessage message) {
-		Host host = new Host(message.getSource().getAddress(), message.getSource().getHostName(), 0);
-		if (this.hostExists(host)) {
+		Host host = this.getOrCreateHost(message.getSource().getAddress());
+		if (host.getPort() != -1) {
 			RemoteShare tmp;
 			if (this.guiCallbacks != null) {
 				this.guiCallbacks.hostWentOffline(host);
@@ -195,24 +195,24 @@ public class NetCache implements IMessageObserver {
 	}
 
 	/**
-	 * Checks if the specified host already exists. Updates the last seen value
-	 * of the host.
+	 * Checks if the specified host already exists. If yes, returns the host, if
+	 * no, returns dummy host with port = -1.
 	 * 
 	 * Changes the host to the host found in cache!
 	 * 
-	 * @param host
-	 *            the specified host
-	 * @return true if the specified host was found
+	 * @param address the specified InetAddress
+	 * @return the host
 	 */
-	public boolean hostExists(Host host) {
-		for (InetAddress address : this.knownHosts.keySet()) {
-			if (host.equals(this.knownHosts.get(address))) {
-				host = this.knownHosts.get(address);
-				host.Seen();
-				return true;
-			}
+	public Host getOrCreateHost(InetAddress address) {
+		Host host = new Host(address, "foo", -1);
+		if (this.knownHosts.contains(address)) {
+
+			host = this.knownHosts.get(address);
+			host.Seen();
+			return host;
+
 		}
-		return false;
+		return host;
 	}
 
 	/**
