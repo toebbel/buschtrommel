@@ -110,6 +110,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	// <editor-fold defaultstate="collapsed"
 	// <editor-fold defaultstate="collapsed"
 	// <editor-fold defaultstate="collapsed"
+	// <editor-fold defaultstate="collapsed"
 	// desc="Generated Code">//GEN-BEGIN:initComponents
 	private void initComponents() {
 
@@ -340,36 +341,22 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		jPanel4.setLayout(jPanel4Layout);
 		jPanel4Layout.setHorizontalGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 				.addGroup(
-						javax.swing.GroupLayout.Alignment.TRAILING,
 						jPanel4Layout
 								.createSequentialGroup()
-								.addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 704, Short.MAX_VALUE)
+								.addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 700, Short.MAX_VALUE)
 								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 								.addGroup(
 										jPanel4Layout
-												.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-												.addGroup(
-														jPanel4Layout
-																.createParallelGroup(
-																		javax.swing.GroupLayout.Alignment.LEADING,
-																		false)
-																.addComponent(resumeTransfer,
-																		javax.swing.GroupLayout.DEFAULT_SIZE,
-																		javax.swing.GroupLayout.DEFAULT_SIZE,
-																		Short.MAX_VALUE)
-																.addComponent(resetTransfer,
-																		javax.swing.GroupLayout.DEFAULT_SIZE,
-																		javax.swing.GroupLayout.DEFAULT_SIZE,
-																		Short.MAX_VALUE)
-																.addComponent(abortTransfer,
-																		javax.swing.GroupLayout.DEFAULT_SIZE,
-																		javax.swing.GroupLayout.DEFAULT_SIZE,
-																		Short.MAX_VALUE))
-												.addComponent(removeTransfer,
-														javax.swing.GroupLayout.Alignment.TRAILING,
-														javax.swing.GroupLayout.DEFAULT_SIZE,
+												.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+												.addComponent(removeTransfer, javax.swing.GroupLayout.DEFAULT_SIZE, 82,
+														Short.MAX_VALUE)
+												.addComponent(resumeTransfer, javax.swing.GroupLayout.DEFAULT_SIZE,
+														javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+												.addComponent(resetTransfer, javax.swing.GroupLayout.DEFAULT_SIZE,
+														javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+												.addComponent(abortTransfer, javax.swing.GroupLayout.DEFAULT_SIZE,
 														javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-								.addContainerGap()));
+								.addGap(4, 4, 4)));
 		jPanel4Layout
 				.setVerticalGroup(jPanel4Layout
 						.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
