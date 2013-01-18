@@ -176,6 +176,7 @@ public class FilesTableModel extends AbstractTableModel {
 		// throw new UnsupportedOperationException("Not yet implemented");
 	}
 
+
 	public synchronized void updatedTTL(ShareAvailability file) {
 		for (String[] col : shares) {
 			// "Filename", "Meta-Information", "Size", "Host-Name","IP", "Hash",

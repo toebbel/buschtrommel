@@ -22,12 +22,15 @@ import de.tr0llhoehle.buschtrommel.network.IncomingDownload;
 import de.tr0llhoehle.buschtrommel.network.OutgoingTransfer;
 import de.tr0llhoehle.buschtrommel.test.mockups.ITransferMock;
 
+import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
 
 import java.awt.Component;
 import java.awt.Window.Type;
@@ -57,6 +60,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	private LocalSharesTableModel sharesModel = new LocalSharesTableModel();
 	private String downloadPath = "~/Downloads";
 	private String defaultTtl = "-1";
+	private JTextField textfield;
 
 	/**
 	 * Creates new form MainFrame
@@ -74,9 +78,11 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 			Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
 		}
 		filesHostsTable.setAutoCreateRowSorter(true);
+
 		localSharesTable.setModel(sharesModel);
 		localSharesTable.setAutoCreateRowSorter(true);
 		downloadFolder.setText(downloadPath);
+		
 		// filesHostsTable.setModel(tablemodel);
 		// tablemodel.addMock("bla", "meta-information", "42", "üch", "ff::ff",
 		// "trölf", "-1");

@@ -26,7 +26,14 @@ public class LocalSharesTableModel extends AbstractTableModel {
 	public String getColumnName(int col) {
 		return names[col].toString();
 	}
-
+    public void setValueAt(Object value, int row, int column) {
+    	//TODO validity check and so on
+    	//System.out.println("changing meta");
+    	
+        shares.get(row)[column]=(String)value;
+        this.fireTableCellUpdated(row, column);
+      }
+	
 	public Class getColumnClass(int columnIndex) {
 		// return types [columnIndex];
 		return java.lang.String.class;
