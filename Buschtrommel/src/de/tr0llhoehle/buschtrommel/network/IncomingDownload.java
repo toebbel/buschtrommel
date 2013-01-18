@@ -41,6 +41,8 @@ public class IncomingDownload extends Transfer {
 
 	@Override
 	public void cleanup() {
+		if(transferState != TransferStatus.Finished &&targetFile != null && targetFile.exists())
+			targetFile.delete();
 		if(transferState == TransferStatus.Cleaned) {
 			logger.log(Level.WARNING, "transfer is already cleaned!");
 			return;
@@ -66,9 +68,6 @@ public class IncomingDownload extends Transfer {
 		
 		if(self != null)
 			self.interrupt();
-		
-		if(targetFile != null && targetFile.exists())
-			targetFile.delete();
 		
 		transferState = TransferStatus.Cleaned;
 	}
