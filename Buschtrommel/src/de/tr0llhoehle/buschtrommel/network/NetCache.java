@@ -138,7 +138,7 @@ public class NetCache implements IMessageObserver {
 
 	private void peerDiscoveryHandler(PeerDiscoveryMessage message) {
 		Host host = this.getOrCreateHost(message.getSource().getAddress());
-		if (host.getPort() != -1) {
+		if (host.getPort() == -1) {
 			// update values
 			host.setDisplayName(message.getAlias());
 			host.setPort(message.getPort());
