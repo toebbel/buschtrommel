@@ -18,22 +18,27 @@ import de.tr0llhoehle.buschtrommel.network.NetCache;
 public class TestNetCache {
 
 	@Test
-	public void testHostExists() throws UnknownHostException {
+	public void testHostExists() throws UnknownHostException, InterruptedException {
 		NetCache tmp = new NetCache(null, null, null);
 		Host host = new Host(InetAddress.getByName("localhost"), "troll", 1234);
 		PeerDiscoveryMessage message = new PeerDiscoveryMessage(PeerDiscoveryMessage.DiscoveryMessageType.HI, "troll",
 				1234);
 
-		//assertFalse(tmp.hostExists(host));
+		assertFalse(tmp.hostExists(host.getAddress()));
 
 		message.setSource(new InetSocketAddress(InetAddress.getByName("localhost"), 4747));
+		
 		tmp.receiveMessage(message);
 
-		//assertTrue(tmp.hostExists(host));
+		Thread.currentThread().sleep(100);
+		
+		assertTrue(tmp.hostExists(host.getAddress()));
 
 		tmp.removeHost(host);
+		
+		Thread.currentThread().sleep(100);
 
-		//assertFalse(tmp.hostExists(host));
+		assertFalse(tmp.hostExists(host.getAddress()));
 	}
 
 	@Test
@@ -45,7 +50,7 @@ public class TestNetCache {
 		message.setSource(new InetSocketAddress(InetAddress.getByName("localhost"), 4747));
 		tmp.receiveMessage(message);
 
-		//assertTrue(tmp.hostExists(host));
+		assertTrue(tmp.hostExists(host.getAddress()));
 		
 		assertTrue(tmp.shareExists("testhash"));
 	}

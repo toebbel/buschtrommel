@@ -138,11 +138,10 @@ public class NetCache implements IMessageObserver {
 
 	private void peerDiscoveryHandler(PeerDiscoveryMessage message) {
 		Host host = this.getOrCreateHost(message.getSource().getAddress());
-		if (host.getPort() == -1) {
-			// update values
-			host.setDisplayName(message.getAlias());
-			host.setPort(message.getPort());
-		} else {
+		boolean found = host.getPort() != -1;
+		host.setDisplayName(message.getAlias());
+		host.setPort(message.getPort());
+		if (!found) {
 			// add new host
 			this.knownHosts.put(host.getAddress(), host);
 			if (this.guiCallbacks != null) {
@@ -154,7 +153,7 @@ public class NetCache implements IMessageObserver {
 			try {
 				if (this.fileTransferAdapter != null) {
 					Thread.sleep((int) (Math.random() * Config.maximumYoResponseTime) + 5000);
-					if(host.getPort() != -1) {
+					if (host.getPort() != -1) {
 						fileTransferAdapter.downloadFilelist(host);
 					}
 				} else {
@@ -202,7 +201,8 @@ public class NetCache implements IMessageObserver {
 	 * 
 	 * Changes the host to the host found in cache!
 	 * 
-	 * @param address the specified InetAddress
+	 * @param address
+	 *            the specified InetAddress
 	 * @return the host
 	 */
 	public Host getOrCreateHost(InetAddress address) {
@@ -254,6 +254,10 @@ public class NetCache implements IMessageObserver {
 			}
 		}
 
+	}
+
+	public boolean hostExists(InetAddress address) {
+		return this.knownHosts.containsKey(address);
 	}
 
 }
