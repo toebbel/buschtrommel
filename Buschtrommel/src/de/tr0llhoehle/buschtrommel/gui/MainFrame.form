@@ -41,7 +41,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="jTabbedPane1" max="32767" attributes="0"/>
+              <Component id="jTabbedPane1" pref="800" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -258,14 +258,17 @@
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="1" attributes="0">
-                      <Component id="jScrollPane1" pref="706" max="32767" attributes="0"/>
+                      <Component id="jScrollPane1" pref="704" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="resumeTransfer" max="32767" attributes="0"/>
-                          <Component id="resetTransfer" alignment="0" max="32767" attributes="0"/>
-                          <Component id="abortTransfer" alignment="0" max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                              <Component id="resumeTransfer" max="32767" attributes="0"/>
+                              <Component id="resetTransfer" alignment="0" max="32767" attributes="0"/>
+                              <Component id="abortTransfer" alignment="0" max="32767" attributes="0"/>
+                          </Group>
+                          <Component id="removeTransfer" alignment="1" max="32767" attributes="0"/>
                       </Group>
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -280,6 +283,8 @@
                               <Component id="resetTransfer" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="resumeTransfer" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="removeTransfer" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                           <Component id="jScrollPane1" alignment="0" pref="631" max="32767" attributes="0"/>
@@ -312,7 +317,7 @@
             </Container>
             <Component class="javax.swing.JButton" name="abortTransfer">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Abort"/>
+                <Property name="text" type="java.lang.String" value="Cancel"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="abortTransferActionPerformed"/>
@@ -332,6 +337,14 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="resumeTransferActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JButton" name="removeTransfer">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Remove"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="removeTransferActionPerformed"/>
               </Events>
             </Component>
           </SubComponents>

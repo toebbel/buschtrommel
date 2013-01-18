@@ -77,4 +77,10 @@ public abstract class Transfer extends MessageMonitor implements ITransferProgre
 	public boolean isActive() {
 		return keepTransferAlive;
 	}
+	
+	@Override
+	public void cleanup() {
+		// TODO Auto-generated method stub
+		
+	}
 }

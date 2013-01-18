@@ -150,5 +150,7 @@ public interface ITransferProgress {
 		InvalidContent,
 		Canceled
 	}
+
+	public void cleanup();
 }
 
