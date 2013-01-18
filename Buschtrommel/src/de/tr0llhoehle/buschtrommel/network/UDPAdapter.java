@@ -42,10 +42,38 @@ public class UDPAdapter extends MessageMonitor {
 
 	private Thread receiveThread;
 
-	public UDPAdapter(int listenPort, int sendPort) throws IOException {
+	/**
+	 * Creates an instance of UDP adapter, that listens on the default port and uses IPv4 and IPv6.
+	 * @throws IOException
+	 */
+	public UDPAdapter() throws IOException {
+		this(DEFAULT_PORT, DEFAULT_PORT);
+	}
 
-		this.multicastv4Group = (Inet4Address) Inet4Address.getByName(MULTICAST_ADDRESS_V4);
-		this.multicastv6Group = (Inet6Address) Inet6Address.getByName(MULTICAST_ADDRESS_V6);
+	/**
+	 * Creates an instance of UDP adapter, that listens on given ports and uses IPv4 and IPv6
+	 * @param listenPort the port to listen to
+	 * @param sendPort the port to send on (can be the same as listen port)
+	 * @throws IOException
+	 */
+	public UDPAdapter(int listenPort, int sendPort) throws IOException {
+		this(listenPort, sendPort, true, true);
+	}
+
+	/**
+	 * Creates an instance of UDP adapter, that listens on the given ports and uses IPv4 and/or IPv6
+	 * @param listenPort the port to listen to
+	 * @param sendPort the port to send in (can be the same as listen port)
+	 * @param ipv4 true to use IPv4. Either IPv4 or IPv6 or both have to be set.
+	 * @param ipv6 true to use IPv6. Either IPv4 or IPv6 or both have to be set.
+	 * @throws IOException
+	 */
+	public UDPAdapter(int listenPort, int sendPort, boolean ipv4, boolean ipv6) throws IOException {
+		assert (ipv4 || ipv6);
+		if (ipv4)
+			this.multicastv4Group = (Inet4Address) Inet4Address.getByName(MULTICAST_ADDRESS_V4);
+		if (ipv6)
+			this.multicastv6Group = (Inet6Address) Inet6Address.getByName(MULTICAST_ADDRESS_V6);
 		this.receive_port = listenPort;
 		this.send_port = sendPort;
 		this.localAddresses = this.getAllLocalAddresses();
@@ -67,14 +95,12 @@ public class UDPAdapter extends MessageMonitor {
 		receiveThread.start();
 	}
 
-	public UDPAdapter() throws IOException {
-		this(DEFAULT_PORT, DEFAULT_PORT);
-	}
-
 	private void openConnection() throws IOException {
 		this.multicastSocket = new MulticastSocket(receive_port);
-		this.multicastSocket.joinGroup(multicastv4Group);
-		this.multicastSocket.joinGroup(multicastv6Group);
+		if (multicastv4Group != null)
+			this.multicastSocket.joinGroup(multicastv4Group);
+		if (multicastv6Group != null)
+			this.multicastSocket.joinGroup(multicastv6Group);
 	}
 
 	/**
@@ -84,8 +110,10 @@ public class UDPAdapter extends MessageMonitor {
 	 */
 	public void closeConnection() throws IOException {
 		this.running = false;
-		this.multicastSocket.leaveGroup(multicastv4Group);
-		this.multicastSocket.leaveGroup(multicastv6Group);
+		if (multicastv4Group != null)
+			this.multicastSocket.leaveGroup(multicastv4Group);
+		if (multicastv6Group != null)
+			this.multicastSocket.leaveGroup(multicastv6Group);
 		this.multicastSocket.close();
 	}
 
@@ -116,11 +144,17 @@ public class UDPAdapter extends MessageMonitor {
 	 */
 	public void sendMulticast(Message message) throws IOException {
 		String data = message.Serialize();
-		DatagramPacket v4Packet = new DatagramPacket(data.getBytes(), data.length(), this.multicastv4Group, send_port);
-		DatagramPacket v6Packet = new DatagramPacket(data.getBytes(), data.length(), this.multicastv6Group, send_port);
+		if (multicastv4Group != null) {
+			DatagramPacket v4Packet = new DatagramPacket(data.getBytes(), data.length(), this.multicastv4Group,
+					send_port);
+			this.multicastSocket.send(v4Packet);
+		}
 
-		this.multicastSocket.send(v4Packet);
-		this.multicastSocket.send(v6Packet);
+		if (multicastv6Group != null) {
+			DatagramPacket v6Packet = new DatagramPacket(data.getBytes(), data.length(), this.multicastv6Group,
+					send_port);
+			this.multicastSocket.send(v6Packet);
+		}
 	}
 
 	/**
@@ -137,8 +171,7 @@ public class UDPAdapter extends MessageMonitor {
 	 */
 	public void sendUnicast(Message message, InetAddress host) throws IOException {
 		String data = message.Serialize();
-		DatagramPacket packet = new DatagramPacket(data.getBytes(Message.ENCODING), data.length(), host,
-				send_port);
+		DatagramPacket packet = new DatagramPacket(data.getBytes(Message.ENCODING), data.length(), host, send_port);
 
 		this.multicastSocket.send(packet);
 	}
