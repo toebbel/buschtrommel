@@ -109,6 +109,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	// <editor-fold defaultstate="collapsed"
 	// <editor-fold defaultstate="collapsed"
 	// <editor-fold defaultstate="collapsed"
+	// <editor-fold defaultstate="collapsed"
 	// desc="Generated Code">//GEN-BEGIN:initComponents
 	private void initComponents() {
 
@@ -260,20 +261,22 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 								.addGroup(
 										jPanel3Layout
 												.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+												.addComponent(addShare)
 												.addGroup(
 														jPanel3Layout
 																.createParallelGroup(
-																		javax.swing.GroupLayout.Alignment.LEADING,
+																		javax.swing.GroupLayout.Alignment.TRAILING,
 																		false)
 																.addComponent(removeShare,
+																		javax.swing.GroupLayout.Alignment.LEADING,
 																		javax.swing.GroupLayout.DEFAULT_SIZE,
 																		javax.swing.GroupLayout.DEFAULT_SIZE,
 																		Short.MAX_VALUE)
-																.addComponent(addShare,
+																.addComponent(activateShare,
+																		javax.swing.GroupLayout.Alignment.LEADING,
 																		javax.swing.GroupLayout.DEFAULT_SIZE,
 																		javax.swing.GroupLayout.DEFAULT_SIZE,
-																		Short.MAX_VALUE)).addComponent(activateShare))
-								.addContainerGap()));
+																		Short.MAX_VALUE))).addContainerGap()));
 		jPanel3Layout
 				.setVerticalGroup(jPanel3Layout
 						.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -521,8 +524,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
 		getContentPane().setLayout(layout);
 		layout.setHorizontalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
-				layout.createSequentialGroup().addContainerGap()
-						.addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 800, Short.MAX_VALUE)));
+				layout.createSequentialGroup().addContainerGap().addComponent(jTabbedPane1)));
 		layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
 				layout.createSequentialGroup().addContainerGap().addComponent(jTabbedPane1)));
 

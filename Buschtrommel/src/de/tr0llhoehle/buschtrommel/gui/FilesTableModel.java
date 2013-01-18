@@ -144,15 +144,18 @@ public class FilesTableModel extends AbstractTableModel {
 	// }
 
 	synchronized void removeShare(ShareAvailability file) {
-
+		Vector<String[]> ids = new Vector<String[]>();
 		for (String[] col : shares) {
 			// "Filename", "Meta-Information", "Size", "Host-Name","IP", "Hash",
 			// "TTL"
 			if (col[5].equals(file.getFile().getHash()) && col[4].equals(file.getHost().getAddress().getHostAddress())) {
-				shares.remove(col);
-				this.fireTableDataChanged();
+//				shares.remove(col);
+//				this.fireTableDataChanged();
+				ids.add(col);
 			}
 		}
+		shares.removeAll(ids);
+		this.fireTableStructureChanged();
 		// throw new UnsupportedOperationException("Not yet implemented");
 	}
 
@@ -168,8 +171,8 @@ public class FilesTableModel extends AbstractTableModel {
 			}
 		}
 		shares.removeAll(ids);
-		this.fireTableStructureChanged();
-		//this.fireTableDataChanged();
+		//this.fireTableStructureChanged();
+		this.fireTableDataChanged();
 	}
 
 	void newHostDiscovered(Host host) {
@@ -178,14 +181,17 @@ public class FilesTableModel extends AbstractTableModel {
 
 
 	public synchronized void updatedTTL(ShareAvailability file) {
+		int row = 0;
 		for (String[] col : shares) {
 			// "Filename", "Meta-Information", "Size", "Host-Name","IP", "Hash",
 			// "TTL"
 			if (col[5].equals(file.getFile().getHash()) && col[4].equals(file.getHost().getAddress().getHostAddress())) {
 
 				col[6] = String.valueOf(file.getTtl());
-				this.fireTableDataChanged();
+
 			}
+			row++;
+			this.fireTableCellUpdated(row, 6);
 		}
 
 	}

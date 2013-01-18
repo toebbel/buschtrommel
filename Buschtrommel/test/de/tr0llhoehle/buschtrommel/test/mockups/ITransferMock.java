@@ -124,4 +124,10 @@ public class ITransferMock implements ITransferProgress {
 
 	}
 
+	@Override
+	public void cleanup() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
