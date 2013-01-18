@@ -524,7 +524,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 			// System.out.println("problem accessing file"+file.getAbsolutePath());
 			// }
 		} else {
-			System.out.println("File access cancelled by user.");
+			//System.out.println("File access cancelled by user.");
 		}
 	}
 
@@ -693,7 +693,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 			// System.out.println("problem accessing file"+file.getAbsolutePath());
 			// }
 		} else {
-			System.out.println("File access cancelled by user.");
+			//System.out.println("File access cancelled by user.");
 		}
 	}// GEN-LAST:event_addShareActionPerformed
 
