@@ -965,15 +965,6 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		// throw new UnsupportedOperationException("Not supported yet.");
 	}
 
-	@Override
-	public void fileTransferComplete(ITransferProgress transferProgress) {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
-
-	@Override
-	public void fileTransferFailed(ITransferProgress transferProgress) {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
 
 	@Override
 	public void newShareAvailable(ShareAvailability file) {

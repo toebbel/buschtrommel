@@ -21,6 +21,7 @@ import de.tr0llhoehle.buschtrommel.network.FileTransferAdapter;
 import de.tr0llhoehle.buschtrommel.network.IMessageObserver;
 import de.tr0llhoehle.buschtrommel.network.ITransferProgress;
 import de.tr0llhoehle.buschtrommel.network.NetCache;
+import de.tr0llhoehle.buschtrommel.network.Transfer;
 import de.tr0llhoehle.buschtrommel.network.UDPAdapter;
 
 /**
@@ -138,7 +139,8 @@ public class Buschtrommel implements IMessageObserver {
 			LoggerWrapper.logError("Can't start download: The given filepath is null");
 			return null;
 		}
-		return fileTransferAdapter.DownloadFile(hash, host, s.getLength(), new java.io.File(targetFile));
+		Transfer result = (Transfer) fileTransferAdapter.DownloadFile(hash, host, s.getLength(), new java.io.File(targetFile));
+		return result;
 	}
 
 	/**
@@ -154,7 +156,8 @@ public class Buschtrommel implements IMessageObserver {
 		RemoteShare s = netCache.getShare(hash);
 		if (s == null)
 			return null;
-		return fileTransferAdapter.DownloadFile(hash, s.getHostList(), s.getLength(), new java.io.File(targetFile));
+		Transfer result = (Transfer) fileTransferAdapter.DownloadFile(hash, s.getHostList(), s.getLength(), new java.io.File(targetFile));
+		return result;
 	}
 
 	/**

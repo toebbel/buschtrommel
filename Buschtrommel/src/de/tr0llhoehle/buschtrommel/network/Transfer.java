@@ -3,8 +3,10 @@ package de.tr0llhoehle.buschtrommel.network;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 import java.util.logging.Handler;
 
+import de.tr0llhoehle.buschtrommel.IGUICallbacks;
 import de.tr0llhoehle.buschtrommel.network.ITransferProgress.TransferStatus;
 
 public abstract class Transfer extends MessageMonitor implements ITransferProgress {
@@ -76,11 +78,5 @@ public abstract class Transfer extends MessageMonitor implements ITransferProgre
 	@Override
 	public boolean isActive() {
 		return keepTransferAlive;
-	}
-	
-	@Override
-	public void cleanup() {
-		// TODO Auto-generated method stub
-		
 	}
 }
