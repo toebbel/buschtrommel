@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Handler;
@@ -167,6 +168,11 @@ public class IncomingDownload extends Transfer {
 		}
 
 		// Transfer bytes
+		try {
+			socket.setReceiveBufferSize(bufferSize);
+		} catch (SocketException e1) {
+			logger.log(Level.INFO, "could not resize receive buffer size :-(");
+		}
 		transferState = TransferStatus.Transfering;
 		keepTransferAlive = true;
 		int bytesRead;

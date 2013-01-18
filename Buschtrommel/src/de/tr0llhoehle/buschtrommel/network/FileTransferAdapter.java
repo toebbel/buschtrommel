@@ -26,6 +26,7 @@ public class FileTransferAdapter extends MessageMonitor {
 	private boolean keepAlive;
 	private ArrayList<ITransferProgress> outgoingTransfers;
 	private Hashtable<String, ITransferProgress> incomingTransfers;
+	protected static final int DEFAULT_BUFFER_SIZE = 512;
 
 	/**
 	 * Creates an instance of FileTransferAdapter and opens a listening TCP Port
@@ -113,13 +114,15 @@ public class FileTransferAdapter extends MessageMonitor {
 				final OutputStream out = s.getOutputStream();
 				ITransferProgress p = null;
 				if (m instanceof GetFileMessage) {
+					s.setReceiveBufferSize(DEFAULT_BUFFER_SIZE);
 					OutgoingTransfer transfer = new OutgoingTransfer((GetFileMessage) m, out, myShares,
-							new InetSocketAddress(s.getInetAddress(), s.getPort()));
+							new InetSocketAddress(s.getInetAddress(), s.getPort()), DEFAULT_BUFFER_SIZE);
 					transfer.start();
 					p = transfer;
 				} else if (m instanceof GetFilelistMessage) {
+					s.setReceiveBufferSize(DEFAULT_BUFFER_SIZE);
 					OutgoingTransfer transfer = new OutgoingTransfer((GetFilelistMessage) m, out, myShares,
-							new InetSocketAddress(s.getInetAddress(), s.getPort()));
+							new InetSocketAddress(s.getInetAddress(), s.getPort()),DEFAULT_BUFFER_SIZE);
 					transfer.start();
 					p = transfer;
 				} else {
@@ -149,7 +152,7 @@ public class FileTransferAdapter extends MessageMonitor {
 	 * @return progress interface instance, that is connected with this download
 	 */
 	public ITransferProgress DownloadFile(String hash, Host host, long length, java.io.File target) {
-		ITransferProgress result = new IncomingDownload(new GetFileMessage(hash, 0, length), host, target);
+		ITransferProgress result = new IncomingDownload(new GetFileMessage(hash, 0, length), host, target, DEFAULT_BUFFER_SIZE);
 		incomingTransfers.put(hash, result);
 		result.start();
 		return result;
