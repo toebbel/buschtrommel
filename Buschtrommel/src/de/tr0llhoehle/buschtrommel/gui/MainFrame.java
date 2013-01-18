@@ -70,8 +70,14 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 				MainFrame.class.getResource("/de/tr0llhoehle/buschtrommel/gui/res/djembe.png")));
 		setTitle("Bongo");
 		initComponents();
+		String hostname = String.valueOf(Math.random());
+		try {
+			hostname = java.net.InetAddress.getLocalHost().getHostName();
+		} catch (UnknownHostException e) {
 
-		buschtrommel = new Buschtrommel(this, "Bongo" + Math.random());
+			LoggerWrapper.logError("Couldn't get hostname");
+		}
+		buschtrommel = new Buschtrommel(this, "Bongo@" + hostname);
 		try {
 			buschtrommel.start();
 		} catch (IOException ex) {
@@ -82,7 +88,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		localSharesTable.setModel(sharesModel);
 		localSharesTable.setAutoCreateRowSorter(true);
 		downloadFolder.setText(downloadPath);
-		
+
 		// filesHostsTable.setModel(tablemodel);
 		// tablemodel.addMock("bla", "meta-information", "42", "üch", "ff::ff",
 		// "trölf", "-1");
@@ -530,7 +536,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 			// System.out.println("problem accessing file"+file.getAbsolutePath());
 			// }
 		} else {
-			//System.out.println("File access cancelled by user.");
+			// System.out.println("File access cancelled by user.");
 		}
 	}
 
@@ -581,9 +587,10 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 				Host host = null;
 				try {
 					host = buschtrommel.getHosts().get(InetAddress.getByName(ip));
-				} catch (UnknownHostException e) {}
+				} catch (UnknownHostException e) {
+				}
 
-				if(host == null) {
+				if (host == null) {
 					LoggerWrapper.logError("Can't start download - the host is unknown");
 					return;
 				}
@@ -671,12 +678,14 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	}// GEN-LAST:event_removeShareActionPerformed1
 
 	public static String humanReadableByteCount(long bytes, boolean si) {
-	    int unit = si ? 1000 : 1024;
-	    if (bytes < unit) return bytes + " B";
-	    int exp = (int) (Math.log(bytes) / Math.log(unit));
-	    String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp-1) + (si ? "" : "i");
-	    return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+		int unit = si ? 1000 : 1024;
+		if (bytes < unit)
+			return bytes + " B";
+		int exp = (int) (Math.log(bytes) / Math.log(unit));
+		String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
+		return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
 	}
+
 	private void addShareActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_addShareActionPerformed
 
 		// jFileChooser1.setCurrentDirectory(null);
@@ -689,8 +698,8 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 			// What to do with the file, e.g. display it in a TextArea
 			// textarea.read( new FileReader( file.getAbsolutePath() ), null );
 			String size = humanReadableByteCount(file.length(), true);
-			//String.valueOf(file.length())
-			
+			// String.valueOf(file.length())
+
 			sharesModel.addShare(file.getName(), file.getAbsolutePath(), size, defaultTtl);
 			// System.out.println(file.getAbsolutePath());
 			// System.out.println( new FileReader( file.getAbsolutePath() ),
@@ -699,7 +708,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 			// System.out.println("problem accessing file"+file.getAbsolutePath());
 			// }
 		} else {
-			//System.out.println("File access cancelled by user.");
+			// System.out.println("File access cancelled by user.");
 		}
 	}// GEN-LAST:event_addShareActionPerformed
 
@@ -885,12 +894,8 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	private javax.swing.JButton saveSettings;
 	private javax.swing.JButton selectDownloadFolder;
 
-	
-	
 	// End of variables declaration//GEN-END:variables
 
-	
-	
 	@Override
 	public void newHostDiscovered(Host host) {
 		tablemodel.newHostDiscovered(host);
@@ -928,7 +933,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
 	@Override
 	public void updatedTTL(ShareAvailability file) {
-		//throw new UnsupportedOperationException("Not supported yet.");
+		// throw new UnsupportedOperationException("Not supported yet.");
 		tablemodel.updatedTTL(file);
 	}
 }
