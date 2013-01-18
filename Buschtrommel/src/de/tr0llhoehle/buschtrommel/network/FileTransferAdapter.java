@@ -10,6 +10,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.logging.ConsoleHandler;
 
 import de.tr0llhoehle.buschtrommel.LoggerWrapper;
 import de.tr0llhoehle.buschtrommel.LocalShareCache;
@@ -117,12 +118,14 @@ public class FileTransferAdapter extends MessageMonitor {
 					s.setReceiveBufferSize(DEFAULT_BUFFER_SIZE);
 					OutgoingTransfer transfer = new OutgoingTransfer((GetFileMessage) m, out, myShares,
 							new InetSocketAddress(s.getInetAddress(), s.getPort()), DEFAULT_BUFFER_SIZE);
+					transfer.RemoveLogHander(new ConsoleHandler());
 					transfer.start();
 					p = transfer;
 				} else if (m instanceof GetFilelistMessage) {
 					s.setReceiveBufferSize(DEFAULT_BUFFER_SIZE);
 					OutgoingTransfer transfer = new OutgoingTransfer((GetFilelistMessage) m, out, myShares,
 							new InetSocketAddress(s.getInetAddress(), s.getPort()),DEFAULT_BUFFER_SIZE);
+					transfer.RemoveLogHander(new ConsoleHandler());
 					transfer.start();
 					p = transfer;
 				} else {
@@ -154,6 +157,7 @@ public class FileTransferAdapter extends MessageMonitor {
 	public ITransferProgress DownloadFile(String hash, Host host, long length, java.io.File target) {
 		ITransferProgress result = new IncomingDownload(new GetFileMessage(hash, 0, length), host, target, DEFAULT_BUFFER_SIZE);
 		incomingTransfers.put(hash, result);
+		result.RemoveLogHander(new ConsoleHandler());
 		result.start();
 		return result;
 	}
