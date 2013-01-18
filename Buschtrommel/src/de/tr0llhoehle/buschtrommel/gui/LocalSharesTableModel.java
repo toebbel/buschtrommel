@@ -57,9 +57,8 @@ public class LocalSharesTableModel extends AbstractTableModel {
 		} else
 			return null;
 	}
-	
 
-	public void addShare(String name, String path, String size, String ttl) {
+	public synchronized void addShare(String name, String path, String size, String ttl) {
 		if (path == null) {
 			System.out.print("path is null");
 			return;
@@ -79,12 +78,12 @@ public class LocalSharesTableModel extends AbstractTableModel {
 		this.fireTableDataChanged();
 	}
 
-	public void addMeta(int index, String meta) {
+	public synchronized void addMeta(int index, String meta) {
 		shares.get(index)[1] = meta;
 		this.fireTableDataChanged();
 	}
 
-	void removeShare(int index) {
+	synchronized void removeShare(int index) {
 		if (index < shares.size()) {
 			shares.remove(index);
 			this.fireTableDataChanged();
