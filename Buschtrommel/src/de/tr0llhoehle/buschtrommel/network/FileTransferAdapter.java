@@ -10,6 +10,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Vector;
 import java.util.logging.ConsoleHandler;
 
 import de.tr0llhoehle.buschtrommel.LoggerWrapper;
@@ -18,6 +19,7 @@ import de.tr0llhoehle.buschtrommel.models.GetFileMessage;
 import de.tr0llhoehle.buschtrommel.models.GetFilelistMessage;
 import de.tr0llhoehle.buschtrommel.models.Host;
 import de.tr0llhoehle.buschtrommel.models.Message;
+import de.tr0llhoehle.buschtrommel.network.ITransferProgress.TransferStatus;
 
 public class FileTransferAdapter extends MessageMonitor {
 	private LocalShareCache myShares;
@@ -25,7 +27,7 @@ public class FileTransferAdapter extends MessageMonitor {
 	private ServerSocket listeningSocket;
 	private Thread receiveThread;
 	private boolean keepAlive;
-	private ArrayList<Transfer> outgoingTransfers;
+	private Vector<Transfer> outgoingTransfers;
 	private Hashtable<String, Transfer> incomingTransfers;
 	protected static final int DEFAULT_BUFFER_SIZE = 512;
 
@@ -44,7 +46,7 @@ public class FileTransferAdapter extends MessageMonitor {
 		this.port = port;
 		myShares = s;
 		incomingTransfers = new Hashtable<>();
-		outgoingTransfers = new ArrayList<>();
+		outgoingTransfers = new Vector<>();
 		startListening();
 	}
 
@@ -118,14 +120,14 @@ public class FileTransferAdapter extends MessageMonitor {
 					s.setReceiveBufferSize(DEFAULT_BUFFER_SIZE);
 					OutgoingTransfer transfer = new OutgoingTransfer((GetFileMessage) m, out, myShares,
 							new InetSocketAddress(s.getInetAddress(), s.getPort()), DEFAULT_BUFFER_SIZE);
-					transfer.RemoveLogHander(new ConsoleHandler());
+					transfer.RegisterLogHander(new ConsoleHandler());
 					transfer.start();
 					p = transfer;
 				} else if (m instanceof GetFilelistMessage) {
 					s.setReceiveBufferSize(DEFAULT_BUFFER_SIZE);
 					OutgoingTransfer transfer = new OutgoingTransfer((GetFilelistMessage) m, out, myShares,
-							new InetSocketAddress(s.getInetAddress(), s.getPort()),DEFAULT_BUFFER_SIZE);
-					transfer.RemoveLogHander(new ConsoleHandler());
+							new InetSocketAddress(s.getInetAddress(), s.getPort()), DEFAULT_BUFFER_SIZE);
+					transfer.RegisterLogHander(new ConsoleHandler());
 					transfer.start();
 					p = transfer;
 				} else {
@@ -155,11 +157,48 @@ public class FileTransferAdapter extends MessageMonitor {
 	 * @return progress interface instance, that is connected with this download
 	 */
 	public Transfer DownloadFile(String hash, Host host, long length, java.io.File target) {
+		if (incomingTransfers.containsKey(hash)) {
+			LoggerWrapper.logInfo("The file to download was/is already downloaded/downloading - cancel & clean it");
+			if (incomingTransfers.get(hash).getStatus() != TransferStatus.Cleaned) {
+				incomingTransfers.get(hash).cancel();
+				incomingTransfers.get(hash).cleanup();
+			}
+		}
+
 		Transfer result = new IncomingDownload(new GetFileMessage(hash, 0, length), host, target, DEFAULT_BUFFER_SIZE);
 		incomingTransfers.put(hash, result);
-		result.RemoveLogHander(new ConsoleHandler());
+		result.RegisterLogHander(new ConsoleHandler());
 		result.start();
 		return result;
+	}
+	
+	/**
+	 * Removes an incomging filetransfer.
+	 * 
+	 * If the download has not already been cleaned up, it is canceled and cleaned. The transfer is removed from the list of incoming downloads. Warning! This will remove the target file.
+	 * @param hash the hash of the file.
+	 */
+	public void cleanDownloadedTransfer(String hash) {
+		if (incomingTransfers.containsKey(hash)) {
+			if (incomingTransfers.get(hash).getStatus() != TransferStatus.Cleaned) {
+				incomingTransfers.get(hash).cancel();
+				incomingTransfers.get(hash).cleanup();
+			}
+			incomingTransfers.remove(hash);
+		}
+	}
+	
+	/**
+	 * Removes all outgoing transfers, that are in the cleaned state
+	 */
+	public void removeCleanedOutgoingDownloads() {
+		Vector<ITransferProgress> candidates = new Vector<>();
+		for(ITransferProgress t : outgoingTransfers) {
+			if(t.getStatus() == TransferStatus.Cleaned) {
+				candidates.add(t);
+			}
+		}
+		outgoingTransfers.removeAll(candidates);
 	}
 
 	/**

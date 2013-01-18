@@ -154,7 +154,7 @@ public interface ITransferProgress {
 
 	/**
 	 * Frees all ressources from the transfer and changes state to 'Cleaned'.
-	 * Target files are removed after cleanup.
+	 * Target files are removed after cleanup, if the transfer was not successful (a.k.a. not in state finished).
 	 * Don't call this method, if the transfer could be used by others.
 	 */
 	public void cleanup();

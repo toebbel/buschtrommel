@@ -23,6 +23,7 @@ import de.tr0llhoehle.buschtrommel.network.ITransferProgress;
 import de.tr0llhoehle.buschtrommel.network.NetCache;
 import de.tr0llhoehle.buschtrommel.network.Transfer;
 import de.tr0llhoehle.buschtrommel.network.UDPAdapter;
+import de.tr0llhoehle.buschtrommel.network.ITransferProgress.TransferStatus;
 
 /**
  * The buschtrommel-object is the heart of the application. It manages all
@@ -244,6 +245,27 @@ public class Buschtrommel implements IMessageObserver {
 	 */
 	public ArrayList<ITransferProgress> getOutgoingTransfers() {
 		return fileTransferAdapter.getOutgoingTransfers();
+	}
+	
+	/**
+	 * This method removes all outgoing transfers from the list, that are in cleaned state.
+	 * 
+	 * Transfers that are no longer in progress can be set cleaned as well, if one of the flags is set.
+	 * @param canceled also remove all outgoing transfers that are in canceled state
+	 * @param lostConnection also remove all outgoing transfers that are in lostConnection state
+	 * @param finished also remove all outgoing transfers that are in finished state
+	 */
+	public void cleanOutgoingTransfers(boolean canceled, boolean lostConnection, boolean finished) {
+		for(ITransferProgress t : fileTransferAdapter.getOutgoingTransfers()) {
+			if((t.getStatus() == TransferStatus.Canceled && canceled) || 
+					(t.getStatus() == TransferStatus.LostConnection && lostConnection) || 
+					((t.getStatus() == TransferStatus.Finished) && finished)) {
+				
+				t.cancel();
+				t.cleanup();
+			}
+		}
+		fileTransferAdapter.removeCleanedOutgoingDownloads();
 	}
 
 	/**
