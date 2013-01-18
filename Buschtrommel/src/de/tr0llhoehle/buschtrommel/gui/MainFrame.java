@@ -967,4 +967,16 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		// throw new UnsupportedOperationException("Not supported yet.");
 		tablemodel.updatedTTL(file);
 	}
+
+	@Override
+	public void fileTransferComplete(ITransferProgress transferProgress) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void fileTransferFailed(ITransferProgress transferProgress) {
+		// TODO Auto-generated method stub
+		
+	}
 }
