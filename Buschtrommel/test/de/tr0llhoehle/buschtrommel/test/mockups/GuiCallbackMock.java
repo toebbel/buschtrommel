@@ -40,16 +40,6 @@ public class GuiCallbackMock implements IGUICallbacks {
 
 	}
 
-	@Override
-	public void fileTransferComplete(ITransferProgress transferProgress) {
-		fileTransferCompleteMessages.add(transferProgress);
-	}
-
-	@Override
-	public void fileTransferFailed(ITransferProgress transferProgress) {
-		fileTransferFailedMessages.add(transferProgress);
-
-	}
 
 	@Override
 	public void newShareAvailable(ShareAvailability file) {

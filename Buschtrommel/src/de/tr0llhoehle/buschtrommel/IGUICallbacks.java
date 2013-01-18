@@ -30,18 +30,6 @@ public interface IGUICallbacks {
 	
 	
 	/**
-	 * Whenever a transfer was completed successful
-	 * @param transferProgress the transfer that succeeded
-	 */
-	public void fileTransferComplete(ITransferProgress transferProgress);
-	
-	/**
-	 * Whenever a transfer failed and needs user interaction
-	 * @param transferProgress the failed transfer
-	 */
-	public void fileTransferFailed(ITransferProgress transferProgress);
-	
-	/**
 	 * A new file is available. It may was announced via UDP or was discovered via GetFileList
 	 * @param file the file that is newly available
 	 */

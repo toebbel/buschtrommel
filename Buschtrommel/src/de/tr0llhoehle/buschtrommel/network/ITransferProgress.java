@@ -148,9 +148,15 @@ public interface ITransferProgress {
 		LostConnection,
 		LocalIOError,
 		InvalidContent,
-		Canceled
+		Canceled, 
+		Cleaned
 	}
 
+	/**
+	 * Frees all ressources from the transfer and changes state to 'Cleaned'.
+	 * Target files are removed after cleanup.
+	 * Don't call this method, if the transfer could be used by others.
+	 */
 	public void cleanup();
 }
 
