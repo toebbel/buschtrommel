@@ -1,6 +1,7 @@
 package de.tr0llhoehle.buschtrommel;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -49,9 +50,34 @@ public class Buschtrommel implements IMessageObserver {
 										// available!
 			throw new IllegalStateException("Hash function is not available!");
 		}
+		readOrCreateSettings(alias);
 		this.alias = alias;
 		this.guiCallbacks = gui;
 		this.shareCache = new LocalShareCache();
+	}
+
+	private void readOrCreateSettings(String alias) {
+		java.io.File cfgFile = new File("config.xml");
+		if(cfgFile.exists()) {
+			try {
+				Config.readFromFile(cfgFile);
+				return;
+			} catch (FileNotFoundException e) {
+				LoggerWrapper.logError("Could not read config file: " + e.getMessage());
+				e.printStackTrace();
+			}
+		}
+		Config.alias = alias;
+		Config.defaultTTL = -1;
+		Config.maximumYoResponseTime = 3000;
+		Config.minDiscoveryMulticastIddle = 5000;
+		Config.shareCachePath = "shares.ht";
+		Config.TTLRenewalTimer = 10;
+		try {
+			Config.saveToFile(cfgFile, new Config());
+		} catch (FileNotFoundException e) {
+			LoggerWrapper.logError("Could not write config file");
+		}
 	}
 
 	/**
