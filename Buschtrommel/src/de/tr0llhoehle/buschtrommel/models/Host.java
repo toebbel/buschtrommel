@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import de.tr0llhoehle.buschtrommel.LoggerWrapper;
 
 public class Host {
+	public static final int UNKNOWN_PORT = -1;
 	private Date lastSeen;
 	private Date firstSeen;
 	private java.net.InetAddress address;

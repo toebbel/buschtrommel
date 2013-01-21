@@ -91,7 +91,7 @@ public class NetCache implements IMessageObserver {
 
 		Host host = this.getOrCreateHost(message.getSource().getAddress());
 
-		if (host.getPort() != -1) {
+		if (host.getPort() != Host.UNKNOWN_PORT) {
 			if (this.knownShares.containsKey(hash)) {
 				RemoteShare tempShare = this.knownShares.get(hash);
 
@@ -144,7 +144,7 @@ public class NetCache implements IMessageObserver {
 
 	private void peerDiscoveryHandler(PeerDiscoveryMessage message) {
 		Host host = this.getOrCreateHost(message.getSource().getAddress());
-		boolean found = host.getPort() != -1;
+		boolean found = host.getPort() != Host.UNKNOWN_PORT;
 		host.setDisplayName(message.getAlias());
 		host.setPort(message.getPort());
 		if (!found) {
@@ -159,7 +159,7 @@ public class NetCache implements IMessageObserver {
 			try {
 				if (this.fileTransferAdapter != null) {
 					Thread.sleep((int) (Math.random() * Config.maximumYoResponseTime) + 5000);
-					if (host.getPort() != -1) {
+					if (host.getPort() != Host.UNKNOWN_PORT) {
 						fileTransferAdapter.downloadFilelist(host);
 					}
 				} else {
@@ -177,7 +177,7 @@ public class NetCache implements IMessageObserver {
 
 	private void byeHandler(ByeMessage message) {
 		Host host = this.getOrCreateHost(message.getSource().getAddress());
-		if (host.getPort() != -1) {
+		if (host.getPort() != Host.UNKNOWN_PORT) {
 			RemoteShare tmp;
 			if (this.guiCallbacks != null) {
 				this.guiCallbacks.hostWentOffline(host);
@@ -203,7 +203,7 @@ public class NetCache implements IMessageObserver {
 
 	/**
 	 * Checks if the specified host already exists. If yes, returns the host, if
-	 * no, returns dummy host with port = -1.
+	 * no, returns dummy host with port = Host.UNKNOWN_PORT.
 	 * 
 	 * Changes the host to the host found in cache!
 	 * 
@@ -212,7 +212,7 @@ public class NetCache implements IMessageObserver {
 	 * @return the host
 	 */
 	public Host getOrCreateHost(InetAddress address) {
-		Host host = new Host(address, "foo", -1);
+		Host host = new Host(address, "foo", Host.UNKNOWN_PORT);
 		if (this.knownHosts.containsKey(address)) {
 
 			host = this.knownHosts.get(address);
