@@ -8,6 +8,7 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Vector;
@@ -19,21 +20,26 @@ public class NetworkUDPMock {
 	private Inet4Address multicastv4Group;
 	private Inet6Address multicastv6Group;
 	private MulticastSocket multicastSocket;
-	private Vector<InetAddress> localAddresses;
 	private boolean running;
 	private int receive_port;
 	private int send_port;
 
 	private Thread receiveThread;
-	
+
 	public Vector<DatagramPacket> receivedMessages;
 
 	/**
-	 * Creates an instance of UDP adapter, that listens on the given ports and uses IPv4 and/or IPv6
-	 * @param listenPort the port to listen to
-	 * @param sendPort the port to send in (can be the same as listen port)
-	 * @param ipv4 true to use IPv4. Either IPv4 or IPv6 or both have to be set.
-	 * @param ipv6 true to use IPv6. Either IPv4 or IPv6 or both have to be set.
+	 * Creates an instance of UDP adapter, that listens on the given ports and
+	 * uses IPv4 and/or IPv6
+	 * 
+	 * @param listenPort
+	 *            the port to listen to
+	 * @param sendPort
+	 *            the port to send in (can be the same as listen port)
+	 * @param ipv4
+	 *            true to use IPv4. Either IPv4 or IPv6 or both have to be set.
+	 * @param ipv6
+	 *            true to use IPv6. Either IPv4 or IPv6 or both have to be set.
 	 * @throws IOException
 	 */
 	public NetworkUDPMock(int listenPort, int sendPort, boolean ipv4, boolean ipv6) throws IOException {
@@ -45,8 +51,6 @@ public class NetworkUDPMock {
 		this.receive_port = listenPort;
 		this.send_port = sendPort;
 		receivedMessages = new Vector<>();
-		
-		localAddresses = this.getAllLocalAddresses();
 
 		multicastSocket = new MulticastSocket(receive_port);
 		if (multicastv4Group != null)
@@ -71,7 +75,6 @@ public class NetworkUDPMock {
 		receiveThread.start();
 	}
 
-
 	/**
 	 * Stops listening for messages and closes the socket.
 	 * 
@@ -93,33 +96,24 @@ public class NetworkUDPMock {
 			buffer = new byte[512];
 			receivePacket = new DatagramPacket(buffer, buffer.length);
 			multicastSocket.receive(receivePacket);
-			if (!this.localAddresses.contains(receivePacket.getAddress())) {
-				receivedMessages.add(receivePacket);
-			}
+
+			receivedMessages.add(receivePacket);
+
 		}
 	}
-	
-	private Vector<InetAddress> getAllLocalAddresses() throws SocketException {
-		Vector<InetAddress> addresses = new Vector<InetAddress>();
-		for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
-			NetworkInterface intf = en.nextElement();
-			for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
-				addresses.addAll(Collections.list(enumIpAddr));
-			}
-		}
-		return addresses;
+
+	public static byte[] stripDatagram(DatagramPacket d) {
+		return Arrays.copyOfRange(d.getData(), 0, d.getLength());
 	}
 
 	public void sendMulticast(byte[] data) throws IOException {
 		if (multicastv4Group != null) {
-			DatagramPacket v4Packet = new DatagramPacket(data, data.length, this.multicastv4Group,
-					send_port);
+			DatagramPacket v4Packet = new DatagramPacket(data, data.length, this.multicastv4Group, send_port);
 			multicastSocket.send(v4Packet);
 		}
 
 		if (multicastv6Group != null) {
-			DatagramPacket v6Packet = new DatagramPacket(data, data.length, this.multicastv6Group,
-					send_port);
+			DatagramPacket v6Packet = new DatagramPacket(data, data.length, this.multicastv6Group, send_port);
 			multicastSocket.send(v6Packet);
 		}
 	}
