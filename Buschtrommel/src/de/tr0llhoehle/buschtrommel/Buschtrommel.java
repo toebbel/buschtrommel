@@ -42,7 +42,6 @@ public class Buschtrommel implements IMessageObserver {
 	private LocalShareCache shareCache;
 	private String alias;
 	private long lastDiscoveryMulticast;
-	
 
 	/**
 	 * Creates an instance if buschtrommel
@@ -52,7 +51,7 @@ public class Buschtrommel implements IMessageObserver {
 	 */
 	public Buschtrommel(IGUICallbacks gui, String alias) {
 		LoggerWrapper.LOGGER.addHandler(new ConsoleHandler());
-		
+
 		if (!HashFuncWrapper.check()) {// cancel bootstrap: Hashfunction is not
 										// available!
 			throw new IllegalStateException("Hash function is not available!");
@@ -65,10 +64,10 @@ public class Buschtrommel implements IMessageObserver {
 
 	private void readOrCreateSettings(String alias) {
 		java.io.File cfgFile = new File("config.xml");
-		if(cfgFile.exists()) {
+		if (cfgFile.exists()) {
 			try {
 				Config.readFromFile(cfgFile);
-				if(Config.alias == null)
+				if (Config.alias == null)
 					Config.alias = alias;
 				return;
 			} catch (FileNotFoundException e) {
@@ -100,14 +99,22 @@ public class Buschtrommel implements IMessageObserver {
 	public void start() throws IOException {
 		start(UDPAdapter.DEFAULT_PORT, UDPAdapter.DEFAULT_PORT, Config.useIPv4, Config.useIPv6);
 	}
-	
+
 	/**
 	 * Joins the network and sends a HI message
-	 * @param listenUdpPort the UDP port to receive group network messages on
-	 * @param sendUdpPort the UDP port to send group network messages on
-	 * @param useIpv4 flag whether to use IPv4 or not (IPv4 or IPv6 or both have to be set)
-	 * @param useIpv6 flag whether to use IPv6 or not (IPv4 or IPv6 or both have to be set)
-	 * @throws IOException if anything goes wrong during network connect
+	 * 
+	 * @param listenUdpPort
+	 *            the UDP port to receive group network messages on
+	 * @param sendUdpPort
+	 *            the UDP port to send group network messages on
+	 * @param useIpv4
+	 *            flag whether to use IPv4 or not (IPv4 or IPv6 or both have to
+	 *            be set)
+	 * @param useIpv6
+	 *            flag whether to use IPv6 or not (IPv4 or IPv6 or both have to
+	 *            be set)
+	 * @throws IOException
+	 *             if anything goes wrong during network connect
 	 */
 	public void start(int listenUdpPort, int sendUdpPort, boolean useIpv4, boolean useIpv6) throws IOException {
 		fileTransferAdapter = new FileTransferAdapter(shareCache);
@@ -127,11 +134,15 @@ public class Buschtrommel implements IMessageObserver {
 	 */
 	public void stop() throws IOException {
 		this.sendByeMessage();
-		fileTransferAdapter.close();
+		if (fileTransferAdapter != null)
+			fileTransferAdapter.close();
 		fileTransferAdapter = null;
-		this.udpAdapter.closeConnection();
-		this.udpAdapter.removeObserver(netCache);
-		this.udpAdapter.removeObserver(this);
+
+		if (udpAdapter != null) {
+			this.udpAdapter.closeConnection();
+			this.udpAdapter.removeObserver(netCache);
+			this.udpAdapter.removeObserver(this);
+		}
 		this.udpAdapter = null;
 	}
 
@@ -149,18 +160,19 @@ public class Buschtrommel implements IMessageObserver {
 	public ITransferProgress DownloadFile(String hash, String targetFile, Host host) {
 		RemoteShare s = netCache.getShare(hash);
 		if (s == null) {
-			LoggerWrapper.logError("Can't start download: The share with the hash " + hash  + " is not known");
+			LoggerWrapper.logError("Can't start download: The share with the hash " + hash + " is not known");
 			return null;
 		}
-		if(host == null) {
+		if (host == null) {
 			LoggerWrapper.logError("Can't start download: The given host is null!");
 			return null;
 		}
-		if(targetFile == null) {
+		if (targetFile == null) {
 			LoggerWrapper.logError("Can't start download: The given filepath is null");
 			return null;
 		}
-		Transfer result = (Transfer) fileTransferAdapter.DownloadFile(hash, host, s.getLength(), new java.io.File(targetFile));
+		Transfer result = (Transfer) fileTransferAdapter.DownloadFile(hash, host, s.getLength(), new java.io.File(
+				targetFile));
 		return result;
 	}
 
@@ -177,7 +189,8 @@ public class Buschtrommel implements IMessageObserver {
 		RemoteShare s = netCache.getShare(hash);
 		if (s == null)
 			return null;
-		Transfer result = (Transfer) fileTransferAdapter.DownloadFile(hash, s.getHostList(), s.getLength(), new java.io.File(targetFile));
+		Transfer result = (Transfer) fileTransferAdapter.DownloadFile(hash, s.getHostList(), s.getLength(),
+				new java.io.File(targetFile));
 		return result;
 	}
 
@@ -240,9 +253,10 @@ public class Buschtrommel implements IMessageObserver {
 	 */
 	public void RemoveFileFromShare(String hash) {
 		LocalShare localShare = shareCache.get(hash);
-		if(shareCache.remove(hash) && localShare != null) {
+		if (shareCache.remove(hash) && localShare != null) {
 			try {
-				udpAdapter.sendMulticast(new FileAnnouncementMessage(new LocalShare(localShare.getHash(), localShare.getLength(), 0, localShare.getDisplayName(), localShare.getMeta(), localShare.getPath())));
+				udpAdapter.sendMulticast(new FileAnnouncementMessage(new LocalShare(localShare.getHash(), localShare
+						.getLength(), 0, localShare.getDisplayName(), localShare.getMeta(), localShare.getPath())));
 			} catch (IOException e) {
 				LoggerWrapper.logError("Could not announce file-unavailability: " + e.getMessage());
 			}
@@ -266,31 +280,40 @@ public class Buschtrommel implements IMessageObserver {
 	public ArrayList<ITransferProgress> getOutgoingTransfers() {
 		return fileTransferAdapter.getOutgoingTransfers();
 	}
-	
+
 	/**
-	 * This method removes all outgoing transfers from the list, that are in cleaned state.
+	 * This method removes all outgoing transfers from the list, that are in
+	 * cleaned state.
 	 * 
-	 * Transfers that are no longer in progress can be set cleaned as well, if one of the flags is set.
-	 * @param canceled also remove all outgoing transfers that are in canceled state
-	 * @param lostConnection also remove all outgoing transfers that are in lostConnection state
-	 * @param finished also remove all outgoing transfers that are in finished state
+	 * Transfers that are no longer in progress can be set cleaned as well, if
+	 * one of the flags is set.
+	 * 
+	 * @param canceled
+	 *            also remove all outgoing transfers that are in canceled state
+	 * @param lostConnection
+	 *            also remove all outgoing transfers that are in lostConnection
+	 *            state
+	 * @param finished
+	 *            also remove all outgoing transfers that are in finished state
 	 */
 	public void cleanOutgoingTransfers(boolean canceled, boolean lostConnection, boolean finished) {
-		for(ITransferProgress t : fileTransferAdapter.getOutgoingTransfers()) {
-			if((t.getStatus() == TransferStatus.Canceled && canceled) || 
-					(t.getStatus() == TransferStatus.LostConnection && lostConnection) || 
-					((t.getStatus() == TransferStatus.Finished) && finished)) {
-				
+		for (ITransferProgress t : fileTransferAdapter.getOutgoingTransfers()) {
+			if ((t.getStatus() == TransferStatus.Canceled && canceled)
+					|| (t.getStatus() == TransferStatus.LostConnection && lostConnection)
+					|| ((t.getStatus() == TransferStatus.Finished) && finished)) {
+
 				t.cancel();
 				t.cleanup();
 			}
 		}
 		fileTransferAdapter.removeCleanedOutgoingDownloads();
 	}
-	
+
 	/**
 	 * Cleans and removes an incoming transfer!
-	 * @param hash of the transfer to remove
+	 * 
+	 * @param hash
+	 *            of the transfer to remove
 	 */
 	public void cleanIncomingTransfer(String hash) {
 		fileTransferAdapter.cleanDownloadedTransfer(hash);
@@ -304,7 +327,7 @@ public class Buschtrommel implements IMessageObserver {
 	public Hashtable<String, RemoteShare> getRemoteShares() {
 		return this.netCache.getShares();
 	}
-	
+
 	/**
 	 * Returns all local shares
 	 * 
@@ -339,14 +362,16 @@ public class Buschtrommel implements IMessageObserver {
 	}
 
 	@Override
-	public void receiveMessage(Message message) { //respond do HI messages either via unicast or multicast
+	public void receiveMessage(Message message) { // respond do HI messages
+													// either via unicast or
+													// multicast
 		if (message instanceof PeerDiscoveryMessage) {
 			if (((PeerDiscoveryMessage) message).getDiscoveryMessageType() == DiscoveryMessageType.HI) {
-				if(udpAdapter == null || fileTransferAdapter == null) {
+				if (udpAdapter == null || fileTransferAdapter == null) {
 					LoggerWrapper.logError("Can't respond to peer discovery because adapter is not initialized!");
 					return;
 				}
-				
+
 				PeerDiscoveryMessage rsp = new PeerDiscoveryMessage(DiscoveryMessageType.YO, alias,
 						fileTransferAdapter.getPort());
 				try {
@@ -369,11 +394,13 @@ public class Buschtrommel implements IMessageObserver {
 	}
 
 	/**
-	 * Returns the port that buschtrommel listens for incoming file transfer requests
+	 * Returns the port that buschtrommel listens for incoming file transfer
+	 * requests
+	 * 
 	 * @return the port or -1, if not connected
 	 */
 	public int getTransferPort() {
-		if(fileTransferAdapter == null)
+		if (fileTransferAdapter == null)
 			return -1;
 		return fileTransferAdapter.getPort();
 	}
