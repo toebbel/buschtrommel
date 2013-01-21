@@ -21,6 +21,7 @@ import de.tr0llhoehle.buschtrommel.models.Message;
 import de.tr0llhoehle.buschtrommel.models.PeerDiscoveryMessage;
 import de.tr0llhoehle.buschtrommel.models.PeerDiscoveryMessage.DiscoveryMessageType;
 import de.tr0llhoehle.buschtrommel.models.Share;
+import de.tr0llhoehle.buschtrommel.test.mockups.FileContentMock;
 import de.tr0llhoehle.buschtrommel.test.mockups.GuiCallbackMock;
 import de.tr0llhoehle.buschtrommel.test.mockups.MessageObserverMock;
 import de.tr0llhoehle.buschtrommel.test.mockups.NetworkMock;
@@ -175,7 +176,7 @@ public class Systemtest {
 		Thread.sleep(6000);
 		assertEquals(1, gui.newShareAvailableMessages.size());
 		assertEquals("dsp", gui.newShareAvailableMessages.get(0).getDisplayName());
-		//assertEquals("meta", gui.newShareAvailableMessages.get(0).getMeta());
+		//assertEquals("meta", gui.newShareAvailableMessages.get(0).getMeta()); //TODO fix missing trim of meta field
 		assertEquals("HASH", gui.newShareAvailableMessages.get(0).getFile().getHash());
 		assertEquals(1, busch.getRemoteShares().get("HASH").getHostList().size());
 		assertEquals("mock", busch.getRemoteShares().get("HASH").getHostList().get(0).getDisplayName());
@@ -190,5 +191,29 @@ public class Systemtest {
 		Host h = busch.getHosts().get(InetAddress.getByName("localhost"));
 		assertEquals(1, h.getSharedFiles().size());
 		assertTrue(h.getSharedFiles().containsKey("HASH"));
+	}
+	
+	@Test(timeout=3000)
+	public void testShareAnnoucement() throws IOException, InterruptedException {
+		busch.start(4747, 4748, true, false);
+		FileContentMock.writeFileContent("tmp", "this is content of a file");
+		Thread.sleep(100);
+		busch.AddFileToShare("tmp", "file", "some meta information");
+		Thread.sleep(1000);
+		
+		//check if the file is in local share and was announced
+		String hash = (new ArrayList<String>(busch.getLocalShares().keySet())).get(0);
+		long length = busch.getLocalShares().get(hash).getLength();
+		int ttl = busch.getLocalShares().get(hash).getTTL();
+		byte[] expected = new FileAnnouncementMessage(new LocalShare(hash, length, ttl, "file", "some meta information", "")).Serialize().getBytes(Message.ENCODING);
+		assertEquals(2, udpNet.receivedMessages.size());
+		assertArrayEquals(expected, NetworkUDPMock.stripDatagram(udpNet.receivedMessages.get(1)));
+		
+		//remove the file
+		busch.RemoveFileFromShare(hash);
+		Thread.sleep(250);
+		expected = new FileAnnouncementMessage(new LocalShare(hash, length, 0, "file", "some meta information", "")).Serialize().getBytes(Message.ENCODING);
+		assertEquals(3, udpNet.receivedMessages.size());
+		assertArrayEquals(expected, NetworkUDPMock.stripDatagram(udpNet.receivedMessages.get(2)));
 	}
 }
