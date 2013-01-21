@@ -27,13 +27,19 @@ public class NetworkMock extends Thread{
 	public void run() {
 		try {
 			s = new ServerSocket();
-			s.bind(new InetSocketAddress("localhost", port));
+			s.bind(new InetSocketAddress(port));
 			so = s.accept();
 			System.out.println("Network Mock accepted connection!");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public boolean isConnected() {
+		if(so == null)
+			return false;
+		return so.isConnected();
 	}
 	
 	
