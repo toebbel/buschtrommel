@@ -72,4 +72,10 @@ public class RemoteShare extends Share {
 		}
 		return result;
 	}
+	
+	@Override
+	public String toString() {
+		return "remoteShare('" + getHash() + "', len " + getLength() + ", available on " + getSources().size() + " hosts)";
+	}
+	
 }
