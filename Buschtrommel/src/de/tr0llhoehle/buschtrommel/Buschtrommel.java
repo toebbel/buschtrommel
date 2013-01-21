@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Timer;
+import java.util.logging.ConsoleHandler;
 
 import de.tr0llhoehle.buschtrommel.models.ByeMessage;
 import de.tr0llhoehle.buschtrommel.models.FileAnnouncementMessage;
@@ -50,6 +51,8 @@ public class Buschtrommel implements IMessageObserver {
 	 * @param alias
 	 */
 	public Buschtrommel(IGUICallbacks gui, String alias) {
+		LoggerWrapper.LOGGER.addHandler(new ConsoleHandler());
+		
 		if (!HashFuncWrapper.check()) {// cancel bootstrap: Hashfunction is not
 										// available!
 			throw new IllegalStateException("Hash function is not available!");
