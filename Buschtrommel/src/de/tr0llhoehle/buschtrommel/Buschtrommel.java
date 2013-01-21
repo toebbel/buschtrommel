@@ -122,6 +122,8 @@ public class Buschtrommel implements IMessageObserver {
 		this.netCache = new NetCache(this.udpAdapter, fileTransferAdapter, this.guiCallbacks);
 		this.udpAdapter.registerObserver(netCache);
 		this.udpAdapter.registerObserver(this);
+		this.fileTransferAdapter.registerObserver(this);
+		this.fileTransferAdapter.registerObserver(netCache);
 		udpAdapter.sendMulticast(new PeerDiscoveryMessage(PeerDiscoveryMessage.DiscoveryMessageType.HI, alias,
 				fileTransferAdapter.getPort()));
 		lastDiscoveryMulticast = System.currentTimeMillis();
@@ -382,6 +384,9 @@ public class Buschtrommel implements IMessageObserver {
 					} else {
 						udpAdapter.sendUnicast(rsp, message.getSource().getAddress());
 					}
+					
+					//autostart filelist download
+					fileTransferAdapter.downloadFilelist(new Host(message.getSource().getAddress(), ((PeerDiscoveryMessage) message).getAlias(), ((PeerDiscoveryMessage) message).getPort()));
 				} catch (IOException e) {
 					LoggerWrapper.logError("Could not response to HI message: " + e.getMessage());
 				} catch (InterruptedException e1) {
