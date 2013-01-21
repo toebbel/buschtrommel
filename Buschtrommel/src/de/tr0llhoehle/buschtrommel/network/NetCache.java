@@ -72,10 +72,13 @@ public class NetCache implements IMessageObserver {
 	@Override
 	public void receiveMessage(Message message) {
 		if (message instanceof FileAnnouncementMessage) {
+			LoggerWrapper.logInfo("NetCache receives File availibility message");
 			this.fileAnnouncmentHandler((FileAnnouncementMessage) message);
 		} else if (message instanceof PeerDiscoveryMessage) {
+			LoggerWrapper.logInfo("NetCache receives peer discovery message");
 			this.peerDiscoveryHandler((PeerDiscoveryMessage) message);
 		} else if (message instanceof ByeMessage) {
+			LoggerWrapper.logInfo("NetCache receives bye message");
 			this.byeHandler((ByeMessage) message);
 		}
 

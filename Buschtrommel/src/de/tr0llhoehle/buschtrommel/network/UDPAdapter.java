@@ -43,7 +43,9 @@ public class UDPAdapter extends MessageMonitor {
 	private Thread receiveThread;
 
 	/**
-	 * Creates an instance of UDP adapter, that listens on the default port and uses IPv4 and IPv6.
+	 * Creates an instance of UDP adapter, that listens on the default port and
+	 * uses IPv4 and IPv6.
+	 * 
 	 * @throws IOException
 	 */
 	public UDPAdapter() throws IOException {
@@ -51,9 +53,13 @@ public class UDPAdapter extends MessageMonitor {
 	}
 
 	/**
-	 * Creates an instance of UDP adapter, that listens on given ports and uses IPv4 and IPv6
-	 * @param listenPort the port to listen to
-	 * @param sendPort the port to send on (can be the same as listen port)
+	 * Creates an instance of UDP adapter, that listens on given ports and uses
+	 * IPv4 and IPv6
+	 * 
+	 * @param listenPort
+	 *            the port to listen to
+	 * @param sendPort
+	 *            the port to send on (can be the same as listen port)
 	 * @throws IOException
 	 */
 	public UDPAdapter(int listenPort, int sendPort) throws IOException {
@@ -61,11 +67,17 @@ public class UDPAdapter extends MessageMonitor {
 	}
 
 	/**
-	 * Creates an instance of UDP adapter, that listens on the given ports and uses IPv4 and/or IPv6
-	 * @param listenPort the port to listen to
-	 * @param sendPort the port to send in (can be the same as listen port)
-	 * @param ipv4 true to use IPv4. Either IPv4 or IPv6 or both have to be set.
-	 * @param ipv6 true to use IPv6. Either IPv4 or IPv6 or both have to be set.
+	 * Creates an instance of UDP adapter, that listens on the given ports and
+	 * uses IPv4 and/or IPv6
+	 * 
+	 * @param listenPort
+	 *            the port to listen to
+	 * @param sendPort
+	 *            the port to send in (can be the same as listen port)
+	 * @param ipv4
+	 *            true to use IPv4. Either IPv4 or IPv6 or both have to be set.
+	 * @param ipv6
+	 *            true to use IPv6. Either IPv4 or IPv6 or both have to be set.
 	 * @throws IOException
 	 */
 	public UDPAdapter(int listenPort, int sendPort, boolean ipv4, boolean ipv6) throws IOException {
@@ -97,10 +109,14 @@ public class UDPAdapter extends MessageMonitor {
 
 	private void openConnection() throws IOException {
 		this.multicastSocket = new MulticastSocket(receive_port);
-		if (multicastv4Group != null)
+		if (multicastv4Group != null) {
+			LoggerWrapper.logInfo("UDP Adapter connects to IPv group");
 			this.multicastSocket.joinGroup(multicastv4Group);
-		if (multicastv6Group != null)
+		}
+		if (multicastv6Group != null) {
+			LoggerWrapper.logInfo("UDP Adapter connects to IPv group");
 			this.multicastSocket.joinGroup(multicastv6Group);
+		}
 	}
 
 	/**
@@ -109,6 +125,7 @@ public class UDPAdapter extends MessageMonitor {
 	 * @throws IOException
 	 */
 	public void closeConnection() throws IOException {
+		LoggerWrapper.logInfo("UDP Adapter shuts down");
 		this.running = false;
 		if (multicastv4Group != null)
 			this.multicastSocket.leaveGroup(multicastv4Group);
@@ -129,7 +146,10 @@ public class UDPAdapter extends MessageMonitor {
 				message = MessageDeserializer.Deserialize(new String(receivePacket.getData(), Message.ENCODING));
 				if (message != null) {
 					message.setSource(new InetSocketAddress(receivePacket.getAddress(), receivePacket.getPort()));
+					LoggerWrapper.logInfo("UDP Adapter received a message: " + message.Serialize());
 					this.sendMessageToObservers(message);
+				} else {
+					LoggerWrapper.logError("UDP Adapter could not deserialize the message");
 				}
 			}
 		}
@@ -143,15 +163,16 @@ public class UDPAdapter extends MessageMonitor {
 	 * @throws IOException
 	 */
 	public void sendMulticast(Message message) throws IOException {
-		String data = message.Serialize();
+		LoggerWrapper.logInfo("UDP Adapter sends multicast: " + message.Serialize());
+		byte[] data = message.Serialize().getBytes(Message.ENCODING);
 		if (multicastv4Group != null) {
-			DatagramPacket v4Packet = new DatagramPacket(data.getBytes(), data.length(), this.multicastv4Group,
+			DatagramPacket v4Packet = new DatagramPacket(data, data.length, this.multicastv4Group,
 					send_port);
 			this.multicastSocket.send(v4Packet);
 		}
 
 		if (multicastv6Group != null) {
-			DatagramPacket v6Packet = new DatagramPacket(data.getBytes(), data.length(), this.multicastv6Group,
+			DatagramPacket v6Packet = new DatagramPacket(data, data.length, this.multicastv6Group,
 					send_port);
 			this.multicastSocket.send(v6Packet);
 		}
@@ -170,7 +191,9 @@ public class UDPAdapter extends MessageMonitor {
 	 * @throws IOException
 	 */
 	public void sendUnicast(Message message, InetAddress host) throws IOException {
+		LoggerWrapper.logInfo("UDP Adapter sends unicast to " + host + " : " + message.Serialize());
 		String data = message.Serialize();
+		LoggerWrapper.logInfo("UDP Adapter sends multicast: " + data);
 		DatagramPacket packet = new DatagramPacket(data.getBytes(Message.ENCODING), data.length(), host, send_port);
 
 		this.multicastSocket.send(packet);
