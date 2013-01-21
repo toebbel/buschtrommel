@@ -380,8 +380,7 @@ public class Buschtrommel implements IMessageObserver {
 						lastDiscoveryMulticast = System.currentTimeMillis();
 						udpAdapter.sendMulticast(rsp);
 					} else {
-						udpAdapter.sendUnicast(rsp, null); // TODO enter host
-															// information
+						udpAdapter.sendUnicast(rsp, message.getSource().getAddress());
 					}
 				} catch (IOException e) {
 					LoggerWrapper.logError("Could not response to HI message: " + e.getMessage());
