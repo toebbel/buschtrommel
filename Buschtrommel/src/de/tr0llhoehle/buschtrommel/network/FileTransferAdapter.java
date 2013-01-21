@@ -268,6 +268,7 @@ public class FileTransferAdapter extends MessageMonitor {
 
 	public Transfer downloadFilelist(Host host) {
 		IncomingFilelistTransfer result = new IncomingFilelistTransfer(host);
+		incomingTransfers.put("filelist from" + host.toString(), result);
 
 		for (IMessageObserver observer : observers)
 			result.registerObserver(observer);
