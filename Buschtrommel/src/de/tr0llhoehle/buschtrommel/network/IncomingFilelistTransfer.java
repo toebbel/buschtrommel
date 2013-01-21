@@ -67,7 +67,7 @@ public class IncomingFilelistTransfer extends Transfer {
 					processResponseFilestream(s.getInputStream());
 					s.close();
 				} catch (IOException e) {
-					logger.log(Level.SEVERE, "Can't get filelist: " + e.getMessage());
+					logger.log(Level.SEVERE, "Can't get filelist from " + partner.toString() + ": " + e.getMessage());
 				}
 			}
 		})).start();
@@ -85,6 +85,7 @@ public class IncomingFilelistTransfer extends Transfer {
 				String raw = String.valueOf(buffer, 0, received) + Message.MESSAGE_SPERATOR;
 				Message result = MessageDeserializer.Deserialize(raw);
 				if(result != null) {
+					result.setSource(partner);
 					sendMessageToObservers(result);
 				} else {
 					logger.log(Level.SEVERE, "could not deserialize message: " + raw);
