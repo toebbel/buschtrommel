@@ -29,6 +29,14 @@ import de.tr0llhoehle.buschtrommel.models.ShareAvailability;
  */
 public class NetCache implements IMessageObserver {
 
+	/**
+	 * FileAnnouncements that can't be assigned to a host are useless. Therefor
+	 * NetCache sends a HI unicast to those hosts to discover their port. The
+	 * FileAnnouncement is delayed by this value (in seconds), so the host has
+	 * time to send a YO message.
+	 */
+	private static final int DELAY_FILE_MESSAGE_AFTER_HOST_DISCOVER = 5;
+
 	private static int TTL_REFRESH_RATE = 5;
 
 	protected Hashtable<InetAddress, Host> knownHosts;
@@ -73,7 +81,7 @@ public class NetCache implements IMessageObserver {
 	public void receiveMessage(Message message) {
 		if (message instanceof FileAnnouncementMessage) {
 			LoggerWrapper.logInfo("NetCache receives File availibility message");
-			this.fileAnnouncmentHandler((FileAnnouncementMessage) message);
+			this.fileAnnouncmentHandler((FileAnnouncementMessage) message, false);
 		} else if (message instanceof PeerDiscoveryMessage) {
 			LoggerWrapper.logInfo("NetCache receives peer discovery message");
 			this.peerDiscoveryHandler((PeerDiscoveryMessage) message);
@@ -84,7 +92,20 @@ public class NetCache implements IMessageObserver {
 
 	}
 
-	private void fileAnnouncmentHandler(FileAnnouncementMessage message) {
+	/**
+	 * Adds the message to the netCache if the host is known.
+	 * 
+	 * If the host is unknown, a HI Unicast is sent to the host and the
+	 * FileAnnouncemessage is delayed, so the host can answer with a YO message.
+	 * By this we know it's port and we can properly save the Share in
+	 * combination with a valid port
+	 * 
+	 * @param message
+	 *            the message to handle
+	 * @param delayed
+	 *            whether the message is a delayed one or not
+	 */
+	private void fileAnnouncmentHandler(FileAnnouncementMessage message, boolean delayed) {
 
 		int ttl = message.getFile().getTTL();
 		String hash = message.getFile().getHash();
@@ -130,15 +151,43 @@ public class NetCache implements IMessageObserver {
 			}
 		} else {
 			try {
-				if (this.udpAdapter != null) {
+				if (this.udpAdapter != null && !delayed) {
 					this.udpAdapter.sendUnicast(new PeerDiscoveryMessage(PeerDiscoveryMessage.DiscoveryMessageType.HI,
 							Config.alias, fileTransferAdapter.getPort()), host.getAddress());
+					handleFileAnnouncementMessageLater(message, DELAY_FILE_MESSAGE_AFTER_HOST_DISCOVER);
 				}
 
 			} catch (IOException e) {
 				LoggerWrapper.logError(e.getMessage());
 			}
 
+		}
+	}
+
+	/**
+	 * Starts a thread, that will call receive message with the given message
+	 * after a given amount of time
+	 * 
+	 * @param m
+	 *            message to re-receive
+	 * @param wait
+	 *            number of seconds to wait
+	 */
+	private void handleFileAnnouncementMessageLater(FileAnnouncementMessage m, int wait) {
+		FileAnnouncementDelay task = new FileAnnouncementDelay(m);
+		(new Timer()).schedule(task, wait * 1000);
+	}
+
+	class FileAnnouncementDelay extends TimerTask {
+		FileAnnouncementMessage message;
+
+		public FileAnnouncementDelay(FileAnnouncementMessage m) {
+			message = m;
+		}
+
+		@Override
+		public void run() {
+			fileAnnouncmentHandler(message, true);
 		}
 	}
 
@@ -245,7 +294,11 @@ public class NetCache implements IMessageObserver {
 			for (String hash : host.getSharedFiles().keySet()) {
 				shareAvailability = host.getSharedFiles().get(hash);
 				tmpTTL = shareAvailability.getTtl();
-				if (tmpTTL != -1 && tmpTTL <= TTL_REFRESH_RATE) { //TODO: change -1 to infinity value
+				if (tmpTTL != -1 && tmpTTL <= TTL_REFRESH_RATE) { // TODO:
+																	// change -1
+																	// to
+																	// infinity
+																	// value
 					host.removeFileFromSharedFiles(hash);
 					shareAvailability.getFile().removeFileSource(shareAvailability);
 					if (shareAvailability.getFile().noSourcesAvailable()) {
