@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.Timer;
 
 import de.tr0llhoehle.buschtrommel.models.ByeMessage;
 import de.tr0llhoehle.buschtrommel.models.FileAnnouncementMessage;
@@ -40,6 +41,7 @@ public class Buschtrommel implements IMessageObserver {
 	private LocalShareCache shareCache;
 	private String alias;
 	private long lastDiscoveryMulticast;
+	
 
 	/**
 	 * Creates an instance if buschtrommel
@@ -77,6 +79,9 @@ public class Buschtrommel implements IMessageObserver {
 		Config.minDiscoveryMulticastIddle = 5000;
 		Config.shareCachePath = "shares.ht";
 		Config.TTLRenewalTimer = 10;
+		Config.useIPv4 = true;
+		Config.useIPv6 = true;
+		Config.FileReannounceGraceTime = 15;
 		try {
 			Config.saveToFile(cfgFile, new Config());
 		} catch (FileNotFoundException e) {
@@ -90,8 +95,20 @@ public class Buschtrommel implements IMessageObserver {
 	 * @throws IOException
 	 */
 	public void start() throws IOException {
+		start(UDPAdapter.DEFAULT_PORT, UDPAdapter.DEFAULT_PORT, Config.useIPv4, Config.useIPv6);
+	}
+	
+	/**
+	 * Joins the network and sends a HI message
+	 * @param listenUdpPort the UDP port to receive group network messages on
+	 * @param sendUdpPort the UDP port to send group network messages on
+	 * @param useIpv4 flag whether to use IPv4 or not (IPv4 or IPv6 or both have to be set)
+	 * @param useIpv6 flag whether to use IPv6 or not (IPv4 or IPv6 or both have to be set)
+	 * @throws IOException if anything goes wrong during network connect
+	 */
+	public void start(int listenUdpPort, int sendUdpPort, boolean useIpv4, boolean useIpv6) throws IOException {
 		fileTransferAdapter = new FileTransferAdapter(shareCache);
-		this.udpAdapter = new UDPAdapter(UDPAdapter.DEFAULT_PORT, UDPAdapter.DEFAULT_PORT, Config.useIPv4, Config.useIPv6);
+		this.udpAdapter = new UDPAdapter(listenUdpPort, sendUdpPort, useIpv4, useIpv6);
 		this.netCache = new NetCache(this.udpAdapter, fileTransferAdapter, this.guiCallbacks);
 		this.udpAdapter.registerObserver(netCache);
 		this.udpAdapter.registerObserver(this);
@@ -346,5 +363,15 @@ public class Buschtrommel implements IMessageObserver {
 			}
 		}
 
+	}
+
+	/**
+	 * Returns the port that buschtrommel listens for incoming file transfer requests
+	 * @return the port or -1, if not connected
+	 */
+	public int getTransferPort() {
+		if(fileTransferAdapter == null)
+			return -1;
+		return fileTransferAdapter.getPort();
 	}
 }
