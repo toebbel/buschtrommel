@@ -1074,11 +1074,11 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	@Override
 	public void newOutgoingTransferStarted(ITransferProgress transfer) {
 		if (transfer != null) {
-			
+			//LoggerWrapper.logInfo("Hash = " + transfer.getExpectedHash());
 			if(seeFilelist){
 				outgoingItems.addElement(transfer);
-			} else if(null != transfer.getTargetFile()){
-				LoggerWrapper.logInfo("added File: " + transfer.getTargetFile());
+			} else if(!"filelist".equals(transfer.getExpectedHash())){
+				
 				outgoingItems.addElement(transfer);
 			} else{
 				LoggerWrapper.logInfo("skipped filelist");
