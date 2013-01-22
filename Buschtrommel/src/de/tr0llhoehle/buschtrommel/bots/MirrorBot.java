@@ -7,6 +7,7 @@ import java.util.TimerTask;
 import java.util.Vector;
 
 import de.tr0llhoehle.buschtrommel.Buschtrommel;
+import de.tr0llhoehle.buschtrommel.Config;
 import de.tr0llhoehle.buschtrommel.IGUICallbacks;
 import de.tr0llhoehle.buschtrommel.models.Host;
 import de.tr0llhoehle.buschtrommel.models.ShareAvailability;
@@ -24,6 +25,7 @@ public class MirrorBot implements IGUICallbacks {
 
 	public MirrorBot() throws IOException {
 		buschtrommel = new Buschtrommel(this, "mirror-bot");
+		Config.defaultTTL = -1;
 		downloading = new Hashtable<String, ITransferProgress>();
 		queue = new Vector<String>();
 		downloaded = new Vector<String>();
@@ -45,13 +47,15 @@ public class MirrorBot implements IGUICallbacks {
 		@Override
 		public void run() {
 			int tries = 0;
-			while (downloading.size() < MAX_NUM_DOWNLOADS && queue.size() > 0 && tries++ < MAX_NUM_DOWNLOADS * 2) {
-				String curr = queue.get(0);
-				queue.remove(curr);
-				System.out.println("download " + curr);
-				ITransferProgress transfer = buschtrommel.DownloadFile(curr, curr);
-				if (transfer != null)
-					downloading.put(curr, transfer);
+			synchronized (downloading) {
+				while (downloading.size() < MAX_NUM_DOWNLOADS && queue.size() > 0 && tries++ < MAX_NUM_DOWNLOADS * 2) {
+					String curr = queue.get(0);
+					queue.remove(curr);
+					System.out.println("download " + curr);
+					ITransferProgress transfer = buschtrommel.DownloadFile(curr, curr);
+					if (transfer != null)
+						downloading.put(curr, transfer);
+				}
 			}
 		}
 	}
@@ -60,23 +64,26 @@ public class MirrorBot implements IGUICallbacks {
 
 		@Override
 		public void run() {
-			for (String hash : downloading.keySet()) {
-				ITransferProgress transfer = downloading.get(hash);
-				if (transfer.getStatus() == TransferStatus.Finished) {
-					downloading.remove(hash);
-					buschtrommel.cleanIncomingTransfer(hash);
-					System.out.println("File '" + hash + "' finished");
-					addFileToShare(hash);
-				} else if (transfer.getStatus() != TransferStatus.PermanentlyNotAvailable
-						&& // in some error state
-						transfer.getStatus() != TransferStatus.Transfering
-						&& transfer.getStatus() != TransferStatus.Connecting) {
-					System.out.println("Transfer '" + hash + "' is in state " + transfer.getStatus().toString()
-							+ " - restarting");
-					buschtrommel.cleanIncomingTransfer(hash);
-					downloading.remove(hash);
-					queue.add(hash);
+			synchronized (downloading) {
+				for (String hash : downloading.keySet()) {
+					ITransferProgress transfer = downloading.get(hash);
+					if (transfer.getStatus() == TransferStatus.Finished) {
+						downloading.remove(hash);
+						buschtrommel.cleanIncomingTransfer(hash);
+						System.out.println("File '" + hash + "' finished");
+						addFileToShare(hash);
+					} else if (transfer.getStatus() != TransferStatus.PermanentlyNotAvailable
+							&& // in some error state
+							transfer.getStatus() != TransferStatus.Transfering
+							&& transfer.getStatus() != TransferStatus.Connecting) {
+						System.out.println("Transfer '" + hash + "' is in state " + transfer.getStatus().toString()
+								+ " - restarting");
+						buschtrommel.cleanIncomingTransfer(hash);
+						downloading.remove(hash);
+						queue.add(hash);
+					}
 				}
+
 			}
 		}
 
