@@ -76,6 +76,7 @@ public class OutgoingTransfer extends Transfer {
 		} else if (m instanceof GetFilelistMessage) {
 			sendHeaderInRsp = false;
 			hash = "filelist";
+			localeFilename = "filelist";
 		}
 	}
 
@@ -114,7 +115,6 @@ public class OutgoingTransfer extends Transfer {
 			byte[] fileList = myShares.getAllShares().getBytes(Message.ENCODING);
 			numAvailableData = fileList.length;
 			ressourceInputStream = new ByteArrayInputStream(fileList);
-			localeFilename = "filelist";
 		} else if (m instanceof GetFileMessage) {
 			// do I know the file?
 			if (!myShares.has(((GetFileMessage) m).getHash())) {
