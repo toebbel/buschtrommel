@@ -52,4 +52,10 @@ public class GuiCallbackMock implements IGUICallbacks {
 		updatedTTLMessages.add(file);
 	}
 
+	@Override
+	public void newOutgoingTransferStarted(ITransferProgress transfer) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

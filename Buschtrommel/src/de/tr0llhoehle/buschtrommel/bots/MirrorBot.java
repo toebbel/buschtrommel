@@ -125,8 +125,16 @@ public class MirrorBot implements IGUICallbacks {
 		MirrorBot bot = new MirrorBot();
 		while(System.in.read() != (int)'c') {
 			bot.printStatus();
+			System.in.skip(1);
 		}
 		bot.cancel();
+		System.out.println("close bot");
+	}
+
+	@Override
+	public void newOutgoingTransferStarted(ITransferProgress transfer) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
