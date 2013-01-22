@@ -231,8 +231,8 @@ public class NetCache implements IMessageObserver, IHostPortResolver {
 				if (tmp.noSourcesAvailable()) {
 					this.knownShares.remove(hash);
 				}
-				this.knownHosts.remove(host.getAddress());
 			}
+			this.knownHosts.remove(host.getAddress());
 		}
 	}
 
