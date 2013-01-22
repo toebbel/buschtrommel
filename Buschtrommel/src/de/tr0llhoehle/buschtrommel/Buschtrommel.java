@@ -42,7 +42,6 @@ public class Buschtrommel implements IMessageObserver {
 	private NetCache netCache;
 	private LocalShareCache shareCache;
 	private String alias;
-	private long lastDiscoveryMulticast;
 	private Logger logger;
 
 	/**
@@ -128,7 +127,6 @@ public class Buschtrommel implements IMessageObserver {
 		this.fileTransferAdapter.registerObserver(netCache);
 		udpAdapter.sendMulticast(new PeerDiscoveryMessage(PeerDiscoveryMessage.DiscoveryMessageType.HI, alias,
 				fileTransferAdapter.getPort()));
-		lastDiscoveryMulticast = System.currentTimeMillis();
 	}
 
 	/**
@@ -366,36 +364,7 @@ public class Buschtrommel implements IMessageObserver {
 	}
 
 	@Override
-	public void receiveMessage(Message message) { // respond do HI messages
-													// either via unicast or
-													// multicast
-		if (message instanceof PeerDiscoveryMessage) {
-			if (((PeerDiscoveryMessage) message).getDiscoveryMessageType() == DiscoveryMessageType.HI) {
-				if (udpAdapter == null || fileTransferAdapter == null) {
-					logger.warning("Can't respond to peer discovery because adapter is not initialized!");
-					return;
-				}
-
-				PeerDiscoveryMessage rsp = new PeerDiscoveryMessage(DiscoveryMessageType.YO, alias,
-						fileTransferAdapter.getPort());
-				try {
-					Thread.sleep((int) (Math.random() * Config.maximumYoResponseTime));
-					if (System.currentTimeMillis() - lastDiscoveryMulticast > Config.minDiscoveryMulticastIddle) {
-						lastDiscoveryMulticast = System.currentTimeMillis();
-						udpAdapter.sendMulticast(rsp);
-					} else {
-						udpAdapter.sendUnicast(rsp, message.getSource().getAddress());
-					}
-					
-					//autostart filelist download
-					fileTransferAdapter.downloadFilelist(new Host(message.getSource().getAddress(), ((PeerDiscoveryMessage) message).getAlias(), ((PeerDiscoveryMessage) message).getPort()));
-				} catch (IOException e) {
-					logger.warning("Could not response to HI message: " + e.getMessage());
-				} catch (InterruptedException e1) {
-					logger.warning("Error while waiting before sending YO response: " + e1.getMessage());
-				}
-			}
-		}
+	public void receiveMessage(Message message) { 
 
 	}
 
