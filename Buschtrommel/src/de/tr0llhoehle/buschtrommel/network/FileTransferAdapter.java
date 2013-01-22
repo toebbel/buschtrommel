@@ -125,13 +125,13 @@ public class FileTransferAdapter extends MessageMonitor {
 				if (m instanceof GetFileMessage) {
 					OutgoingTransfer transfer = new OutgoingTransfer((GetFileMessage) m, out, myShares,
 							new InetSocketAddress(s.getInetAddress(), s.getPort()), bufferSize);
-					transfer.RegisterLogHander(new ConsoleHandler());
+					transfer.SetLoggerParent(logger);
 					transfer.start();
 					p = transfer;
 				} else if (m instanceof GetFilelistMessage) {
 					OutgoingTransfer transfer = new OutgoingTransfer((GetFilelistMessage) m, out, myShares,
 							new InetSocketAddress(s.getInetAddress(), s.getPort()), bufferSize);
-					transfer.RegisterLogHander(new ConsoleHandler());
+					transfer.SetLoggerParent(logger);
 					transfer.start();
 					p = transfer;
 				} else {
@@ -171,7 +171,7 @@ public class FileTransferAdapter extends MessageMonitor {
 
 		Transfer result = new IncomingDownload(new GetFileMessage(hash, 0, length), host, target, -1);
 		incomingTransfers.put(hash, result);
-		result.RegisterLogHander(new ConsoleHandler());
+		result.SetLoggerParent(logger);
 		result.start();
 		return result;
 	}

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Vector;
 import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import de.tr0llhoehle.buschtrommel.IGUICallbacks;
 import de.tr0llhoehle.buschtrommel.network.ITransferProgress.TransferStatus;
@@ -70,6 +71,11 @@ public abstract class Transfer extends MessageMonitor implements ITransferProgre
 	@Override
 	public void RegisterLogHander(Handler h) {
 		logger.addHandler(h);
+	}
+	
+	@Override
+	public void SetLoggerParent(Logger l) {
+		logger.setParent(l);
 	}
 
 	@Override

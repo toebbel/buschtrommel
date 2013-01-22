@@ -3,6 +3,7 @@ package de.tr0llhoehle.buschtrommel.test.mockups;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.logging.Handler;
+import java.util.logging.Logger;
 
 import de.tr0llhoehle.buschtrommel.network.ITransferProgress;
 
@@ -126,6 +127,12 @@ public class ITransferMock implements ITransferProgress {
 
 	@Override
 	public void cleanup() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void SetLoggerParent(Logger l) {
 		// TODO Auto-generated method stub
 		
 	}

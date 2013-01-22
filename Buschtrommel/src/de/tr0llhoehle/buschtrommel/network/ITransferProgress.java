@@ -2,6 +2,7 @@ package de.tr0llhoehle.buschtrommel.network;
 
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * This interface gives acces to the progress of a transfer and some controll methods like cancel and resume.
@@ -128,6 +129,7 @@ public interface ITransferProgress {
 	
 	public void RegisterLogHander(java.util.logging.Handler h);
 	public void RemoveLogHander(java.util.logging.Handler h);
+	public void SetLoggerParent(Logger l);
 	
 	public enum TransferType {
 		Multisource,

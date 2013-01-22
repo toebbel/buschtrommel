@@ -138,6 +138,8 @@ public class NetCache implements IMessageObserver {
 							message.getFile().getMeta()));
 					if (this.guiCallbacks != null) {
 						this.guiCallbacks.newShareAvailable(host.getSharedFiles().get(hash));
+					} else {
+						logger.warning("GUI callback is null - can't announce file");
 					}
 				}
 
