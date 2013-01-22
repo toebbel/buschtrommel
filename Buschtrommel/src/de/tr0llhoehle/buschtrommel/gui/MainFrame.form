@@ -410,7 +410,7 @@
                   </Properties>
                   <AuxValues>
                     <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JList(outgoingItems)"/>
-                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="activeTransferList.setCellRenderer(downloadCellRenderer);"/>
+                    <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="outgoingTransferList.setCellRenderer(downloadCellRenderer);"/>
                   </AuxValues>
                 </Component>
               </SubComponents>
