@@ -163,9 +163,11 @@ public class OutgoingTransfer extends Transfer {
 
 	private void doTransfer() throws IOException {
 		if (ressourceInputStream == null) {
-			if (sendHeaderInRsp)
-				networkOutputStream.write((new FileRequestResponseMessage(ResponseCode.NEVER_TRY_AGAIN, 0).Serialize())
-						.getBytes());
+			if (sendHeaderInRsp) {
+				String header = new FileRequestResponseMessage(ResponseCode.NEVER_TRY_AGAIN, 0).Serialize();
+				logger.info("send header '" + header + "'");
+				networkOutputStream.write(header.getBytes());
+			}
 
 			networkOutputStream.close();
 			return;
@@ -204,10 +206,10 @@ public class OutgoingTransfer extends Transfer {
 			if (bufferSize == -1) {
 				bufferSize = FALLBACK_BUFFER_SIZE;
 				logger.log(Level.INFO, "Using fallback buffersize " + bufferSize);
-
 			}
 
 			// send the file
+			logger.info("sending data");
 			ressourceInputStream.skip(offset);
 			int bytesRead = 0;
 			int bytesToRead = bufferSize;
@@ -230,7 +232,8 @@ public class OutgoingTransfer extends Transfer {
 			networkOutputStream.flush();
 			networkOutputStream.close();
 			ressourceInputStream.close();
-
+			logger.info("finished sending data");
+			
 			if (totalTransferedVolume == expectedTransferVolume)
 				transferState = TransferStatus.Finished;
 			else {
@@ -270,6 +273,7 @@ public class OutgoingTransfer extends Transfer {
 
 	@Override
 	public void start() {
+		logger.info("start outgoing transfer");
 		assert transferThread == null;
 		transferThread = new Thread(new Runnable() {
 

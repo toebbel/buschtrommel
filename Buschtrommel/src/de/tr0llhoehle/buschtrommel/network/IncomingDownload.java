@@ -321,11 +321,12 @@ public class IncomingDownload extends Transfer {
 			transferState = TransferStatus.Finished;
 		} else {
 			try {
-				if (HashFuncWrapper.hash(targetPath.getAbsolutePath()) == getExpectedHash()) {
+				String hash = HashFuncWrapper.hash(targetPath.getAbsolutePath());
+				if (hash.equals(getExpectedHash())) {
 					logger.log(Level.INFO, "File has expected hash");
 					transferState = TransferStatus.Finished;
 				} else {
-					logger.log(Level.INFO, "File has invalid hash");
+					logger.log(Level.INFO, "File has invalid hash: '" + hash + "' but '" + getExpectedHash() + "' expected");
 					transferState = TransferStatus.InvalidContent;
 				}
 			} catch (IOException e) {
