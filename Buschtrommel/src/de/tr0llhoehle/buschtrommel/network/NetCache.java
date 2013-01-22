@@ -48,6 +48,7 @@ public class NetCache implements IMessageObserver {
 	protected UDPAdapter udpAdapter;
 	protected FileTransferAdapter fileTransferAdapter;
 	protected Timer ttlChecker;
+	private long lastDiscoveryMulticast;
 
 	private Logger logger;
 
@@ -67,6 +68,8 @@ public class NetCache implements IMessageObserver {
 				checkAndUpdateTTLs();
 			}
 		}, TTL_REFRESH_RATE * 1000, TTL_REFRESH_RATE * 1000);
+		
+		lastDiscoveryMulticast = System.currentTimeMillis();
 	}
 
 	/**
@@ -212,22 +215,39 @@ public class NetCache implements IMessageObserver {
 				this.guiCallbacks.newHostDiscovered(host);
 			}
 		}
+		
+		if (udpAdapter == null || fileTransferAdapter == null) {
+			logger.warning("Can't respond to peer discovery because adapter is not initialized!");
+			return;
+		}
+		
 		switch (message.getType()) {
+		
 		case PeerDiscoveryMessage.TYPE_FIELD_HI:
+			PeerDiscoveryMessage rsp = new PeerDiscoveryMessage(DiscoveryMessageType.YO, host.getDisplayName(),
+					fileTransferAdapter.getPort());
 			try {
-				if (this.fileTransferAdapter != null) {
-					Thread.sleep((int) (Math.random() * Config.maximumYoResponseTime) + 5000);
-					if (host.getPort() != Host.UNKNOWN_PORT) {
-						fileTransferAdapter.downloadFilelist(host);
-					}
+				Thread.sleep((int) (Math.random() * Config.maximumYoResponseTime));
+				if (System.currentTimeMillis() - lastDiscoveryMulticast > Config.minDiscoveryMulticastIddle) {
+					lastDiscoveryMulticast = System.currentTimeMillis();
+					udpAdapter.sendMulticast(rsp);
 				} else {
-					logger.warning("Could not find fileTransfer Adapter");
+					udpAdapter.sendUnicast(rsp, message.getSource().getAddress());
 				}
-			} catch (InterruptedException e) {
-				logger.warning(e.getMessage());
+
+				// autostart filelist download
+				fileTransferAdapter.downloadFilelist(new Host(message.getSource().getAddress(),
+						((PeerDiscoveryMessage) message).getAlias(), ((PeerDiscoveryMessage) message).getPort()));
+			} catch (IOException e) {
+				logger.warning("Could not response to HI message: " + e.getMessage());
+			} catch (InterruptedException e1) {
+				logger.warning("Error while waiting before sending YO response: " + e1.getMessage());
 			}
 			break;
-		case PeerDiscoveryMessage.TYPE_FIELD_YO: // nothing to do
+			
+		case PeerDiscoveryMessage.TYPE_FIELD_YO:
+			
+			
 			break;
 		default:
 		}
@@ -313,12 +333,12 @@ public class NetCache implements IMessageObserver {
 				// remove files with TTL that's too low
 				if (tmpTTL <= 0) {
 					host.removeFileFromSharedFiles(hash);
-					
+
 					shareAvailability.getFile().removeFileSource(shareAvailability);
 					if (shareAvailability.getFile().noSourcesAvailable()) {
 						knownShares.remove(hash);
 					}
-					
+
 					if (guiCallbacks != null) {
 						guiCallbacks.removeShare(shareAvailability);
 					}

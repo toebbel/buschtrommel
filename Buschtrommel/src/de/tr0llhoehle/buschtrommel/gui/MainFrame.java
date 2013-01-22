@@ -14,36 +14,21 @@ import de.tr0llhoehle.buschtrommel.Buschtrommel;
 import de.tr0llhoehle.buschtrommel.IGUICallbacks;
 import de.tr0llhoehle.buschtrommel.LoggerWrapper;
 import de.tr0llhoehle.buschtrommel.models.Host;
+import de.tr0llhoehle.buschtrommel.models.LocalShare;
 import de.tr0llhoehle.buschtrommel.models.ShareAvailability;
 import de.tr0llhoehle.buschtrommel.network.ITransferProgress;
-import de.tr0llhoehle.buschtrommel.network.ITransferProgress.TransferStatus;
-import de.tr0llhoehle.buschtrommel.network.ITransferProgress.TransferType;
-import de.tr0llhoehle.buschtrommel.network.IncomingDownload;
-import de.tr0llhoehle.buschtrommel.network.OutgoingTransfer;
-import de.tr0llhoehle.buschtrommel.test.mockups.ITransferMock;
 
-import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultListModel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
-import javax.swing.ListCellRenderer;
-import javax.swing.ListModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellEditor;
+import javax.swing.Timer;
 
-import java.awt.Component;
-import java.awt.Window.Type;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
-import java.util.List;
-import java.util.logging.Handler;
+import java.util.Hashtable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,15 +38,15 @@ import java.util.logging.Logger;
  */
 public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
-	private DefaultListModel<ITransferProgress> listmodel = new DefaultListModel<ITransferProgress>();
+	private DefaultListModel<ITransferProgress> downloadItems = new DefaultListModel<ITransferProgress>();
 	private DownloadItem downloadCellRenderer = new DownloadItem();
 	private Buschtrommel buschtrommel;
 	private FilesTableModel tablemodel = new FilesTableModel();
 	private LocalSharesTableModel sharesModel = new LocalSharesTableModel();
 	private String downloadPath = System.getProperty("user.home") + "/Downloads";
 	private String defaultTtl = "-1";
-	private JTextField textfield;
-
+	private String pathToShareSettings;
+	private Timer transferTimer;
 	/**
 	 * Creates new form MainFrame
 	 */
@@ -89,12 +74,44 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		localSharesTable.setAutoCreateRowSorter(true);
 		downloadFolder.setText(downloadPath);
 
+		readOldLocalShares();
+		
+		setupTimer();
+		
+
+
+
 		// filesHostsTable.setModel(tablemodel);
 		// tablemodel.addMock("bla", "meta-information", "42", "üch", "ff::ff",
 		// "trölf", "-1");
 		// tablemodel.addMock("arrrr", "larp", "300000", "üch", "ff::ff",
 		// "trölf", "-1");
 
+	}
+
+	private void setupTimer() {
+		//timer
+		int delay = 500; //milliseconds
+		java.awt.event.ActionListener taskPerformer = new java.awt.event.ActionListener() {
+		      public void actionPerformed(ActionEvent evt) {
+		          updateTransfers();
+		      }
+		  };
+		  transferTimer = new Timer(delay, taskPerformer);
+		  transferTimer.start();
+	}
+
+	protected void readOldLocalShares() {
+		if (buschtrommel == null) {
+			return;
+		}
+		Hashtable<String, LocalShare> temp_shares = buschtrommel.getLocalShares();
+		for (String hash : temp_shares.keySet()) {
+			LocalShare share = temp_shares.get(hash);
+			String size = humanReadableByteCount(share.getLength(), true);
+			sharesModel.addShareMeta(share.getDisplayName(), share.getMeta(), share.getPath(), size,
+					String.valueOf(share.getTTL()));
+		}
 	}
 
 	/**
@@ -130,7 +147,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		activateShare = new javax.swing.JButton();
 		jPanel4 = new javax.swing.JPanel();
 		jScrollPane1 = new javax.swing.JScrollPane();
-		activeTransferList = new javax.swing.JList(listmodel);
+		activeTransferList = new javax.swing.JList(downloadItems);
 		abortTransfer = new javax.swing.JButton();
 		resetTransfer = new javax.swing.JButton();
 		resumeTransfer = new javax.swing.JButton();
@@ -519,6 +536,18 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
 		pack();
 	}// </editor-fold>//GEN-END:initComponents
+	
+	/*
+	 * as long as a transfer is in the list, it is forced to repaint every second
+	 */
+	private void updateTransfers(){
+		activeTransferList.repaint();
+		if(downloadItems.isEmpty()){
+			
+				transferTimer.stop();
+			
+		}
+	}
 
 	private void removeTransferActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_removeTransferActionPerformed
 		int items_to_delete[] = null;
@@ -532,21 +561,26 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
 			for (int i = items_to_delete.length - 1; i >= 0; i--) {
 				// System.out.println("deleting: " + items_to_delete[i]);
-				listmodel.elementAt(i).cancel();
-				listmodel.elementAt(i).cleanup();
+				downloadItems.elementAt(i).cancel();
+				downloadItems.elementAt(i).cleanup();
 
 				// remove from list
-				listmodel.remove(items_to_delete[i]);
+				downloadItems.remove(items_to_delete[i]);
 			}
 
 		}
 	}// GEN-LAST:event_removeTransferActionPerformed
 
 	private void formWindowClosing(java.awt.event.WindowEvent evt) {// GEN-FIRST:event_formWindowClosing
-		// TODO add your handling code here:
+		//TODO timer to force close
+		if(transferTimer.isRunning()){
+			transferTimer.stop();
+		}
+		
 		if (buschtrommel != null) {
 			LoggerWrapper.logInfo("Exiting");
 			try {
+
 				buschtrommel.stop();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -636,7 +670,10 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 				ITransferProgress progress = buschtrommel.DownloadFile(hash, downloadPath + "/" + name, host);
 
 				if (progress != null) {
-					listmodel.addElement(progress);
+					downloadItems.addElement(progress);
+					if(!transferTimer.isRunning()){
+						transferTimer.start();
+					}
 				} else {
 					LoggerWrapper.logError("Something with the download went wrong");
 				}
@@ -662,40 +699,33 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 			if (buschtrommel != null) {
 
 				ITransferProgress progress = buschtrommel.DownloadFile(hash, downloadPath + "/" + name);
-				listmodel.addElement(progress);
+				downloadItems.addElement(progress);
+				if(!transferTimer.isRunning()){
+					transferTimer.start();
+				}
 			}
 		}
 
 	}// GEN-LAST:event_jButton1ActionPerformed
 
 	private void saveSettingsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_saveSettingsActionPerformed
-		// TODO add your handling code here:
+		//java.io.File cfgFile = new File("config-gui.xml");
+//		if (cfgFile.exists()) {
+//			try {
+//				Config.readFromFile(cfgFile);
+//				if (Config.alias == null)
+//					Config.alias = alias;
+//				return;
+//			} catch (FileNotFoundException e) {
+//				LoggerWrapper.logError("Could not read config file: " + e.getMessage());
+//				e.printStackTrace();
+//			}
+//		}
+
+
 	}// GEN-LAST:event_saveSettingsActionPerformed
 
-	// private void downloadFilesActionPerformed(java.awt.event.ActionEvent evt)
-	// {// GEN-FIRST:event_downloadFilesBtnActionPerformed
-	// if (downloadPath == null) {
-	// JOptionPane.showMessageDialog(null,
-	// "Please set a Download-Folder first");
-	// return;
-	// }
-	//
-	// int[] selected = filesHostsTable.getSelectedRows();
-	//
-	// for (int i : selected) {
-	// // "Filename", "Meta-Information", "Size", "Host-Name","IP", "Hash",
-	// // "TTL"
-	// String hash = tablemodel.getValueAt(i, 5);
-	// String ip = tablemodel.getValueAt(i, 4);
-	// String name = tablemodel.getValueAt(i, 0);
-	// if (buschtrommel != null) {
-	//
-	// ITransferProgress progress = buschtrommel.DownloadFile(hash, downloadPath
-	// + "/" + name);
-	// listmodel.addElement(progress);
-	// }
-	// }
-	// }// GEN-LAST:event_downloadFilesBtnActionPerformed
+
 
 	private void removeShareActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_removeShareActionPerformed
 		int selected[] = localSharesTable.getSelectedRows();
@@ -763,8 +793,8 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
 			for (int i = items_to_reset.length - 1; i >= 0; i--) {
 				// System.out.println("deleting: " + items_to_delete[i]);
-				listmodel.elementAt(i).resumeTransfer();
-				listmodel.notify();
+				downloadItems.elementAt(i).resumeTransfer();
+				downloadItems.notify();
 
 				// remove from list
 				// listmodel.remove(items_to_reset[i]);
@@ -802,8 +832,8 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
 			for (int i = items_to_reset.length - 1; i >= 0; i--) {
 				// System.out.println("deleting: " + items_to_delete[i]);
-				listmodel.elementAt(i).reset();
-				listmodel.notify();
+				downloadItems.elementAt(i).reset();
+				downloadItems.notify();
 
 				// remove from list
 				// listmodel.remove(items_to_reset[i]);
@@ -838,7 +868,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
 			for (int i = items_to_delete.length - 1; i >= 0; i--) {
 				// System.out.println("deleting: " + items_to_delete[i]);
-				listmodel.elementAt(i).cancel();
+				downloadItems.elementAt(i).cancel();
 
 				// remove from list
 				// listmodel.remove(items_to_delete[i]);
@@ -954,7 +984,6 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		// throw new UnsupportedOperationException("Not supported yet.");
 	}
 
-
 	@Override
 	public void newShareAvailable(ShareAvailability file) {
 		// filesHostsTable.setModel(filesModel);
@@ -973,6 +1002,5 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		// TODO Auto-generated method stub 4 Beni
 		
 	}
-
 
 }
