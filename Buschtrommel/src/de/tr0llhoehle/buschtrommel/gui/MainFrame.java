@@ -601,7 +601,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 			for (int i = items_to_reset.length - 1; i >= 0; i--) {
 				// System.out.println("deleting: " + items_to_delete[i]);
 				outgoingItems.elementAt(i).reset();
-				outgoingItems.notify();
+				//outgoingItems.notify();
 
 				// remove from list
 				// listmodel.remove(items_to_reset[i]);
@@ -901,7 +901,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 			for (int i = items_to_reset.length - 1; i >= 0; i--) {
 				// System.out.println("deleting: " + items_to_delete[i]);
 				downloadItems.elementAt(i).resumeTransfer();
-				downloadItems.notify();
+				//downloadItems.notify();
 
 				// remove from list
 				// listmodel.remove(items_to_reset[i]);
@@ -924,7 +924,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 			for (int i = items_to_reset.length - 1; i >= 0; i--) {
 				// System.out.println("deleting: " + items_to_delete[i]);
 				downloadItems.elementAt(i).reset();
-				downloadItems.notify();
+				//downloadItems.notify();
 
 				// remove from list
 				// listmodel.remove(items_to_reset[i]);
