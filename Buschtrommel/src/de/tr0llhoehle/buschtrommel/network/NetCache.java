@@ -236,8 +236,7 @@ public class NetCache implements IMessageObserver {
 				}
 
 				// autostart filelist download
-				fileTransferAdapter.downloadFilelist(new Host(message.getSource().getAddress(),
-						((PeerDiscoveryMessage) message).getAlias(), ((PeerDiscoveryMessage) message).getPort()));
+				//fileTransferAdapter.downloadFilelist(host);
 			} catch (IOException e) {
 				logger.warning("Could not response to HI message: " + e.getMessage());
 			} catch (InterruptedException e1) {
@@ -251,6 +250,7 @@ public class NetCache implements IMessageObserver {
 			break;
 		default:
 		}
+		fileTransferAdapter.downloadFilelist(host);
 	}
 
 	private void byeHandler(ByeMessage message) {
