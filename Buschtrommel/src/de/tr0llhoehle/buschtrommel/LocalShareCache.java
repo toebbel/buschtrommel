@@ -7,6 +7,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Logger;
 
 import de.tr0llhoehle.buschtrommel.models.FileAnnouncementMessage;
@@ -28,11 +30,36 @@ public class LocalShareCache {
 
 	protected Hashtable<String, LocalShare> shares;
 	private Logger logger;
+	private Timer ttlChecker;
+	private static final int TTL_REFRESH_RATE = 5; //in seconds
 
 	
 	public LocalShareCache() {
 		logger = java.util.logging.Logger.getLogger(this.getClass().getName());
 		shares = new Hashtable<>();
+		
+		ttlChecker = new Timer();
+		ttlChecker.scheduleAtFixedRate(new TimerTask() {
+			public void run() {
+				checkAndUpdateTTLs();
+			}
+		}, TTL_REFRESH_RATE * 1000, TTL_REFRESH_RATE * 1000);
+	}
+	
+	private void checkAndUpdateTTLs() {
+		for(String hash : shares.keySet()) {
+			
+			//ignore TTLs that are infinity
+			if(shares.get(hash).getTTL() == Share.TTL_INFINITY)
+				continue;
+			
+			int updatedTTL = shares.get(hash).getTTL() - TTL_REFRESH_RATE;
+			if(updatedTTL <= 0) {
+				shares.remove(hash);
+			} else {
+				shares.get(hash).setTTL(updatedTTL);
+			}
+		}
 	}
 
 	/**
