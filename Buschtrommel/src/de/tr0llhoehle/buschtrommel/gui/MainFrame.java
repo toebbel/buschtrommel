@@ -1085,7 +1085,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 				return;
 			}
 			
-			outgoingItems.addElement(transfer);
+			//outgoingItems.addElement(transfer);
 			if (!transferOutTimer.isRunning()) {
 				transferOutTimer.start();
 			}
