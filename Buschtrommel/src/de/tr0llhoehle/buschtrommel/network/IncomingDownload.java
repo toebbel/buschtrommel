@@ -89,7 +89,7 @@ public class IncomingDownload extends Transfer {
 		// set general stuff
 		super(new InetSocketAddress(host.getAddress(), host.getPort()));
 		refreshPartnersPort = false;
-		this.partner = new InetSocketAddress(host.getAddress(), host.getPort());
+		partner = new InetSocketAddress(host.getAddress(), host.getPort());
 		logger = java.util.logging.Logger.getLogger("incoming " + hash + " " + partner.toString());
 		transferType = TransferType.Singlesource;
 		bufferSize = -1;
@@ -152,7 +152,7 @@ public class IncomingDownload extends Transfer {
 		}
 		
 		//retrieve port for host, if necessary
-		if(refreshPartnersPort) {
+		if(refreshPartnersPort || partner == null) {
 			logger.info("retrieve port for host");
 			Host newPartner = hosts.getOrCreateHost(partner.getAddress());
 			if(newPartner.getPort() == Host.UNKNOWN_PORT) {
