@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.util.Hashtable;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Logger;
 
 import de.tr0llhoehle.buschtrommel.Config;
 import de.tr0llhoehle.buschtrommel.IGUICallbacks;
@@ -47,7 +48,10 @@ public class NetCache implements IMessageObserver {
 	protected FileTransferAdapter fileTransferAdapter;
 	protected Timer ttlChecker;
 
+	private Logger logger;
+
 	public NetCache(UDPAdapter udpAdapter, FileTransferAdapter fileAdapter, IGUICallbacks guiCallbacks) {
+		logger = java.util.logging.Logger.getLogger(this.getClass().getName());
 		this.udpAdapter = udpAdapter;
 		this.guiCallbacks = guiCallbacks;
 
@@ -80,13 +84,13 @@ public class NetCache implements IMessageObserver {
 	@Override
 	public void receiveMessage(Message message) {
 		if (message instanceof FileAnnouncementMessage) {
-			LoggerWrapper.logInfo("NetCache receives File availibility message");
+			logger.info("NetCache receives File availibility message");
 			this.fileAnnouncmentHandler((FileAnnouncementMessage) message, false);
 		} else if (message instanceof PeerDiscoveryMessage) {
-			LoggerWrapper.logInfo("NetCache receives peer discovery message");
+			logger.info("NetCache receives peer discovery message");
 			this.peerDiscoveryHandler((PeerDiscoveryMessage) message);
 		} else if (message instanceof ByeMessage) {
-			LoggerWrapper.logInfo("NetCache receives bye message");
+			logger.info("NetCache receives bye message");
 			this.byeHandler((ByeMessage) message);
 		}
 
@@ -158,7 +162,7 @@ public class NetCache implements IMessageObserver {
 				}
 
 			} catch (IOException e) {
-				LoggerWrapper.logError(e.getMessage());
+				logger.warning(e.getMessage());
 			}
 
 		}
@@ -212,10 +216,10 @@ public class NetCache implements IMessageObserver {
 						fileTransferAdapter.downloadFilelist(host);
 					}
 				} else {
-					LoggerWrapper.logError("Could not find fileTransfer Adapter");
+					logger.warning("Could not find fileTransfer Adapter");
 				}
 			} catch (InterruptedException e) {
-				LoggerWrapper.logError(e.getMessage());
+				logger.warning(e.getMessage());
 			}
 			break;
 		case PeerDiscoveryMessage.TYPE_FIELD_YO: // nothing to do

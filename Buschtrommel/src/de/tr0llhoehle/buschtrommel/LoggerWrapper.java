@@ -12,14 +12,14 @@ import java.util.logging.Logger;
  */
 public class LoggerWrapper {
 	
-	public final static Logger LOGGER = Logger.getLogger("buschtrommel");
+	public final static Logger MASTER_LOGGER = Logger.getLogger("buschtrommel");
 	
 	/**
 	 * Writes info message into the logger
 	 * @param message the message to log
 	 */
 	public final static void logInfo(String message) {
-		LOGGER.info(message);
+		MASTER_LOGGER.info(message);
 	}
 	
 	/**
@@ -27,6 +27,6 @@ public class LoggerWrapper {
 	 * @param message the message to log
 	 */
 	public final static void logError(String message) {
-		LOGGER.warning(message);
+		MASTER_LOGGER.warning(message);
 	}
 }

@@ -7,6 +7,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.logging.Logger;
+
 import de.tr0llhoehle.buschtrommel.models.FileAnnouncementMessage;
 import de.tr0llhoehle.buschtrommel.models.LocalShare;
 import de.tr0llhoehle.buschtrommel.models.Message;
@@ -24,8 +26,14 @@ import de.tr0llhoehle.buschtrommel.network.UDPAdapter;
  */
 public class LocalShareCache {
 
-	protected Hashtable<String, LocalShare> shares = new Hashtable<>();
+	protected Hashtable<String, LocalShare> shares;
+	private Logger logger;
 
+	
+	public LocalShareCache() {
+		logger = java.util.logging.Logger.getLogger(this.getClass().getName());
+		shares = new Hashtable<>();
+	}
 
 	/**
 	 * 
@@ -81,19 +89,19 @@ public class LocalShareCache {
 	 */
 	public void newShare(LocalShare share) {
 		if (share == null) {
-			LoggerWrapper.logError("no share given");
+			logger.warning("no share given");
 			return;
 		}
 		// String hash = share.getHash();
 		if (this.has(share.getHash())) {
-			LoggerWrapper.logError("A Share with the given Hash: " + share.getHash()
+			logger.warning("A Share with the given Hash: " + share.getHash()
 					+ "has already be defined. It is now replaced with the new Share");
 			this.shares.remove(share.getHash());
 
 		}
-		// LoggerWrapper.logInfo("set hash: " + share.getHash());
+		// logger.info("set hash: " + share.getHash());
 		this.shares.put(share.getHash(), share);
-		// LoggerWrapper.logInfo("file has been added");
+		// logger.info("file has been added");
 
 	}
 
@@ -121,7 +129,7 @@ public class LocalShareCache {
 	 * @return true if shares could be saved to file
 	 */
 	public boolean saveToFile(String path) {
-		LoggerWrapper.logInfo("Write all shares into " + path);
+		logger.info("Write all shares into " + path);
 		if (path == null || !path.endsWith(".ht")) {
 			throw new IllegalArgumentException("the given path: " + path + " is not valid (must end with .ht)");
 		}
@@ -131,10 +139,10 @@ public class LocalShareCache {
 			writer.write(convertSharesToString());
 			writer.close();
 		} catch (FileNotFoundException e1) {
-			LoggerWrapper.logError("the given path: " + path + " is not valid");
+			logger.warning("the given path: " + path + " is not valid");
 			return false;
 		} catch (IOException e) {
-			LoggerWrapper.logError("Could not write to file '" + path + "' - " + e.getMessage());
+			logger.warning("Could not write to file '" + path + "' - " + e.getMessage());
 			return false;
 		}
 		return true;
@@ -158,7 +166,7 @@ public class LocalShareCache {
 				// split into parseable part and path
 				String[] line = reader.readLine().split(String.valueOf(Message.MESSAGE_SPERATOR));
 				if (line.length != 2) {
-					LoggerWrapper.logError("Could not parse line " + lineCount + " in shareCache file");
+					logger.warning("Could not parse line " + lineCount + " in shareCache file");
 					lineCount++;
 					continue;
 				}
@@ -166,7 +174,7 @@ public class LocalShareCache {
 
 				// check if file is still there
 				if (!(new java.io.File(line[1]).exists())) {
-					LoggerWrapper.logError("The file '" + line[1]
+					logger.warning("The file '" + line[1]
 							+ "' is not available any more. Removed it from ShareCache");
 					continue;
 				}
@@ -174,7 +182,7 @@ public class LocalShareCache {
 				// check if part 1 parseable
 				Message m = MessageDeserializer.Deserialize(line[0] + Message.MESSAGE_SPERATOR); //has to append seperator because deserializer needs this and we cut it off.
 				if (m == null || !(m instanceof FileAnnouncementMessage)) {
-					LoggerWrapper.logError("Could not parse line " + line + ": " + line[0]);
+					logger.warning("Could not parse line " + line + ": " + line[0]);
 					continue;
 				}
 
@@ -191,7 +199,7 @@ public class LocalShareCache {
 			}
 			reader.close();
 		} catch (IOException e) {
-			LoggerWrapper.logError("Could not read ShareCache: " + e.getMessage());
+			logger.warning("Could not read ShareCache: " + e.getMessage());
 		}
 		return true;
 	}

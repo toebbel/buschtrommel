@@ -10,6 +10,8 @@ import de.tr0llhoehle.buschtrommel.models.*;
  */
 public class MessageDeserializer {
 	
+	private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MessageDeserializer.class.getName());
+	
 	/**
 	 * Creates an instance of a subclass of Message that matches the given context.
 	 * 
@@ -19,13 +21,13 @@ public class MessageDeserializer {
 	 * @return instance or null if no matching message could be found
 	 */
 	public static Message Deserialize(String raw) {
-		LoggerWrapper.logInfo("deserialize '" + raw + "'");
+		logger.info("deserialize '" + raw + "'");
 		int typeSeperator = -1;
 		typeSeperator = raw.indexOf(Message.FIELD_SEPERATOR);
 		if(typeSeperator == -1) //some messages don't contain any field seperator, because they have only a type field
 			typeSeperator = raw.indexOf(Message.MESSAGE_SPERATOR);
 		if(typeSeperator == -1) {
-			LoggerWrapper.logError("Can't deserialize raw message '" + raw + "'");
+			logger.warning("Can't deserialize raw message '" + raw + "'");
 			return null;
 		}
 		
@@ -44,7 +46,7 @@ public class MessageDeserializer {
 			case GetFilelistMessage.TYPE_FIELD:
 				return new GetFilelistMessage();
 			default:
-				LoggerWrapper.logError("I don't unterstand the following message: '" + raw + "' :(");
+				logger.warning("I don't unterstand the following message: '" + raw + "' :(");
 				return null;
 		}
 	}
@@ -54,13 +56,13 @@ public class MessageDeserializer {
 		Message result = null;
 		
 		if(fields.length != 3) {
-			LoggerWrapper.logError("Invlaid number of fields in GetFileMessage body: '" + msgContent + "'");
+			logger.warning("Invlaid number of fields in GetFileMessage body: '" + msgContent + "'");
 			return result;
 		}
 		try {
 			return new GetFileMessage(fixBrokenHash(fields[0]), Long.valueOf(fields[1]), Long.valueOf(fields[2].substring(0, fields[2].length() - 1)));
 		} catch(IllegalArgumentException e) { //NumberFormatException is subtype
-			LoggerWrapper.logError("Could not parse the GetFileMessage body: '" + fields[0] + "|" + fields[1] + "|" + fields[2] + "\\. Excpetion: " + e.getMessage());
+			logger.warning("Could not parse the GetFileMessage body: '" + fields[0] + "|" + fields[1] + "|" + fields[2] + "\\. Excpetion: " + e.getMessage());
 		}
 		
 		return result;
@@ -75,7 +77,7 @@ public class MessageDeserializer {
 		Message result = null;
 		
 		if(fields.length != 5) {
-			LoggerWrapper.logError("Invalid number of fields in FileAnnouncementMessage body: '" + msgContent + "'");
+			logger.warning("Invalid number of fields in FileAnnouncementMessage body: '" + msgContent + "'");
 			return result;
 		}
 		
@@ -89,7 +91,7 @@ public class MessageDeserializer {
 			
 			result = new FileAnnouncementMessage(new LocalShare(hash, length, ttl, fields[3], meta, ""));
 		} catch(IllegalArgumentException e) { //NumberFormatException is subtype
-			LoggerWrapper.logError("Could not parse the FileAnnouncementMessage body: '" + msgContent + "'. Excpetion: " + e.getMessage());
+			logger.warning("Could not parse the FileAnnouncementMessage body: '" + msgContent + "'. Excpetion: " + e.getMessage());
 		}
 		
 		return result;
@@ -100,7 +102,7 @@ public class MessageDeserializer {
 		Message result = null;
 		
 		if(fields.length != 2) {
-			LoggerWrapper.logError("Invlaid number of fields in HI/YO message body: '" + msgContent + "'");
+			logger.warning("Invlaid number of fields in HI/YO message body: '" + msgContent + "'");
 			return result;
 		}
 		
@@ -118,7 +120,7 @@ public class MessageDeserializer {
 			
 			result = new PeerDiscoveryMessage(t, alias, port);
 		} catch(IllegalArgumentException e) { //NumberFormatException is subtype
-			LoggerWrapper.logError("Could not parse the Hi/Yo message body: '" + msgContent + "'. Excpetion: " + e.getMessage());
+			logger.warning("Could not parse the Hi/Yo message body: '" + msgContent + "'. Excpetion: " + e.getMessage());
 		}
 		
 		return result;

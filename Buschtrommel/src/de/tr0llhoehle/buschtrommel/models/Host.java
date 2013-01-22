@@ -2,6 +2,7 @@ package de.tr0llhoehle.buschtrommel.models;
 
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.logging.Logger;
 
 import de.tr0llhoehle.buschtrommel.LoggerWrapper;
 
@@ -13,6 +14,7 @@ public class Host {
 	private String displayName;
 	private Hashtable<String, ShareAvailability> shares;
 	private int port;
+	private Logger logger;
 	
 	/**
 	 * Creates an instance of Host with an emtpy share
@@ -20,6 +22,7 @@ public class Host {
 	 * @param displayName human readable Displayname. Can be empty (IP address will be used). Message and Field seperator will be replaced with spaces.
 	 */
 	public Host(java.net.InetAddress address, String displayName, int port) {
+		logger = java.util.logging.Logger.getLogger(this.getClass().getName());
 		firstSeen = new Date();
 		lastSeen = firstSeen;
 		this.port = port;
@@ -60,7 +63,7 @@ public class Host {
 	 * @param f the file to add
 	 */
 	public void addFileToSharedFiles(ShareAvailability share) {
-		LoggerWrapper.logInfo("Add file '" + share.getFile() + "' to " + this.toString());
+		logger.info("Add file '" + share.getFile() + "' to " + this.toString());
 		shares.put(share.getFile().getHash(), share);
 	}
 	
@@ -69,7 +72,7 @@ public class Host {
 	 * @param hash hash of the file in upper-case and without leading 0x.
 	 */
 	public void removeFileFromSharedFiles(String hash) {
-		LoggerWrapper.logInfo("Remove file with hash '" + hash + "' from " + this.toString());
+		logger.info("Remove file with hash '" + hash + "' from " + this.toString());
 		shares.remove(hash);
 	}
 	
@@ -77,7 +80,7 @@ public class Host {
 	 * Updates the LastSeen field to current time
 	 */
 	public void Seen() {
-		LoggerWrapper.logInfo("Seen host " + this.toString());
+		logger.info("Seen host " + this.toString());
 		lastSeen = new Date();
 	}
 	

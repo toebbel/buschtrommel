@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Timer;
 import java.util.logging.ConsoleHandler;
+import java.util.logging.Logger;
 
 import de.tr0llhoehle.buschtrommel.models.ByeMessage;
 import de.tr0llhoehle.buschtrommel.models.FileAnnouncementMessage;
@@ -42,6 +43,7 @@ public class Buschtrommel implements IMessageObserver {
 	private LocalShareCache shareCache;
 	private String alias;
 	private long lastDiscoveryMulticast;
+	private Logger logger;
 
 	/**
 	 * Creates an instance if buschtrommel
@@ -50,7 +52,7 @@ public class Buschtrommel implements IMessageObserver {
 	 * @param alias
 	 */
 	public Buschtrommel(IGUICallbacks gui, String alias) {
-		LoggerWrapper.LOGGER.addHandler(new ConsoleHandler());
+		logger = java.util.logging.Logger.getLogger(this.getClass().getName());
 
 		if (!HashFuncWrapper.check()) {// cancel bootstrap: Hashfunction is not
 										// available!
@@ -71,7 +73,7 @@ public class Buschtrommel implements IMessageObserver {
 					Config.alias = alias;
 				return;
 			} catch (FileNotFoundException e) {
-				LoggerWrapper.logError("Could not read config file: " + e.getMessage());
+				logger.warning("Could not read config file: " + e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -87,7 +89,7 @@ public class Buschtrommel implements IMessageObserver {
 		try {
 			Config.saveToFile(cfgFile, new Config());
 		} catch (FileNotFoundException e) {
-			LoggerWrapper.logError("Could not write config file");
+			logger.warning("Could not write config file");
 		}
 	}
 
@@ -162,15 +164,15 @@ public class Buschtrommel implements IMessageObserver {
 	public ITransferProgress DownloadFile(String hash, String targetFile, Host host) {
 		RemoteShare s = netCache.getShare(hash);
 		if (s == null) {
-			LoggerWrapper.logError("Can't start download: The share with the hash " + hash + " is not known");
+			logger.warning("Can't start download: The share with the hash " + hash + " is not known");
 			return null;
 		}
 		if (host == null) {
-			LoggerWrapper.logError("Can't start download: The given host is null!");
+			logger.warning("Can't start download: The given host is null!");
 			return null;
 		}
 		if (targetFile == null) {
-			LoggerWrapper.logError("Can't start download: The given filepath is null");
+			logger.warning("Can't start download: The given filepath is null");
 			return null;
 		}
 		Transfer result = (Transfer) fileTransferAdapter.DownloadFile(hash, host, s.getLength(), new java.io.File(
@@ -260,7 +262,7 @@ public class Buschtrommel implements IMessageObserver {
 				udpAdapter.sendMulticast(new FileAnnouncementMessage(new LocalShare(localShare.getHash(), localShare
 						.getLength(), 0, localShare.getDisplayName(), localShare.getMeta(), localShare.getPath())));
 			} catch (IOException e) {
-				LoggerWrapper.logError("Could not announce file-unavailability: " + e.getMessage());
+				logger.warning("Could not announce file-unavailability: " + e.getMessage());
 			}
 		}
 	}
@@ -356,10 +358,10 @@ public class Buschtrommel implements IMessageObserver {
 			if (this.udpAdapter != null) {
 				this.udpAdapter.sendMulticast(new ByeMessage());
 			} else {
-				LoggerWrapper.logError("Could not find UDP Adapter");
+				logger.warning("Could not find UDP Adapter");
 			}
 		} catch (IOException e) {
-			LoggerWrapper.logError(e.getMessage());
+			logger.warning(e.getMessage());
 		}
 	}
 
@@ -370,7 +372,7 @@ public class Buschtrommel implements IMessageObserver {
 		if (message instanceof PeerDiscoveryMessage) {
 			if (((PeerDiscoveryMessage) message).getDiscoveryMessageType() == DiscoveryMessageType.HI) {
 				if (udpAdapter == null || fileTransferAdapter == null) {
-					LoggerWrapper.logError("Can't respond to peer discovery because adapter is not initialized!");
+					logger.warning("Can't respond to peer discovery because adapter is not initialized!");
 					return;
 				}
 
@@ -388,9 +390,9 @@ public class Buschtrommel implements IMessageObserver {
 					//autostart filelist download
 					fileTransferAdapter.downloadFilelist(new Host(message.getSource().getAddress(), ((PeerDiscoveryMessage) message).getAlias(), ((PeerDiscoveryMessage) message).getPort()));
 				} catch (IOException e) {
-					LoggerWrapper.logError("Could not response to HI message: " + e.getMessage());
+					logger.warning("Could not response to HI message: " + e.getMessage());
 				} catch (InterruptedException e1) {
-					LoggerWrapper.logError("Error while waiting before sending YO response: " + e1.getMessage());
+					logger.warning("Error while waiting before sending YO response: " + e1.getMessage());
 				}
 			}
 		}

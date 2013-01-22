@@ -12,6 +12,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.ConsoleHandler;
+import java.util.logging.Logger;
 
 import de.tr0llhoehle.buschtrommel.LoggerWrapper;
 import de.tr0llhoehle.buschtrommel.LocalShareCache;
@@ -29,6 +30,7 @@ public class FileTransferAdapter extends MessageMonitor {
 	private boolean keepAlive;
 	private Vector<Transfer> outgoingTransfers;
 	private Hashtable<String, Transfer> incomingTransfers;
+	private Logger logger;
 	
 
 	/**
@@ -43,6 +45,7 @@ public class FileTransferAdapter extends MessageMonitor {
 	 * @throws IOException
 	 */
 	public FileTransferAdapter(LocalShareCache s, int port) throws IOException {
+		logger = java.util.logging.Logger.getLogger(this.getClass().getName());
 		this.port = port;
 		myShares = s;
 		incomingTransfers = new Hashtable<>();
@@ -65,9 +68,9 @@ public class FileTransferAdapter extends MessageMonitor {
 
 			@Override
 			public void run() {
-				LoggerWrapper.logInfo("Start Listening thread");
+				logger.info("Start Listening thread");
 				handleIncomingConnections();
-				LoggerWrapper.logInfo("Stop Listening thread");
+				logger.info("Stop Listening thread");
 			}
 		});
 		receiveThread.start();
@@ -132,14 +135,14 @@ public class FileTransferAdapter extends MessageMonitor {
 					transfer.start();
 					p = transfer;
 				} else {
-					LoggerWrapper.logInfo("Received garbage on fileTransferAdapter");
+					logger.info("Received garbage on fileTransferAdapter");
 				}
 
 				if (p != null)
 					outgoingTransfers.add(p);
 
 			} catch (IOException e) {
-				LoggerWrapper.logError(e.getMessage());
+				logger.warning(e.getMessage());
 			}
 		}
 	}
@@ -159,7 +162,7 @@ public class FileTransferAdapter extends MessageMonitor {
 	 */
 	public Transfer DownloadFile(String hash, Host host, long length, java.io.File target) {
 		if (incomingTransfers.containsKey(hash)) {
-			LoggerWrapper.logInfo("The file to download was/is already downloaded/downloading - cancel & clean it");
+			logger.info("The file to download was/is already downloaded/downloading - cancel & clean it");
 			if (incomingTransfers.get(hash).getStatus() != TransferStatus.Cleaned) {
 				incomingTransfers.get(hash).cancel();
 				incomingTransfers.get(hash).cleanup();

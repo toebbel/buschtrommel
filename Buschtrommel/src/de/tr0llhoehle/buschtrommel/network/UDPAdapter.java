@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Vector;
+import java.util.logging.Logger;
 
 import de.tr0llhoehle.buschtrommel.LoggerWrapper;
 import de.tr0llhoehle.buschtrommel.models.Host;
@@ -41,6 +42,7 @@ public class UDPAdapter extends MessageMonitor {
 	private int send_port;
 
 	private Thread receiveThread;
+	private Logger logger;
 
 	/**
 	 * Creates an instance of UDP adapter, that listens on the default port and
@@ -82,6 +84,7 @@ public class UDPAdapter extends MessageMonitor {
 	 */
 	public UDPAdapter(int listenPort, int sendPort, boolean ipv4, boolean ipv6) throws IOException {
 		assert (ipv4 || ipv6);
+		logger = java.util.logging.Logger.getLogger(this.getClass().getName());
 		if (ipv4)
 			this.multicastv4Group = (Inet4Address) Inet4Address.getByName(MULTICAST_ADDRESS_V4);
 		if (ipv6)
@@ -98,7 +101,7 @@ public class UDPAdapter extends MessageMonitor {
 				try {
 					startReceiving();
 				} catch (IOException e) {
-					LoggerWrapper.logError(e.getMessage());
+					logger.warning(e.getMessage());
 				}
 			}
 		});
@@ -110,11 +113,11 @@ public class UDPAdapter extends MessageMonitor {
 	private void openConnection() throws IOException {
 		this.multicastSocket = new MulticastSocket(receive_port);
 		if (multicastv4Group != null) {
-			LoggerWrapper.logInfo("UDP Adapter connects to IPv group");
+			logger.info("UDP Adapter connects to IPv group");
 			this.multicastSocket.joinGroup(multicastv4Group);
 		}
 		if (multicastv6Group != null) {
-			LoggerWrapper.logInfo("UDP Adapter connects to IPv group");
+			logger.info("UDP Adapter connects to IPv group");
 			this.multicastSocket.joinGroup(multicastv6Group);
 		}
 	}
@@ -125,7 +128,7 @@ public class UDPAdapter extends MessageMonitor {
 	 * @throws IOException
 	 */
 	public void closeConnection() throws IOException {
-		LoggerWrapper.logInfo("UDP Adapter shuts down");
+		logger.info("UDP Adapter shuts down");
 		this.running = false;
 		if (multicastv4Group != null)
 			this.multicastSocket.leaveGroup(multicastv4Group);
@@ -146,10 +149,10 @@ public class UDPAdapter extends MessageMonitor {
 				message = MessageDeserializer.Deserialize(new String(receivePacket.getData(), Message.ENCODING));
 				if (message != null) {
 					message.setSource(new InetSocketAddress(receivePacket.getAddress(), receivePacket.getPort()));
-					LoggerWrapper.logInfo("UDP Adapter received a message: " + message.Serialize());
+					logger.info("UDP Adapter received a message: " + message.Serialize());
 					this.sendMessageToObservers(message);
 				} else {
-					LoggerWrapper.logError("UDP Adapter could not deserialize the message");
+					logger.warning("UDP Adapter could not deserialize the message");
 				}
 			}
 		}
@@ -163,7 +166,7 @@ public class UDPAdapter extends MessageMonitor {
 	 * @throws IOException
 	 */
 	public void sendMulticast(Message message) throws IOException {
-		LoggerWrapper.logInfo("UDP Adapter sends multicast: " + message.Serialize());
+		logger.info("UDP Adapter sends multicast: " + message.Serialize());
 		byte[] data = message.Serialize().getBytes(Message.ENCODING);
 		if (multicastv4Group != null) {
 			DatagramPacket v4Packet = new DatagramPacket(data, data.length, this.multicastv4Group,
@@ -191,9 +194,9 @@ public class UDPAdapter extends MessageMonitor {
 	 * @throws IOException
 	 */
 	public void sendUnicast(Message message, InetAddress host) throws IOException {
-		LoggerWrapper.logInfo("UDP Adapter sends unicast to " + host + " : " + message.Serialize());
+		logger.info("UDP Adapter sends unicast to " + host + " : " + message.Serialize());
 		String data = message.Serialize();
-		LoggerWrapper.logInfo("UDP Adapter sends multicast: " + data);
+		logger.info("UDP Adapter sends multicast: " + data);
 		DatagramPacket packet = new DatagramPacket(data.getBytes(Message.ENCODING), data.length(), host, send_port);
 
 		this.multicastSocket.send(packet);

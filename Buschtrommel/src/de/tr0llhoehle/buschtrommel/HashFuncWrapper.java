@@ -6,6 +6,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Formatter;
 
+import de.tr0llhoehle.buschtrommel.network.MessageDeserializer;
+
 /**
  * This class wraps the hash function that is used in buschtrommel.
  * @author Tobias Sturm
@@ -14,6 +16,7 @@ import java.util.Formatter;
 public class HashFuncWrapper {
 
 	private static final String HASH_FUNCTION = "SHA-1";
+	private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MessageDeserializer.class.getName());
 
 	/**
 	 * Checks if the hash-provider is available on this machine.
@@ -42,7 +45,7 @@ public class HashFuncWrapper {
 			MessageDigest md = MessageDigest.getInstance(HASH_FUNCTION);
 			return byteArray2Hex(md.digest(d));
 		} catch (NoSuchAlgorithmException ex) {
-			LoggerWrapper.logError(HASH_FUNCTION + "is not available on this machine!");
+			logger.warning(HASH_FUNCTION + "is not available on this machine!");
 			throw new IllegalStateException(HASH_FUNCTION + "is not available on this machine!");
 		}
 		
@@ -69,7 +72,7 @@ public class HashFuncWrapper {
 
 			return byteArray2Hex(md.digest());
 		} catch (NoSuchAlgorithmException e) {
-			LoggerWrapper.logError(HASH_FUNCTION + "is not available on this machine!");
+			logger.warning(HASH_FUNCTION + "is not available on this machine!");
 			throw new IllegalStateException(HASH_FUNCTION + "is not available on this machine!");
 		}
 		
