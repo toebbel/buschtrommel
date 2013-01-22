@@ -69,10 +69,13 @@ public class OutgoingTransfer extends Transfer {
 		keepTransferAlive = true;
 		transferState = TransferStatus.Initialized;
 		totalTransferedVolume = 0;
+		
 
 		if (m instanceof GetFileMessage) {
 			sendHeaderInRsp = true;
 			hash = ((GetFileMessage) m).getHash();
+			initialTransferVolume = ((GetFileMessage) m).getLength();
+			expectedTransferVolume = initialTransferVolume; 
 		} else if (m instanceof GetFilelistMessage) {
 			sendHeaderInRsp = false;
 			hash = "filelist";
