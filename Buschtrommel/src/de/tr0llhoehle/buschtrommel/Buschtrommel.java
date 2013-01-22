@@ -62,7 +62,7 @@ public class Buschtrommel implements IMessageObserver {
 		this.alias = alias;
 		this.guiCallbacks = gui;
 		this.shareCache = new LocalShareCache();
-		// this.shareCache.restoreFromFile(Config.shareCachePath);
+		this.shareCache.restoreFromFile(Config.shareCachePath);
 	}
 
 	private void readOrCreateSettings(String alias) {
@@ -154,7 +154,7 @@ public class Buschtrommel implements IMessageObserver {
 			this.udpAdapter.removeObserver(this);
 		}
 		this.udpAdapter = null;
-		// this.shareCache.saveToFile(Config.shareCachePath);
+		this.shareCache.saveToFile(Config.shareCachePath);
 	}
 
 	/***
