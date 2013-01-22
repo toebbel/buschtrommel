@@ -13,6 +13,7 @@ import java.util.Vector;
 import javax.swing.table.AbstractTableModel;
 
 /**
+ * the tableModel to store the entries of the files table
  * 
  * @author benjamin
  */
@@ -149,8 +150,8 @@ public class FilesTableModel extends AbstractTableModel {
 			// "Filename", "Meta-Information", "Size", "Host-Name","IP", "Hash",
 			// "TTL"
 			if (col[5].equals(file.getFile().getHash()) && col[4].equals(file.getHost().getAddress().getHostAddress())) {
-//				shares.remove(col);
-//				this.fireTableDataChanged();
+				// shares.remove(col);
+				// this.fireTableDataChanged();
 				ids.add(col);
 			}
 		}
@@ -171,14 +172,13 @@ public class FilesTableModel extends AbstractTableModel {
 			}
 		}
 		shares.removeAll(ids);
-		//this.fireTableStructureChanged();
+		// this.fireTableStructureChanged();
 		this.fireTableDataChanged();
 	}
 
 	void newHostDiscovered(Host host) {
 		// throw new UnsupportedOperationException("Not yet implemented");
 	}
-
 
 	public synchronized void updatedTTL(ShareAvailability file) {
 		int row = 0;
@@ -191,7 +191,11 @@ public class FilesTableModel extends AbstractTableModel {
 
 			}
 			row++;
-			this.fireTableCellUpdated(row, 6);
+			if (shares.size() > row) {
+				this.fireTableCellUpdated(row, 6);
+			} else {
+				this.fireTableStructureChanged();
+			}
 		}
 
 	}

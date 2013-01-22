@@ -14,7 +14,7 @@ import javax.swing.ListCellRenderer;
 import javax.swing.UIManager;
 
 /**
- * 
+ * Renders a Transfers
  * @author benjamin
  */
 public class DownloadItem extends javax.swing.JPanel implements ListCellRenderer<ITransferProgress> {

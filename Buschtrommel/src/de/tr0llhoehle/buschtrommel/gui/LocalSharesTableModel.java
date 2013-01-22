@@ -97,6 +97,26 @@ public class LocalSharesTableModel extends AbstractTableModel {
 		this.shares.add(eintrag);
 		this.fireTableDataChanged();
 	}
+	
+	public synchronized void addShareMeta(String name, String meta, String path, String size, String ttl) {
+		if (path == null) {
+			System.out.print("path is null");
+			return;
+		}
+		String eintrag[] = new String[names.length];
+		// "Filename", "Meta-Information", "Path", "Size","TTL"
+		eintrag[0] = name;
+		eintrag[1] = meta;
+		eintrag[2] = path;
+		eintrag[3] = size;
+		eintrag[4] = ttl;
+		if (ttl == "") {
+			ttl = "-1";
+		}
+
+		this.shares.add(eintrag);
+		this.fireTableDataChanged();
+	}
 
 	public synchronized void addMeta(int index, String meta) {
 		shares.get(index)[1] = meta;
