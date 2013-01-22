@@ -151,12 +151,6 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
         filesHostsTable = new javax.swing.JTable();
         downloadFiles = new javax.swing.JButton();
         downloadFilesMultihost = new javax.swing.JButton();
-        jPanel3 = new javax.swing.JPanel();
-        addShare = new javax.swing.JButton();
-        removeShare = new javax.swing.JButton();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        localSharesTable = new javax.swing.JTable();
-        activateShare = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         activeTransferList = new javax.swing.JList(downloadItems);
@@ -170,6 +164,12 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
         abortOutTransfer = new javax.swing.JButton();
         resetOutTransfer = new javax.swing.JButton();
         removeOutTransfer = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
+        addShare = new javax.swing.JButton();
+        removeShare = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        localSharesTable = new javax.swing.JTable();
+        activateShare = new javax.swing.JButton();
         jPanel5 = new javax.swing.JPanel();
         saveSettings = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
@@ -248,69 +248,6 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
         );
 
         jTabbedPane1.addTab("Hosts & Files", jPanel1);
-
-        jPanel3.setName("sharesTab"); // NOI18N
-
-        addShare.setText("Add new Share");
-        addShare.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        addShare.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addShareActionPerformed(evt);
-            }
-        });
-
-        removeShare.setText("Remove Share");
-        removeShare.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                removeShareActionPerformed(evt);
-                removeShareActionPerformed1(evt);
-            }
-        });
-
-        jScrollPane2.setName("shares-table"); // NOI18N
-
-        localSharesTable.setModel(sharesModel);
-        localSharesTable.setName(""); // NOI18N
-        jScrollPane2.setViewportView(localSharesTable);
-
-        activateShare.setText("activate Share");
-        activateShare.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                activateShareActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 655, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(addShare)
-                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(removeShare, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(activateShare, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap())
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 619, Short.MAX_VALUE)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(addShare)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(activateShare)
-                        .addGap(18, 18, 18)
-                        .addComponent(removeShare)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
-        );
-
-        jTabbedPane1.addTab("Shares", jPanel3);
 
         jPanel4.setName("activeTransfersTab"); // NOI18N
 
@@ -435,6 +372,69 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
         );
 
         jTabbedPane1.addTab("outgoing Transfers", jPanel6);
+
+        jPanel3.setName("sharesTab"); // NOI18N
+
+        addShare.setText("Add new Share");
+        addShare.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        addShare.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addShareActionPerformed(evt);
+            }
+        });
+
+        removeShare.setText("Remove Share");
+        removeShare.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                removeShareActionPerformed(evt);
+                removeShareActionPerformed1(evt);
+            }
+        });
+
+        jScrollPane2.setName("shares-table"); // NOI18N
+
+        localSharesTable.setModel(sharesModel);
+        localSharesTable.setName(""); // NOI18N
+        jScrollPane2.setViewportView(localSharesTable);
+
+        activateShare.setText("activate Share");
+        activateShare.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                activateShareActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 655, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(addShare)
+                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(removeShare, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(activateShare, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 619, Short.MAX_VALUE)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(addShare)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(activateShare)
+                        .addGap(18, 18, 18)
+                        .addComponent(removeShare)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+
+        jTabbedPane1.addTab("Shares", jPanel3);
 
         jPanel5.setName("settingsTab"); // NOI18N
 
