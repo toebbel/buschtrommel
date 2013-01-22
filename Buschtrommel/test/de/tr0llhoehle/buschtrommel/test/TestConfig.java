@@ -3,6 +3,7 @@ package de.tr0llhoehle.buschtrommel.test;
 import static org.junit.Assert.*;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import org.junit.AfterClass;
 import org.junit.Test;
@@ -10,27 +11,30 @@ import org.junit.Test;
 import de.tr0llhoehle.buschtrommel.Config;
 
 public class TestConfig {
-	private static java.io.File target = new java.io.File("config.xml");
+	private static String target = "config.xml";
+	private int defaultTTL = 60;
+	private int maximumYoResponseTime = 3000;
+	private String shareCachePath = "shares.xml";
+	private int TTLRenewalTimer = 10;
 	
 	@AfterClass
 	public static void cleanUp() {
-		target.delete();
+		//target.delete();
 	}
 	
 	@Test
-	public void testSaveLoad() throws FileNotFoundException {
-		Config c = new Config();
-		c.defaultTTL = 60;
-		c.maximumYoResponseTime = 3000;
-		c.shareCachePath = "shares.xml";
-		c.TTLRenewalTimer = 10;
+	public void testSaveLoad() throws IOException {
+		Config.defaultTTL = defaultTTL;
+		Config.maximumYoResponseTime = maximumYoResponseTime;
+		Config.shareCachePath = shareCachePath;
+		Config.TTLRenewalTimer = TTLRenewalTimer;
 
-		Config.saveToFile(target, c);
-		Config loaded = Config.readFromFile(target);
-		assertEquals(loaded.defaultTTL, c.defaultTTL);
-		assertEquals(loaded.maximumYoResponseTime, c.maximumYoResponseTime);
-		assertEquals(loaded.shareCachePath, c.shareCachePath);
-		assertEquals(loaded.TTLRenewalTimer, c.TTLRenewalTimer);
+		Config.getInstance().saveToFile(target);
+		Config.getInstance().readFromFile(target);
+		assertEquals(Config.defaultTTL, defaultTTL);
+		assertEquals(Config.maximumYoResponseTime, maximumYoResponseTime);
+		assertEquals(Config.shareCachePath, shareCachePath);
+		assertEquals(Config.TTLRenewalTimer, TTLRenewalTimer);
 	}
 
 }

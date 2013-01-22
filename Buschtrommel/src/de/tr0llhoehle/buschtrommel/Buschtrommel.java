@@ -61,34 +61,38 @@ public class Buschtrommel implements IMessageObserver {
 		this.alias = alias;
 		this.guiCallbacks = gui;
 		this.shareCache = new LocalShareCache();
+		// this.shareCache.restoreFromFile(Config.shareCachePath);
 	}
 
 	private void readOrCreateSettings(String alias) {
-		java.io.File cfgFile = new File("config.xml");
-		if (cfgFile.exists()) {
+		String cfgFile = "config.properties";
+		File testfile = new File(cfgFile);
+		if (testfile.exists()) {
 			try {
-				Config.readFromFile(cfgFile);
+				Config.getInstance().readFromFile(cfgFile);
 				if (Config.alias == null)
 					Config.alias = alias;
 				return;
-			} catch (FileNotFoundException e) {
+			} catch (IOException e) {
 				logger.warning("Could not read config file: " + e.getMessage());
 				e.printStackTrace();
 			}
-		}
-		Config.alias = alias;
-		Config.defaultTTL = -1;
-		Config.maximumYoResponseTime = 3000;
-		Config.minDiscoveryMulticastIddle = 5000;
-		Config.shareCachePath = "shares.ht";
-		Config.TTLRenewalTimer = 10;
-		Config.useIPv4 = true;
-		Config.useIPv6 = true;
-		Config.FileReannounceGraceTime = 15;
-		try {
-			Config.saveToFile(cfgFile, new Config());
-		} catch (FileNotFoundException e) {
-			logger.warning("Could not write config file");
+		} else {
+			logger.info("Config file not existing. Create new one.");
+			Config.alias = alias;
+			Config.defaultTTL = -1;
+			Config.maximumYoResponseTime = 3000;
+			Config.minDiscoveryMulticastIddle = 5000;
+			Config.shareCachePath = "shares.ht";
+			Config.TTLRenewalTimer = 10;
+			Config.useIPv4 = true;
+			Config.useIPv6 = true;
+			Config.FileReannounceGraceTime = 15;
+			try {
+				Config.getInstance().saveToFile(cfgFile);
+			} catch (IOException e) {
+				logger.warning("Could not write config file");
+			}
 		}
 	}
 
@@ -98,7 +102,9 @@ public class Buschtrommel implements IMessageObserver {
 	 * @throws IOException
 	 */
 	public void start() throws IOException {
-		start(UDPAdapter.DEFAULT_PORT, UDPAdapter.DEFAULT_PORT, false, true); //TODO use config
+		start(UDPAdapter.DEFAULT_PORT, UDPAdapter.DEFAULT_PORT, false, true); // TODO
+																				// use
+																				// config
 	}
 
 	/**
@@ -146,6 +152,7 @@ public class Buschtrommel implements IMessageObserver {
 			this.udpAdapter.removeObserver(this);
 		}
 		this.udpAdapter = null;
+		// this.shareCache.saveToFile(Config.shareCachePath);
 	}
 
 	/***
@@ -364,7 +371,7 @@ public class Buschtrommel implements IMessageObserver {
 	}
 
 	@Override
-	public void receiveMessage(Message message) { 
+	public void receiveMessage(Message message) {
 
 	}
 
