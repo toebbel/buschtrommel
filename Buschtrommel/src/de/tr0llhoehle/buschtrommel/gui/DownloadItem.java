@@ -72,7 +72,7 @@ public class DownloadItem extends javax.swing.JPanel implements ListCellRenderer
 		// System.out.println(percent);
 		Progress.setMaximum(100);
 		Progress.setValue((int) percent);
-
+		Progress.setString(percent + "%");
 		setBackground(background);
 		setForeground(foreground);
 		this.setOpaque(true);
@@ -94,7 +94,12 @@ public class DownloadItem extends javax.swing.JPanel implements ListCellRenderer
         Filename = new javax.swing.JLabel();
         TransferStatus = new javax.swing.JTextField();
 
+        Progress.setStringPainted(true);
+
         Filename.setText("File");
+        Filename.setMaximumSize(new java.awt.Dimension(100, 18));
+        Filename.setMinimumSize(new java.awt.Dimension(100, 18));
+        Filename.setPreferredSize(new java.awt.Dimension(100, 18));
 
         TransferStatus.setEditable(false);
         TransferStatus.setText("FileTransferStatus");
@@ -111,9 +116,9 @@ public class DownloadItem extends javax.swing.JPanel implements ListCellRenderer
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(Filename)
+                .addComponent(Filename, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(Progress, javax.swing.GroupLayout.DEFAULT_SIZE, 444, Short.MAX_VALUE)
+                .addComponent(Progress, javax.swing.GroupLayout.DEFAULT_SIZE, 370, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(TransferStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -123,9 +128,9 @@ public class DownloadItem extends javax.swing.JPanel implements ListCellRenderer
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(Filename)
+                    .addComponent(Filename, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(Progress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(13, Short.MAX_VALUE))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
