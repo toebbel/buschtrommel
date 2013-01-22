@@ -43,9 +43,9 @@ public class TestTransferSystem {
 		
 		LocalShareCache receiversShares = new LocalShareCache();		
 		
-		sender = new FileTransferAdapter(sendersShares , new GuiCallbackMock(), 8007);
+		sender = new FileTransferAdapter(sendersShares , new GuiCallbackMock(), null, 8007);
 		
-		receiver = new FileTransferAdapter(receiversShares , new GuiCallbackMock(), 8008);
+		receiver = new FileTransferAdapter(receiversShares , new GuiCallbackMock(), null,  8008);
 		tmpFile = new java.io.File("tmp.out");
 		Thread.sleep(500);
 	}
