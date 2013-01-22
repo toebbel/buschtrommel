@@ -18,6 +18,7 @@ import de.tr0llhoehle.buschtrommel.models.Message;
 import de.tr0llhoehle.buschtrommel.network.FileTransferAdapter;
 import de.tr0llhoehle.buschtrommel.network.ITransferProgress;
 import de.tr0llhoehle.buschtrommel.test.mockups.FileContentMock;
+import de.tr0llhoehle.buschtrommel.test.mockups.GuiCallbackMock;
 
 /**
  * Tests that transfer a file from one instance to another
@@ -42,9 +43,9 @@ public class TestTransferSystem {
 		
 		LocalShareCache receiversShares = new LocalShareCache();		
 		
-		sender = new FileTransferAdapter(sendersShares , 8007);
+		sender = new FileTransferAdapter(sendersShares , new GuiCallbackMock(), 8007);
 		
-		receiver = new FileTransferAdapter(receiversShares , 8008);
+		receiver = new FileTransferAdapter(receiversShares , new GuiCallbackMock(), 8008);
 		tmpFile = new java.io.File("tmp.out");
 		Thread.sleep(500);
 	}
