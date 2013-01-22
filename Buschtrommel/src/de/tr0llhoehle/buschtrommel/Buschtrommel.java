@@ -97,7 +97,7 @@ public class Buschtrommel implements IMessageObserver {
 	 * @throws IOException
 	 */
 	public void start() throws IOException {
-		start(UDPAdapter.DEFAULT_PORT, UDPAdapter.DEFAULT_PORT, Config.useIPv4, Config.useIPv6);
+		start(UDPAdapter.DEFAULT_PORT, UDPAdapter.DEFAULT_PORT, false, true); //TODO use config
 	}
 
 	/**
