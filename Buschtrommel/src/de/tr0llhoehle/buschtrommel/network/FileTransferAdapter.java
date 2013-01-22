@@ -33,6 +33,7 @@ public class FileTransferAdapter extends MessageMonitor {
 	private Hashtable<String, Transfer> incomingTransfers;
 	private Logger logger;
 	private IGUICallbacks gui;
+	private IHostPortResolver hosts;
 	
 
 	/**
@@ -46,19 +47,20 @@ public class FileTransferAdapter extends MessageMonitor {
 	 *            the tcp port to use.
 	 * @throws IOException
 	 */
-	public FileTransferAdapter(LocalShareCache s, IGUICallbacks guiCallback, int port) throws IOException {
+	public FileTransferAdapter(LocalShareCache s, IGUICallbacks guiCallback, IHostPortResolver hostResolver, int port) throws IOException {
 		logger = java.util.logging.Logger.getLogger(this.getClass().getName());
 		this.port = port;
 		assert guiCallback != null;
 		gui = guiCallback;
 		myShares = s;
+		hosts = hostResolver;
 		incomingTransfers = new Hashtable<>();
 		outgoingTransfers = new Vector<>();
 		startListening();
 	}
 
-	public FileTransferAdapter(LocalShareCache s, IGUICallbacks guiCallback) throws IOException {
-		this(s, guiCallback, 0);
+	public FileTransferAdapter(LocalShareCache s, IGUICallbacks guiCallback, IHostPortResolver hostResolver) throws IOException {
+		this(s, guiCallback, hostResolver, 0);
 	}
 
 	private void startListening() throws IOException {
@@ -175,7 +177,7 @@ public class FileTransferAdapter extends MessageMonitor {
 			}
 		}
 
-		Transfer result = new IncomingDownload(new GetFileMessage(hash, 0, length), host, target, -1);
+		Transfer result = new IncomingDownload(new GetFileMessage(hash, 0, length), host, target, hosts);
 		incomingTransfers.put(hash, result);
 		result.SetLoggerParent(logger);
 		result.start();

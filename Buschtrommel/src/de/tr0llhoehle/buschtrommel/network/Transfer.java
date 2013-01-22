@@ -19,12 +19,17 @@ public abstract class Transfer extends MessageMonitor implements ITransferProgre
 	protected String hash;
 	protected TransferStatus transferState;
 	protected long expectedTransferVolume;
+	protected long initialTransferVolume;
 	protected long offset;
 	protected long totalTransferedVolume;
 	protected boolean keepTransferAlive;
 	protected static final int FALLBACK_BUFFER_SIZE = 256;
 
 	public Transfer(InetSocketAddress partner) {
+		this.partner = partner;
+	}
+	
+	protected void updatePartner(InetSocketAddress partner) {
 		this.partner = partner;
 	}
 
@@ -35,7 +40,7 @@ public abstract class Transfer extends MessageMonitor implements ITransferProgre
 
 	@Override
 	public long getLength() {
-		return expectedTransferVolume;
+		return initialTransferVolume;
 	}
 
 	@Override

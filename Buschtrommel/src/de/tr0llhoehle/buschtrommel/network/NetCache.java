@@ -7,6 +7,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 
+import de.tr0llhoehle.buschtrommel.Buschtrommel;
 import de.tr0llhoehle.buschtrommel.Config;
 import de.tr0llhoehle.buschtrommel.IGUICallbacks;
 import de.tr0llhoehle.buschtrommel.LoggerWrapper;
@@ -29,7 +30,7 @@ import de.tr0llhoehle.buschtrommel.models.ShareAvailability;
  * @author Moritz Winter
  * 
  */
-public class NetCache implements IMessageObserver {
+public class NetCache implements IMessageObserver, IHostPortResolver {
 
 	/**
 	 * FileAnnouncements that can't be assigned to a host are useless. Therefor
@@ -46,21 +47,20 @@ public class NetCache implements IMessageObserver {
 
 	protected IGUICallbacks guiCallbacks;
 	protected UDPAdapter udpAdapter;
-	protected FileTransferAdapter fileTransferAdapter;
 	protected Timer ttlChecker;
-	private long lastDiscoveryMulticast;
+	protected Buschtrommel buschtrommel;
+	
 
 	private Logger logger;
 
-	public NetCache(UDPAdapter udpAdapter, FileTransferAdapter fileAdapter, IGUICallbacks guiCallbacks) {
+	public NetCache(UDPAdapter udpAdapter, IGUICallbacks guiCallbacks, Buschtrommel buschtrommel) {
 		logger = java.util.logging.Logger.getLogger(this.getClass().getName());
 		this.udpAdapter = udpAdapter;
 		this.guiCallbacks = guiCallbacks;
+		this.buschtrommel = buschtrommel;
 
 		this.knownHosts = new Hashtable<InetAddress, Host>();
 		this.knownShares = new Hashtable<String, RemoteShare>();
-
-		this.fileTransferAdapter = fileAdapter;
 
 		this.ttlChecker = new Timer();
 		ttlChecker.scheduleAtFixedRate(new TimerTask() {
@@ -69,7 +69,7 @@ public class NetCache implements IMessageObserver {
 			}
 		}, TTL_REFRESH_RATE * 1000, TTL_REFRESH_RATE * 1000);
 		
-		lastDiscoveryMulticast = System.currentTimeMillis();
+		
 	}
 
 	/**
@@ -165,7 +165,7 @@ public class NetCache implements IMessageObserver {
 			try {
 				if (this.udpAdapter != null && !delayed) {
 					this.udpAdapter.sendUnicast(new PeerDiscoveryMessage(PeerDiscoveryMessage.DiscoveryMessageType.HI,
-							Config.alias, fileTransferAdapter.getPort()), host.getAddress());
+							Config.alias, buschtrommel.getTransferPort()), host.getAddress());
 					handleFileAnnouncementMessageLater(message, DELAY_FILE_MESSAGE_AFTER_HOST_DISCOVER);
 				}
 
@@ -214,43 +214,8 @@ public class NetCache implements IMessageObserver {
 			if (this.guiCallbacks != null) {
 				this.guiCallbacks.newHostDiscovered(host);
 			}
+			buschtrommel.newHostDiscovered(host);
 		}
-		
-		if (udpAdapter == null || fileTransferAdapter == null) {
-			logger.warning("Can't respond to peer discovery because adapter is not initialized!");
-			return;
-		}
-		
-		switch (message.getType()) {
-		
-		case PeerDiscoveryMessage.TYPE_FIELD_HI:
-			PeerDiscoveryMessage rsp = new PeerDiscoveryMessage(DiscoveryMessageType.YO, host.getDisplayName(),
-					fileTransferAdapter.getPort());
-			try {
-				Thread.sleep((int) (Math.random() * Config.maximumYoResponseTime));
-				if (System.currentTimeMillis() - lastDiscoveryMulticast > Config.minDiscoveryMulticastIddle) {
-					lastDiscoveryMulticast = System.currentTimeMillis();
-					udpAdapter.sendMulticast(rsp);
-				} else {
-					udpAdapter.sendUnicast(rsp, message.getSource().getAddress());
-				}
-
-				// autostart filelist download
-				//fileTransferAdapter.downloadFilelist(host);
-			} catch (IOException e) {
-				logger.warning("Could not response to HI message: " + e.getMessage());
-			} catch (InterruptedException e1) {
-				logger.warning("Error while waiting before sending YO response: " + e1.getMessage());
-			}
-			break;
-			
-		case PeerDiscoveryMessage.TYPE_FIELD_YO:
-			
-			
-			break;
-		default:
-		}
-		fileTransferAdapter.downloadFilelist(host);
 	}
 
 	private void byeHandler(ByeMessage message) {
@@ -266,8 +231,8 @@ public class NetCache implements IMessageObserver {
 				if (tmp.noSourcesAvailable()) {
 					this.knownShares.remove(hash);
 				}
-				this.knownHosts.remove(host.getAddress());
 			}
+			this.knownHosts.remove(host.getAddress());
 		}
 	}
 
