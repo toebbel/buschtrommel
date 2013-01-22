@@ -1078,6 +1078,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 			if(seeFilelist){
 				outgoingItems.addElement(transfer);
 			} else if(null != transfer.getTargetFile()){
+				LoggerWrapper.logInfo("added File: " + transfer.getTargetFile());
 				outgoingItems.addElement(transfer);
 			} else{
 				LoggerWrapper.logInfo("skipped filelist");
