@@ -19,6 +19,7 @@ public abstract class Transfer extends MessageMonitor implements ITransferProgre
 	protected String hash;
 	protected TransferStatus transferState;
 	protected long expectedTransferVolume;
+	protected long initialTransferVolume;
 	protected long offset;
 	protected long totalTransferedVolume;
 	protected boolean keepTransferAlive;
@@ -39,7 +40,7 @@ public abstract class Transfer extends MessageMonitor implements ITransferProgre
 
 	@Override
 	public long getLength() {
-		return expectedTransferVolume;
+		return initialTransferVolume;
 	}
 
 	@Override

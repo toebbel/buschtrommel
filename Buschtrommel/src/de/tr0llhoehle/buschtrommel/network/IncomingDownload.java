@@ -100,6 +100,7 @@ public class IncomingDownload extends Transfer {
 		this.offset = sourceFile.getOffset();
 		this.hash = sourceFile.getHash();
 		expectedTransferVolume = sourceFile.getLength();
+		initialTransferVolume = sourceFile.getLength();
 
 		// initialize state variables
 		this.totalTransferedVolume = 0;
@@ -141,6 +142,7 @@ public class IncomingDownload extends Transfer {
 			try {
 				logger.log(Level.INFO, "open stream to '" + targetFile.getPath() + "'");
 				targetFilestream = new FileOutputStream(targetFile, false);
+				totalTransferedVolume = 0;
 			} catch (FileNotFoundException e) {
 				logger.log(Level.SEVERE, "Could not create target filestream: " + e.getMessage());
 				transferState = TransferStatus.LocalIOError;
