@@ -319,14 +319,13 @@ public class OutgoingTransfer extends Transfer {
 			if (networkOutputStream != null)
 				networkOutputStream.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.warning("Could not close socket: " + e.getMessage());
 		}
 		try {
 			if (ressourceInputStream != null)
 				ressourceInputStream.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			logger.warning("Could not close input stream: " + e.getMessage());
 			e.printStackTrace();
 		}
 

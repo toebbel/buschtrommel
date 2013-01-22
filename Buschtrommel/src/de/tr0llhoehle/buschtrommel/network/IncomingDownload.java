@@ -57,7 +57,7 @@ public class IncomingDownload extends Transfer {
 			if (targetFilestream != null)
 				targetFilestream.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			logger.warning("Could not close target filestream: " + e.getMessage());
 			e.printStackTrace();
 		}
 
@@ -65,7 +65,7 @@ public class IncomingDownload extends Transfer {
 			if (socket != null)
 				socket.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			logger.warning("Could not close socket: " + e.getMessage());
 			e.printStackTrace();
 		}
 		
@@ -479,8 +479,7 @@ public class IncomingDownload extends Transfer {
 						doTransfer();
 					}
 				} catch (UnsupportedEncodingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					throw new RuntimeException("unsupported encoding");
 				}
 				keepTransferAlive = false;
 				self = null;

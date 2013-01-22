@@ -31,13 +31,12 @@ public class LocalShareCache {
 	protected Hashtable<String, LocalShare> shares;
 	private Logger logger;
 	private Timer ttlChecker;
-	private static final int TTL_REFRESH_RATE = 5; //in seconds
+	private static final int TTL_REFRESH_RATE = 5; // in seconds
 
-	
 	public LocalShareCache() {
 		logger = java.util.logging.Logger.getLogger(this.getClass().getName());
 		shares = new Hashtable<>();
-		
+
 		ttlChecker = new Timer();
 		ttlChecker.scheduleAtFixedRate(new TimerTask() {
 			public void run() {
@@ -45,16 +44,16 @@ public class LocalShareCache {
 			}
 		}, TTL_REFRESH_RATE * 1000, TTL_REFRESH_RATE * 1000);
 	}
-	
+
 	private void checkAndUpdateTTLs() {
-		for(String hash : shares.keySet()) {
-			
-			//ignore TTLs that are infinity
-			if(shares.get(hash).getTTL() == Share.TTL_INFINITY)
+		for (String hash : shares.keySet()) {
+
+			// ignore TTLs that are infinity
+			if (shares.get(hash).getTTL() == Share.TTL_INFINITY)
 				continue;
-			
+
 			int updatedTTL = shares.get(hash).getTTL() - TTL_REFRESH_RATE;
-			if(updatedTTL <= 0) {
+			if (updatedTTL <= 0) {
 				shares.remove(hash);
 			} else {
 				shares.get(hash).setTTL(updatedTTL);
@@ -132,15 +131,15 @@ public class LocalShareCache {
 
 	}
 
-
 	protected String convertSharesToString() {
 		StringBuilder allShares = new StringBuilder();
 
 		ArrayList<LocalShare> shareList = new ArrayList<LocalShare>(shares.values());
 
 		for (LocalShare i : shareList) {
-			if(i.getTTL() == Share.TTL_INFINITY)
-				allShares.append((new FileAnnouncementMessage(i).Serialize()) + new java.io.File(i.getPath()).getAbsolutePath() + "\n");
+			if (i.getTTL() == Share.TTL_INFINITY)
+				allShares.append((new FileAnnouncementMessage(i).Serialize())
+						+ new java.io.File(i.getPath()).getAbsolutePath() + "\n");
 		}
 
 		return allShares.toString();
@@ -160,7 +159,7 @@ public class LocalShareCache {
 		if (path == null || !path.endsWith(".ht")) {
 			throw new IllegalArgumentException("the given path: " + path + " is not valid (must end with .ht)");
 		}
-		
+
 		try {
 			FileWriter writer = new FileWriter(path, false);
 			writer.write(convertSharesToString());
@@ -201,13 +200,24 @@ public class LocalShareCache {
 
 				// check if file is still there
 				if (!(new java.io.File(line[1]).exists())) {
-					logger.warning("The file '" + line[1]
-							+ "' is not available any more. Removed it from ShareCache");
+					logger.warning("The file '" + line[1] + "' is not available any more. Removed it from ShareCache");
 					continue;
 				}
 
 				// check if part 1 parseable
-				Message m = MessageDeserializer.Deserialize(line[0] + Message.MESSAGE_SPERATOR); //has to append seperator because deserializer needs this and we cut it off.
+				Message m = MessageDeserializer.Deserialize(line[0] + Message.MESSAGE_SPERATOR); // has
+																									// to
+																									// append
+																									// seperator
+																									// because
+																									// deserializer
+																									// needs
+																									// this
+																									// and
+																									// we
+																									// cut
+																									// it
+																									// off.
 				if (m == null || !(m instanceof FileAnnouncementMessage)) {
 					logger.warning("Could not parse line " + line + ": " + line[0]);
 					continue;
@@ -215,13 +225,11 @@ public class LocalShareCache {
 
 				// create share from this information
 				LocalShare s = ((FileAnnouncementMessage) m).getFile();
-				s = new LocalShare(s.getHash(), s.getLength(), s.getTTL(), s.getDisplayName(), s.getMeta(), line[1]); // TODO
-																												// check
-																												// if
-																												// length
-																												// is
-																												// still
-																												// correct
+				if (s.getLength() != (new java.io.File(s.getPath()).length())) {
+					logger.info("Length of file " + s.getPath() + " has changed. Ignore the share");
+				} else {
+					s = new LocalShare(s.getHash(), s.getLength(), s.getTTL(), s.getDisplayName(), s.getMeta(), line[1]);
+				}
 				newShare(s);
 			}
 			reader.close();
@@ -232,14 +240,14 @@ public class LocalShareCache {
 	}
 
 	public boolean remove(String hash) {
-		if(this.has(hash)) {
+		if (this.has(hash)) {
 			this.shares.remove(hash);
 			return true;
 		} else {
 			return false;
 		}
 	}
-	
+
 	public Hashtable<String, LocalShare> getLocalShares() {
 		return this.shares;
 	}

@@ -34,7 +34,6 @@ public class FileTransferAdapter extends MessageMonitor {
 	private Logger logger;
 	private IGUICallbacks gui;
 	private IHostPortResolver hosts;
-	
 
 	/**
 	 * Creates an instance of FileTransferAdapter and opens a listening TCP Port
@@ -47,7 +46,8 @@ public class FileTransferAdapter extends MessageMonitor {
 	 *            the tcp port to use.
 	 * @throws IOException
 	 */
-	public FileTransferAdapter(LocalShareCache s, IGUICallbacks guiCallback, IHostPortResolver hostResolver, int port) throws IOException {
+	public FileTransferAdapter(LocalShareCache s, IGUICallbacks guiCallback, IHostPortResolver hostResolver, int port)
+			throws IOException {
 		logger = java.util.logging.Logger.getLogger(this.getClass().getName());
 		this.port = port;
 		assert guiCallback != null;
@@ -59,7 +59,8 @@ public class FileTransferAdapter extends MessageMonitor {
 		startListening();
 	}
 
-	public FileTransferAdapter(LocalShareCache s, IGUICallbacks guiCallback, IHostPortResolver hostResolver) throws IOException {
+	public FileTransferAdapter(LocalShareCache s, IGUICallbacks guiCallback, IHostPortResolver hostResolver)
+			throws IOException {
 		this(s, guiCallback, hostResolver, 0);
 	}
 
@@ -95,8 +96,7 @@ public class FileTransferAdapter extends MessageMonitor {
 				try {
 					Thread.sleep(500);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.warning("interrupted exception while wainting for incoming connection" + e.getMessage());
 				}
 				InputStream networkInputStream = s.getInputStream();
 				byte[] buffer = new byte[512];
@@ -127,7 +127,7 @@ public class FileTransferAdapter extends MessageMonitor {
 				Transfer p = null;
 				int bufferSize = -1;
 				bufferSize = s.getSendBufferSize();
-				
+
 				if (m instanceof GetFileMessage) {
 					OutgoingTransfer transfer = new OutgoingTransfer((GetFileMessage) m, out, myShares,
 							new InetSocketAddress(s.getInetAddress(), s.getPort()), bufferSize);
@@ -183,12 +183,15 @@ public class FileTransferAdapter extends MessageMonitor {
 		result.start();
 		return result;
 	}
-	
+
 	/**
 	 * Removes an incomging filetransfer.
 	 * 
-	 * If the download has not already been cleaned up, it is canceled and cleaned. The transfer is removed from the list of incoming downloads.
-	 * @param hash the hash of the file.
+	 * If the download has not already been cleaned up, it is canceled and
+	 * cleaned. The transfer is removed from the list of incoming downloads.
+	 * 
+	 * @param hash
+	 *            the hash of the file.
 	 */
 	public void cleanDownloadedTransfer(String hash) {
 		if (incomingTransfers.containsKey(hash)) {
@@ -199,14 +202,14 @@ public class FileTransferAdapter extends MessageMonitor {
 			incomingTransfers.remove(hash);
 		}
 	}
-	
+
 	/**
 	 * Removes all outgoing transfers, that are in the cleaned state
 	 */
 	public void removeCleanedOutgoingDownloads() {
 		Vector<ITransferProgress> candidates = new Vector<>();
-		for(ITransferProgress t : outgoingTransfers) {
-			if(t.getStatus() == TransferStatus.Cleaned) {
+		for (ITransferProgress t : outgoingTransfers) {
+			if (t.getStatus() == TransferStatus.Cleaned) {
 				candidates.add(t);
 			}
 		}
@@ -226,9 +229,8 @@ public class FileTransferAdapter extends MessageMonitor {
 	 */
 	public Transfer DownloadFile(String hash, List<Host> hosts, long length, java.io.File target) {
 		assert hosts.size() > 0;
-		return DownloadFile(hash, hosts.get(0), length, target); // TODO
-																	// implement
-																	// multisource
+		// TODO implement multisource
+		return DownloadFile(hash, hosts.get(0), length, target);
 	}
 
 	/**
