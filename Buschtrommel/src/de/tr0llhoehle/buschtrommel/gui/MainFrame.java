@@ -1106,4 +1106,10 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		tablemodel.updatedTTL(file);
 	}
 
+	@Override
+	public void newOutgoingTransferStarted(ITransferProgress transfer) {
+		// TODO Auto-generated method stub 4 Beni
+		
+	}
+
 }

@@ -23,10 +23,16 @@ public interface IGUICallbacks {
 	public void hostWentOffline(Host host);
 	
 	/**
-	 * Whenever the ttl of a share expires
+	 * Whenever the ttl of a remoteShare expires
 	 * @param file the concerning file
 	 */
 	public void removeShare(ShareAvailability file);
+	
+	/**
+	 * 
+	 * @param transfer
+	 */
+	public void newOutgoingTransferStarted(ITransferProgress transfer);
 	
 	
 	/**

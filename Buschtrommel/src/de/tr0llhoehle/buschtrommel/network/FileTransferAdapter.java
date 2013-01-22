@@ -14,6 +14,7 @@ import java.util.Vector;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Logger;
 
+import de.tr0llhoehle.buschtrommel.IGUICallbacks;
 import de.tr0llhoehle.buschtrommel.LoggerWrapper;
 import de.tr0llhoehle.buschtrommel.LocalShareCache;
 import de.tr0llhoehle.buschtrommel.models.GetFileMessage;
@@ -31,6 +32,7 @@ public class FileTransferAdapter extends MessageMonitor {
 	private Vector<Transfer> outgoingTransfers;
 	private Hashtable<String, Transfer> incomingTransfers;
 	private Logger logger;
+	private IGUICallbacks gui;
 	
 
 	/**
@@ -44,17 +46,19 @@ public class FileTransferAdapter extends MessageMonitor {
 	 *            the tcp port to use.
 	 * @throws IOException
 	 */
-	public FileTransferAdapter(LocalShareCache s, int port) throws IOException {
+	public FileTransferAdapter(LocalShareCache s, IGUICallbacks guiCallback, int port) throws IOException {
 		logger = java.util.logging.Logger.getLogger(this.getClass().getName());
 		this.port = port;
+		assert guiCallback != null;
+		gui = guiCallback;
 		myShares = s;
 		incomingTransfers = new Hashtable<>();
 		outgoingTransfers = new Vector<>();
 		startListening();
 	}
 
-	public FileTransferAdapter(LocalShareCache s) throws IOException {
-		this(s, 0);
+	public FileTransferAdapter(LocalShareCache s, IGUICallbacks guiCallback) throws IOException {
+		this(s, guiCallback, 0);
 	}
 
 	private void startListening() throws IOException {
@@ -138,8 +142,10 @@ public class FileTransferAdapter extends MessageMonitor {
 					logger.info("Received garbage on fileTransferAdapter");
 				}
 
-				if (p != null)
+				if (p != null) {
 					outgoingTransfers.add(p);
+					gui.newOutgoingTransferStarted(p);
+				}
 
 			} catch (IOException e) {
 				logger.warning(e.getMessage());

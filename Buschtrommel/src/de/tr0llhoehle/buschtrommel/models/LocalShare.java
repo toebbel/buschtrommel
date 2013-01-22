@@ -31,6 +31,11 @@ public class LocalShare extends Share {
 		return this.ttl;
 	}
 	
+	public void setTTL(int newTTL) {
+		assert newTTL >= 0 || newTTL == TTL_INFINITY;
+		this.ttl = newTTL;
+	}
+	
 	public String getDisplayName() {
 		return displayName;
 	}

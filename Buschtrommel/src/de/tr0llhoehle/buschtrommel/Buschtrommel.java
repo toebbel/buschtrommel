@@ -118,7 +118,7 @@ public class Buschtrommel implements IMessageObserver {
 	 *             if anything goes wrong during network connect
 	 */
 	public void start(int listenUdpPort, int sendUdpPort, boolean useIpv4, boolean useIpv6) throws IOException {
-		fileTransferAdapter = new FileTransferAdapter(shareCache);
+		fileTransferAdapter = new FileTransferAdapter(shareCache, guiCallbacks);
 		this.udpAdapter = new UDPAdapter(listenUdpPort, sendUdpPort, useIpv4, useIpv6);
 		this.netCache = new NetCache(this.udpAdapter, fileTransferAdapter, this.guiCallbacks);
 		this.udpAdapter.registerObserver(netCache);
