@@ -27,6 +27,10 @@ public abstract class Transfer extends MessageMonitor implements ITransferProgre
 	public Transfer(InetSocketAddress partner) {
 		this.partner = partner;
 	}
+	
+	protected void updatePartner(InetSocketAddress partner) {
+		this.partner = partner;
+	}
 
 	@Override
 	public TransferType getType() {

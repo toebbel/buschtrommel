@@ -30,14 +30,14 @@ public class TestNetworkDiscoverySystem {
 		nodeA = new UDPAdapter(8000, 8001);
 		observerA = new MessageObserverMock();
 		guiA = new GuiCallbackMock();
-		cacheA = new NetCache(nodeA, null, guiA);
+		cacheA = new NetCache(nodeA, guiA, null );
 		nodeA.registerObserver(observerA);
 		nodeA.registerObserver(cacheA);
 
 		nodeB = new UDPAdapter(8001, 8000);
 		observerB = new MessageObserverMock();
 		guiB = new GuiCallbackMock();
-		cacheB = new NetCache(nodeB, null, guiB);
+		cacheB = new NetCache(nodeB, guiB, null);
 		nodeB.registerObserver(observerB);
 		nodeB.registerObserver(cacheB);
 	}

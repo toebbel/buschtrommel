@@ -78,7 +78,7 @@ public class TestIncomingDownload {
 	@Test(timeout=5000)
 	public void testStartDownload() throws InterruptedException, IOException {
 		mock = new NetworkMock(8080);
-		IncomingDownload in = new IncomingDownload(new GetFileMessage("ABC", 0, 10), new Host(mock.getAddr(), "mock", mock.getPort()),  new File("tmp"));
+		IncomingDownload in = new IncomingDownload(new GetFileMessage("ABC", 0, 10), new Host(mock.getAddr(), "mock", mock.getPort()),  new File("tmp"), null);
 		in.DisableIntegrityCheck();
 		
 		//check if download request is correct
@@ -128,7 +128,7 @@ public class TestIncomingDownload {
 	@Test(timeout=15000)
 	public void testAbortWhenStreamTooLong() throws InterruptedException, IOException {
 		mock = new NetworkMock(8080);
-		IncomingDownload in = new IncomingDownload(new GetFileMessage("ABC", 0, 1024), new Host(mock.getAddr(), "mock", mock.getPort()),  new File("tmp.out"), 31);
+		IncomingDownload in = new IncomingDownload(new GetFileMessage("ABC", 0, 1024), new Host(mock.getAddr(), "mock", mock.getPort()),  new File("tmp.out"), null, 31);
 		in.DisableIntegrityCheck();
 		
 		//check if download request is correct
@@ -168,7 +168,7 @@ public class TestIncomingDownload {
 	public void testStartDownload_NeverTryAgain() throws InterruptedException, IOException {
 		mock = new NetworkMock(8080);
 		MessageObserverMock obsMock = new MessageObserverMock();
-		IncomingDownload in = new IncomingDownload(new GetFileMessage("ABCDEFABCDEF", 9, 1023), new Host(mock.getAddr(), "mock", mock.getPort()), new File("tmp"));
+		IncomingDownload in = new IncomingDownload(new GetFileMessage("ABCDEFABCDEF", 9, 1023), new Host(mock.getAddr(), "mock", mock.getPort()), new File("tmp"), null);
 		in.DisableIntegrityCheck();
 		in.registerObserver(obsMock);
 		
@@ -193,7 +193,7 @@ public class TestIncomingDownload {
 	public void testStartDownload_ConnectionLoss() throws InterruptedException, IOException {
 		mock = new NetworkMock(8080);
 		MessageObserverMock obsMock = new MessageObserverMock();
-		IncomingDownload in = new IncomingDownload(new GetFileMessage("ABCDEFABCDEF", 9, 14), new Host(mock.getAddr(), "mock", mock.getPort()), new File("tmp"));
+		IncomingDownload in = new IncomingDownload(new GetFileMessage("ABCDEFABCDEF", 9, 14), new Host(mock.getAddr(), "mock", mock.getPort()), new File("tmp"), null);
 		in.DisableIntegrityCheck();
 		in.registerObserver(obsMock);
 		
@@ -256,7 +256,7 @@ public class TestIncomingDownload {
 	@Test(timeout=5000)
 	public void testStartDownload_receiveGarbage() throws InterruptedException, IOException {
 		mock = new NetworkMock(8080);
-		IncomingDownload in = new IncomingDownload(new GetFileMessage("ABCDEFABCDEF", 9, 1023), new Host(mock.getAddr(), "mock", mock.getPort()), new File("tmp"));
+		IncomingDownload in = new IncomingDownload(new GetFileMessage("ABCDEFABCDEF", 9, 1023), new Host(mock.getAddr(), "mock", mock.getPort()), new File("tmp"), null);
 		in.DisableIntegrityCheck();
 		
 		in.start();
@@ -284,7 +284,7 @@ public class TestIncomingDownload {
 	class TestWrapper extends IncomingDownload {
 
 		public TestWrapper() {
-			super(new GetFileMessage("", 0, 0), null, new File("tmp"));
+			super(new GetFileMessage("", 0, 0), null, new File("tmp"), null);
 		}
 
 		@Override

@@ -43,6 +43,7 @@ public class Buschtrommel implements IMessageObserver {
 	private LocalShareCache shareCache;
 	private String alias;
 	private Logger logger;
+	private long lastDiscoveryMulticast;
 
 	/**
 	 * Creates an instance if buschtrommel
@@ -120,15 +121,16 @@ public class Buschtrommel implements IMessageObserver {
 	 *             if anything goes wrong during network connect
 	 */
 	public void start(int listenUdpPort, int sendUdpPort, boolean useIpv4, boolean useIpv6) throws IOException {
-		fileTransferAdapter = new FileTransferAdapter(shareCache, guiCallbacks);
+		this.netCache = new NetCache(this.udpAdapter, this.guiCallbacks, this);
+		fileTransferAdapter = new FileTransferAdapter(shareCache, guiCallbacks, netCache);
 		this.udpAdapter = new UDPAdapter(listenUdpPort, sendUdpPort, useIpv4, useIpv6);
-		this.netCache = new NetCache(this.udpAdapter, fileTransferAdapter, this.guiCallbacks);
 		this.udpAdapter.registerObserver(netCache);
 		this.udpAdapter.registerObserver(this);
 		this.fileTransferAdapter.registerObserver(this);
 		this.fileTransferAdapter.registerObserver(netCache);
 		udpAdapter.sendMulticast(new PeerDiscoveryMessage(PeerDiscoveryMessage.DiscoveryMessageType.HI, alias,
 				fileTransferAdapter.getPort()));
+		lastDiscoveryMulticast = System.currentTimeMillis();
 	}
 
 	/**
@@ -393,7 +395,7 @@ public class Buschtrommel implements IMessageObserver {
 
 	@Override
 	public void receiveMessage(Message message) {
-
+		
 	}
 
 	/**
@@ -406,5 +408,34 @@ public class Buschtrommel implements IMessageObserver {
 		if (fileTransferAdapter == null)
 			return -1;
 		return fileTransferAdapter.getPort();
+	}
+
+	public void newHostDiscovered(Host host) {
+		if (udpAdapter == null || fileTransferAdapter == null) {
+			logger.warning("Can't respond to peer discovery because adapter is not initialized!");
+			return;
+		}
+		
+			PeerDiscoveryMessage rsp = new PeerDiscoveryMessage(DiscoveryMessageType.YO, host.getDisplayName(),
+					fileTransferAdapter.getPort());
+			try {
+				Thread.sleep((int) (Math.random() * Config.maximumYoResponseTime));
+				if (System.currentTimeMillis() - lastDiscoveryMulticast > Config.minDiscoveryMulticastIddle) {
+					lastDiscoveryMulticast = System.currentTimeMillis();
+					udpAdapter.sendMulticast(rsp);
+				} else {
+					udpAdapter.sendUnicast(rsp, host.getAddress());
+				}
+
+				// autostart filelist download
+				//fileTransferAdapter.downloadFilelist(host);
+			} catch (IOException e) {
+				logger.warning("Could not response to HI message: " + e.getMessage());
+			} catch (InterruptedException e1) {
+				logger.warning("Error while waiting before sending YO response: " + e1.getMessage());
+			}
+		
+		fileTransferAdapter.downloadFilelist(host);
+		
 	}
 }

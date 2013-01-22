@@ -20,6 +20,7 @@ import de.tr0llhoehle.buschtrommel.models.FileRequestResponseMessage;
 import de.tr0llhoehle.buschtrommel.models.GetFileMessage;
 import de.tr0llhoehle.buschtrommel.models.Host;
 import de.tr0llhoehle.buschtrommel.models.Message;
+import de.tr0llhoehle.buschtrommel.network.ITransferProgress.TransferStatus;
 
 /**
  * This class represents a download from a host to this client (single source).
@@ -38,6 +39,8 @@ public class IncomingDownload extends Transfer {
 	java.net.Socket socket;
 	Thread self;
 	int bufferSize;
+	private boolean refreshPartnersPort;
+	private IHostPortResolver hosts;
 
 	@Override
 	public void cleanup() {
@@ -82,13 +85,15 @@ public class IncomingDownload extends Transfer {
 	 * @param target
 	 *            the target file to write to
 	 */
-	public IncomingDownload(GetFileMessage sourceFile, Host host, java.io.File target) {
+	public IncomingDownload(GetFileMessage sourceFile, Host host, java.io.File target, IHostPortResolver hosts) {
 		// set general stuff
 		super(new InetSocketAddress(host.getAddress(), host.getPort()));
+		refreshPartnersPort = false;
 		this.partner = new InetSocketAddress(host.getAddress(), host.getPort());
 		logger = java.util.logging.Logger.getLogger("incoming " + hash + " " + partner.toString());
 		transferType = TransferType.Singlesource;
 		bufferSize = -1;
+		this.hosts = hosts;
 
 		// file request
 		this.sourceFile = sourceFile;
@@ -115,8 +120,8 @@ public class IncomingDownload extends Transfer {
 	 * @param bufferSize
 	 *            the buffersize (>0) or -1 to detect automatically
 	 */
-	public IncomingDownload(GetFileMessage sourceFile, Host host, java.io.File target, int bufferSize) {
-		this(sourceFile, host, target);
+	public IncomingDownload(GetFileMessage sourceFile, Host host, java.io.File target, NetCache net, int bufferSize) {
+		this(sourceFile, host, target, net);
 		assert bufferSize > 0;
 		this.bufferSize = bufferSize;
 	}
@@ -142,6 +147,18 @@ public class IncomingDownload extends Transfer {
 				targetFilestream = null;
 				return;
 			}
+		}
+		
+		//retrieve port for host, if necessary
+		if(refreshPartnersPort) {
+			logger.info("retrieve port for host");
+			Host newPartner = hosts.getOrCreateHost(partner.getAddress());
+			if(newPartner.getPort() == Host.UNKNOWN_PORT) {
+				transferState = TransferStatus.PermanentlyNotAvailable;
+				logger.info("the host is not online");
+				return;
+			}
+			this.updatePartner(new InetSocketAddress(newPartner.getAddress(), newPartner.getPort()));
 		}
 
 		// connect and send request
@@ -414,6 +431,7 @@ public class IncomingDownload extends Transfer {
 		closeSocket();
 		closeFile(targetFile.exists());
 		transferState = TransferStatus.Initialized;
+		refreshPartnersPort = true;
 	}
 
 	@Override
@@ -432,7 +450,8 @@ public class IncomingDownload extends Transfer {
 			logger.log(Level.SEVERE, "target filestream doesn't exist anymore!");
 			transferState = TransferStatus.LocalIOError;
 		}
-
+		refreshPartnersPort = true;
+		
 		self = getCreateOwnThread();
 		self.start();
 	}
