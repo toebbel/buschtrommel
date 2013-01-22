@@ -17,6 +17,7 @@ import de.tr0llhoehle.buschtrommel.models.FileAnnouncementMessage;
 import de.tr0llhoehle.buschtrommel.models.Host;
 import de.tr0llhoehle.buschtrommel.models.Message;
 import de.tr0llhoehle.buschtrommel.models.PeerDiscoveryMessage;
+import de.tr0llhoehle.buschtrommel.models.Share;
 import de.tr0llhoehle.buschtrommel.models.ShareAvailability;
 
 /**
@@ -84,13 +85,13 @@ public class NetCache implements IMessageObserver {
 	@Override
 	public void receiveMessage(Message message) {
 		if (message instanceof FileAnnouncementMessage) {
-			logger.info("NetCache receives File availibility message");
+			logger.info("NetCache receives File availibility message '" + message + "' from" + message.getSource());
 			this.fileAnnouncmentHandler((FileAnnouncementMessage) message, false);
 		} else if (message instanceof PeerDiscoveryMessage) {
-			logger.info("NetCache receives peer discovery message");
+			logger.info("NetCache receives peer discovery message '" + message + "' from" + message.getSource());
 			this.peerDiscoveryHandler((PeerDiscoveryMessage) message);
 		} else if (message instanceof ByeMessage) {
-			logger.info("NetCache receives bye message");
+			logger.info("NetCache receives bye message '" + message + "' from" + message.getSource());
 			this.byeHandler((ByeMessage) message);
 		}
 
@@ -110,13 +111,13 @@ public class NetCache implements IMessageObserver {
 	 *            whether the message is a delayed one or not
 	 */
 	private void fileAnnouncmentHandler(FileAnnouncementMessage message, boolean delayed) {
-
 		int ttl = message.getFile().getTTL();
 		String hash = message.getFile().getHash();
 
 		Host host = this.getOrCreateHost(message.getSource().getAddress());
 
 		if (host.getPort() != Host.UNKNOWN_PORT) {
+			logger.info("The sender of the file announcement (" + message.getSource() + ") is unknown");
 			if (this.knownShares.containsKey(hash)) {
 				RemoteShare tempShare = this.knownShares.get(hash);
 
@@ -124,6 +125,7 @@ public class NetCache implements IMessageObserver {
 				// update
 				// ttl
 				if (host.getSharedFiles().containsKey(hash)) {
+					logger.info("announced file " + hash + " already known for this host. Refreshing ttl");
 					host.getSharedFiles().get(hash).setTTL(ttl);
 					if (this.guiCallbacks != null) {
 						this.guiCallbacks.updatedTTL(host.getSharedFiles().get(hash));
@@ -134,6 +136,7 @@ public class NetCache implements IMessageObserver {
 				// to
 				// the host
 				else {
+					logger.info("announced file " + hash + " is unknown for the current host.");
 					host.addFileToSharedFiles(tempShare.addFileSource(host, ttl, message.getFile().getDisplayName(),
 							message.getFile().getMeta()));
 					if (this.guiCallbacks != null) {
@@ -145,7 +148,7 @@ public class NetCache implements IMessageObserver {
 
 			} else {
 				// case: share not cached, but host already cached
-
+				logger.info("announced file " + hash + " is unknown for the current host.");
 				RemoteShare tmp = new RemoteShare(hash, message.getFile().getLength());
 				this.knownShares.put(hash, tmp);
 				host.addFileToSharedFiles(tmp.addFileSource(host, ttl, message.getFile().getDisplayName(), message
@@ -156,6 +159,7 @@ public class NetCache implements IMessageObserver {
 
 			}
 		} else {
+			logger.info("FileAnnouncement will be delayed");
 			try {
 				if (this.udpAdapter != null && !delayed) {
 					this.udpAdapter.sendUnicast(new PeerDiscoveryMessage(PeerDiscoveryMessage.DiscoveryMessageType.HI,
@@ -300,11 +304,7 @@ public class NetCache implements IMessageObserver {
 			for (String hash : host.getSharedFiles().keySet()) {
 				shareAvailability = host.getSharedFiles().get(hash);
 				tmpTTL = shareAvailability.getTtl();
-				if (tmpTTL != -1 && tmpTTL <= TTL_REFRESH_RATE) { // TODO:
-																	// change -1
-																	// to
-																	// infinity
-																	// value
+				if (tmpTTL != Share.TTL_INFINITY && tmpTTL - TTL_REFRESH_RATE <= 0) {
 					host.removeFileFromSharedFiles(hash);
 					shareAvailability.getFile().removeFileSource(shareAvailability);
 					if (shareAvailability.getFile().noSourcesAvailable()) {
@@ -313,8 +313,10 @@ public class NetCache implements IMessageObserver {
 					if (guiCallbacks != null) {
 						guiCallbacks.removeShare(shareAvailability);
 					}
-				} else {
-					shareAvailability.setTTL(tmpTTL - TTL_REFRESH_RATE);
+				} else if (tmpTTL != Share.TTL_INFINITY) {
+					if(tmpTTL - TTL_REFRESH_RATE > 0) {
+						shareAvailability.setTTL(tmpTTL - TTL_REFRESH_RATE);
+					}
 				}
 			}
 		}
