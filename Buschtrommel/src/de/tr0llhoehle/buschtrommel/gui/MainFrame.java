@@ -49,6 +49,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	private String defaultTtl = "-1";
 	private String pathToShareSettings;
 	private Timer transferTimer;
+	private Timer transferOutTimer;
 
 	/**
 	 * Creates new form MainFrame
@@ -99,6 +100,14 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		};
 		transferTimer = new Timer(delay, taskPerformer);
 		transferTimer.start();
+		
+		java.awt.event.ActionListener task2Performer = new java.awt.event.ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				updateOutTransfers();
+			}
+		};
+		transferOutTimer = new Timer(delay, task2Performer);
+		transferOutTimer.start();
 	}
 
 	protected void readOldLocalShares() {
@@ -691,6 +700,15 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
 		}
 	}
+	
+	private void updateOutTransfers() {
+		outgoingTransferList.repaint();
+		if (outgoingItems.isEmpty()) {
+
+			transferOutTimer.stop();
+
+		}
+	}
 
 	private void removeTransferActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_removeTransferActionPerformed
 		int items_to_delete[] = null;
@@ -718,6 +736,10 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		// TODO timer to force close
 		if (transferTimer.isRunning()) {
 			transferTimer.stop();
+		}
+		
+		if (transferOutTimer.isRunning()) {
+			transferOutTimer.stop();
 		}
 
 		if (buschtrommel != null) {
@@ -1108,7 +1130,14 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
 	@Override
 	public void newOutgoingTransferStarted(ITransferProgress transfer) {
-		// TODO Auto-generated method stub 4 Beni
+		if (transfer != null) {
+			outgoingItems.addElement(transfer);
+			if (!transferOutTimer.isRunning()) {
+				transferOutTimer.start();
+			}
+		} else {
+			LoggerWrapper.logError("Something with the download went wrong");
+		}
 		
 	}
 
