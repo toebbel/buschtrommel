@@ -275,8 +275,10 @@ public class IncomingDownload extends Transfer {
 	 */
 	private void closeSocket() {
 		try {
-			if (socket != null)
+			if (socket != null) {
 				socket.close();
+				socket = null;
+			}
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, "Could not close network socket: " + e.getMessage());
 		}
@@ -376,13 +378,10 @@ public class IncomingDownload extends Transfer {
 					} else {
 						str_expectedTransferVolume += new String(new byte[] { (byte) next }, Message.ENCODING);
 					}
-			} catch (IOException e) {
-				logger.log(Level.SEVERE, "Could not understand 'expected transfer volume' in response");
+			} catch (IOException | InterruptedException e) {
+				logger.log(Level.SEVERE, "Could not understand response header");
 				transferState = TransferStatus.LostConnection;
-				return null;
-			} catch (InterruptedException e) {
-				logger.log(Level.SEVERE, "Could not wait for response head");
-				transferState = TransferStatus.LostConnection;
+				closeSocket();
 				return null;
 			}
 			try {
