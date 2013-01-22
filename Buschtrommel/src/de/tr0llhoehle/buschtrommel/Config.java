@@ -31,6 +31,8 @@ public class Config {
 	public static int FileReannounceGraceTime; // time in sec before a ttl of a
 												// localshare is over -> send it
 												// to buschtrommel to reannounce
+	public static String defaultDownloadFolder;
+	public static boolean showFileListTransfers;
 
 	private Config() {
 		this.prop = new Properties();
@@ -60,6 +62,8 @@ public class Config {
 		useIPv4 = prop.getProperty("useIPv4").equals("true");
 		useIPv6 = prop.getProperty("useIPv6").equals("true");
 		FileReannounceGraceTime = Integer.parseInt(prop.getProperty("FileReannounceGraceTime"));
+		defaultDownloadFolder = prop.getProperty("defaultDownloadFolder");
+		showFileListTransfers = prop.getProperty("showFileListTransfers").equals("true");
 	}
 
 	public void saveToFile(String path) throws IOException {
@@ -77,6 +81,8 @@ public class Config {
 		this.prop.setProperty("useIPv4", Boolean.toString(useIPv4));
 		this.prop.setProperty("useIPv6", Boolean.toString(useIPv6));
 		this.prop.setProperty("FileReannounceGraceTime", Integer.toString(FileReannounceGraceTime));
+		this.prop.setProperty("defaultDownloadFolder", defaultDownloadFolder);
+		this.prop.setProperty("showFileListTransfers", Boolean.toString(showFileListTransfers));
 		
 		this.prop.store(new FileOutputStream(path), null);
 	}

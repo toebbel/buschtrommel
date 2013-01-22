@@ -81,7 +81,7 @@ public class Buschtrommel implements IMessageObserver {
 		} else {
 			logger.info("Config file not existing. Create new one.");
 			Config.alias = alias;
-			Config.defaultTTL = -1;
+			Config.defaultTTL = -1; //TODO: set to infinity value
 			Config.maximumYoResponseTime = 3000;
 			Config.minDiscoveryMulticastIddle = 5000;
 			Config.shareCachePath = "shares.ht";
@@ -89,6 +89,8 @@ public class Buschtrommel implements IMessageObserver {
 			Config.useIPv4 = true;
 			Config.useIPv6 = true;
 			Config.FileReannounceGraceTime = 15;
+			Config.defaultDownloadFolder = System.getProperty("user.home") + "/Downloads";
+			Config.showFileListTransfers = false;
 			try {
 				Config.getInstance().saveToFile(cfgFile);
 			} catch (IOException e) {
