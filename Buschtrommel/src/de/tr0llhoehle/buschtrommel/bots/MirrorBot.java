@@ -97,20 +97,16 @@ public class MirrorBot implements IGUICallbacks {
 		buschtrommel.stop();
 	}
 
-	@Override
 	public void newHostDiscovered(Host host) {
 	}
 
-	@Override
 	public void hostWentOffline(Host host) {
 	}
 
-	@Override
 	public void removeShare(ShareAvailability file) {
 	}
 
 
-	@Override
 	public synchronized void newShareAvailable(ShareAvailability file) {
 		String hash = file.getFile().getHash();
 		System.out.println("new share available: " + hash);
@@ -118,7 +114,6 @@ public class MirrorBot implements IGUICallbacks {
 			queue.add(hash);
 	}
 
-	@Override
 	public void updatedTTL(ShareAvailability file) {
 	}
 
