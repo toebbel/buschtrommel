@@ -1136,7 +1136,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 				transferOutTimer.start();
 			}
 		} else {
-			LoggerWrapper.logError("Something with the download went wrong");
+			LoggerWrapper.logError("Something with the outgoing transfer went wrong");
 		}
 		
 	}
