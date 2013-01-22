@@ -87,58 +87,57 @@ public class DownloadItem extends javax.swing.JPanel implements ListCellRenderer
 	 */
 	@SuppressWarnings("unchecked")
 	// <editor-fold defaultstate="collapsed"
-	// desc="Generated Code">//GEN-BEGIN:initComponents
-	private void initComponents() {
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
 
-		Progress = new javax.swing.JProgressBar();
-		Filename = new javax.swing.JLabel();
-		TransferStatus = new javax.swing.JTextField();
+        Progress = new javax.swing.JProgressBar();
+        Filename = new javax.swing.JLabel();
+        TransferStatus = new javax.swing.JTextField();
 
-		Filename.setText("File");
+        Filename.setText("File");
 
-		TransferStatus.setEditable(false);
-		TransferStatus.setText("FileTransferStatus");
-		TransferStatus.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				TransferStatusActionPerformed(evt);
-			}
-		});
+        TransferStatus.setEditable(false);
+        TransferStatus.setText("FileTransferStatus");
+        TransferStatus.setMaximumSize(new java.awt.Dimension(142, 28));
+        TransferStatus.setMinimumSize(new java.awt.Dimension(142, 28));
+        TransferStatus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                TransferStatusActionPerformed(evt);
+            }
+        });
 
-		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-		this.setLayout(layout);
-		layout.setHorizontalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
-				layout.createSequentialGroup()
-						.addComponent(Filename)
-						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-						.addComponent(Progress, javax.swing.GroupLayout.DEFAULT_SIZE, 444, Short.MAX_VALUE)
-						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-						.addComponent(TransferStatus, javax.swing.GroupLayout.PREFERRED_SIZE,
-								javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)));
-		layout.setVerticalGroup(layout
-				.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addComponent(TransferStatus)
-				.addGroup(
-						layout.createSequentialGroup()
-								.addContainerGap()
-								.addGroup(
-										layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-												.addComponent(Filename)
-												.addComponent(Progress, javax.swing.GroupLayout.PREFERRED_SIZE,
-														javax.swing.GroupLayout.DEFAULT_SIZE,
-														javax.swing.GroupLayout.PREFERRED_SIZE))
-								.addContainerGap(13, Short.MAX_VALUE)));
-	}// </editor-fold>//GEN-END:initComponents
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(Filename)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(Progress, javax.swing.GroupLayout.DEFAULT_SIZE, 444, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(TransferStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(TransferStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(Filename)
+                    .addComponent(Progress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(13, Short.MAX_VALUE))
+        );
+    }// </editor-fold>//GEN-END:initComponents
 
 	private void TransferStatusActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_TransferStatusActionPerformed
 		// TODO add your handling code here:
 	}// GEN-LAST:event_TransferStatusActionPerformed
 
-	// Variables declaration - do not modify//GEN-BEGIN:variables
-	private javax.swing.JLabel Filename;
-	private javax.swing.JProgressBar Progress;
-	private javax.swing.JTextField TransferStatus;
-
-	// End of variables declaration//GEN-END:variables
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel Filename;
+    private javax.swing.JProgressBar Progress;
+    private javax.swing.JTextField TransferStatus;
+    // End of variables declaration//GEN-END:variables
 
 	public static String statusToString(TransferStatus transfer) {
 		if (transfer == null) {

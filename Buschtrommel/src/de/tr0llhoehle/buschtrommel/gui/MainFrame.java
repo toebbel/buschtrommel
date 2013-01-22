@@ -190,6 +190,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Bongo");
+        setMinimumSize(new java.awt.Dimension(640, 480));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);

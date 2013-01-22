@@ -21,7 +21,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="Progress" pref="444" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="TransferStatus" min="-2" max="-2" attributes="0"/>
+              <Component id="TransferStatus" min="-2" pref="142" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -51,6 +51,12 @@
       <Properties>
         <Property name="editable" type="boolean" value="false"/>
         <Property name="text" type="java.lang.String" value="FileTransferStatus"/>
+        <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[142, 28]"/>
+        </Property>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[142, 28]"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="TransferStatusActionPerformed"/>
