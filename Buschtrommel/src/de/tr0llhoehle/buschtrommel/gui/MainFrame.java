@@ -892,20 +892,21 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		int selected[] = localSharesTable.getSelectedRows();
 		for (int i : selected) {
 			sharesModel.getValueAt(i, 0);
-
+			String path = sharesModel.getValueAt(i, 2);
 			if (buschtrommel != null) {
+				
+				for(String key : buschtrommel.getLocalShares().keySet()){
+					if(path.equals(buschtrommel.getLocalShares().get(key).getPath())){
+						buschtrommel.RemoveFileFromShare(key);
+					}
+				}
+
 				sharesModel.removeShare(i);
+				
 
 			}
 		}
 	}// GEN-LAST:event_removeShareActionPerformed
-
-	private void loadSettingsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_loadSettingsActionPerformed
-		// TODO add your handling code here:
-	}// GEN-LAST:event_loadSettingsActionPerformed
-
-	private void removeShareActionPerformed1(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_removeShareActionPerformed1
-	}// GEN-LAST:event_removeShareActionPerformed1
 
 	public static String humanReadableByteCount(long bytes, boolean si) {
 		int unit = si ? 1000 : 1024;
