@@ -81,6 +81,10 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		localSharesTable.setAutoCreateRowSorter(true);
 		downloadFolder.setText(Config.defaultDownloadFolder);
 
+		viewFilelistTransfersBox.setSelected(Config.showFileListTransfers);
+		v4Checkbox.setEnabled(Config.useIPv4);
+		v6Checkbox.setEnabled(Config.useIPv6);
+
 		readOldLocalShares();
 
 		setupTimer();
@@ -143,6 +147,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	// <editor-fold defaultstate="collapsed"
 	// <editor-fold defaultstate="collapsed"
 	// <editor-fold defaultstate="collapsed"
+	// <editor-fold defaultstate="collapsed"
 	// desc="Generated Code">//GEN-BEGIN:initComponents
 	private void initComponents() {
 
@@ -182,6 +187,9 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		selectDownloadFolder = new javax.swing.JButton();
 		jLabel4 = new javax.swing.JLabel();
 		viewFilelistTransfersBox = new javax.swing.JCheckBox();
+		jLabel5 = new javax.swing.JLabel();
+		v4Checkbox = new javax.swing.JCheckBox();
+		v6Checkbox = new javax.swing.JCheckBox();
 
 		jFileChooser1.setDialogTitle("Datei wählen");
 
@@ -529,6 +537,22 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 			}
 		});
 
+		jLabel5.setText("IP-Version");
+
+		v4Checkbox.setText("v4");
+		v4Checkbox.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				v4CheckboxActionPerformed(evt);
+			}
+		});
+
+		v6Checkbox.setText("v6");
+		v6Checkbox.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				v6CheckboxActionPerformed(evt);
+			}
+		});
+
 		javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
 		jPanel5.setLayout(jPanel5Layout);
 		jPanel5Layout
@@ -573,9 +597,30 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 																												selectDownloadFolder))
 																						.addComponent(jTextField2)))
 														.addGroup(
-																jPanel5Layout.createSequentialGroup()
-																		.addComponent(jLabel4).addGap(18, 18, 18)
-																		.addComponent(viewFilelistTransfersBox)
+																jPanel5Layout
+																		.createSequentialGroup()
+																		.addGroup(
+																				jPanel5Layout
+																						.createParallelGroup(
+																								javax.swing.GroupLayout.Alignment.LEADING)
+																						.addComponent(jLabel4)
+																						.addComponent(jLabel5))
+																		.addGap(18, 18, 18)
+																		.addGroup(
+																				jPanel5Layout
+																						.createParallelGroup(
+																								javax.swing.GroupLayout.Alignment.LEADING)
+																						.addComponent(
+																								viewFilelistTransfersBox)
+																						.addGroup(
+																								jPanel5Layout
+																										.createSequentialGroup()
+																										.addComponent(
+																												v4Checkbox)
+																										.addPreferredGap(
+																												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+																										.addComponent(
+																												v6Checkbox)))
 																		.addGap(0, 0, Short.MAX_VALUE)))
 										.addContainerGap()));
 		jPanel5Layout.setVerticalGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -602,7 +647,12 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 								.addGroup(
 										jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
 												.addComponent(jLabel4).addComponent(viewFilelistTransfersBox))
-								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 489,
+								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+								.addGroup(
+										jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+												.addComponent(jLabel5).addComponent(v4Checkbox)
+												.addComponent(v6Checkbox))
+								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 453,
 										Short.MAX_VALUE).addComponent(saveSettings).addContainerGap()));
 
 		saveSettings.getAccessibleContext().setAccessibleName("save_Settings");
@@ -620,6 +670,43 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
 		pack();
 	}// </editor-fold>//GEN-END:initComponents
+
+	private void v4CheckboxActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_v4CheckboxActionPerformed
+		if (Config.useIPv6) {
+			Config.useIPv4 = !Config.useIPv4;
+		}
+
+		if (Config.useIPv4) {
+			v6Checkbox.setEnabled(true);
+			// Config.useIPv4=false;
+		} else {
+			v6Checkbox.setEnabled(false);
+			// Config.useIPv4=true;
+		}
+
+		v4Checkbox.setSelected(Config.useIPv4);
+
+	}// GEN-LAST:event_v4CheckboxActionPerformed
+
+	private void v6CheckboxActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_v6CheckboxActionPerformed
+
+		if (Config.useIPv4) {
+			Config.useIPv6 = !Config.useIPv6;
+		}
+
+		if (Config.useIPv6) {
+			v4Checkbox.setEnabled(true);
+		} else {
+			v4Checkbox.setEnabled(false);
+		}
+
+		// Config.useIPv6 = !Config.useIPv6;
+
+		// if (!Config.useIPv4) {
+		// Config.useIPv6 = true;
+		// }
+		v6Checkbox.setSelected(Config.useIPv6);
+	}// GEN-LAST:event_v6CheckboxActionPerformed
 
 	private void viewFilelistTransfersBoxActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_viewFilelistTransfersBoxActionPerformed
 		Config.showFileListTransfers = !Config.showFileListTransfers;
@@ -1066,6 +1153,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	private javax.swing.JLabel jLabel2;
 	private javax.swing.JLabel jLabel3;
 	private javax.swing.JLabel jLabel4;
+	private javax.swing.JLabel jLabel5;
 	private javax.swing.JPanel jPanel1;
 	private javax.swing.JPanel jPanel3;
 	private javax.swing.JPanel jPanel4;
@@ -1088,6 +1176,8 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	private javax.swing.JButton resumeTransfer;
 	private javax.swing.JButton saveSettings;
 	private javax.swing.JButton selectDownloadFolder;
+	private javax.swing.JCheckBox v4Checkbox;
+	private javax.swing.JCheckBox v6Checkbox;
 	private javax.swing.JCheckBox viewFilelistTransfersBox;
 
 	// End of variables declaration//GEN-END:variables

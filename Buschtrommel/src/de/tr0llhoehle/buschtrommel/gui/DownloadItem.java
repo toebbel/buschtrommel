@@ -72,7 +72,7 @@ public class DownloadItem extends javax.swing.JPanel implements ListCellRenderer
 		// System.out.println(percent);
 		Progress.setMaximum(100);
 		Progress.setValue((int) percent);
-		Progress.setString(percent + "%");
+		Progress.setString((int) percent + "%");
 		setBackground(background);
 		setForeground(foreground);
 		this.setOpaque(true);
