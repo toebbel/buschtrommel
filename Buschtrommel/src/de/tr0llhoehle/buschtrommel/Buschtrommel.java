@@ -155,6 +155,7 @@ public class Buschtrommel implements IMessageObserver {
 		}
 		this.udpAdapter = null;
 		this.shareCache.saveToFile(Config.shareCachePath);
+		Config.getInstance().saveToFile("config.properties");
 	}
 
 	/***
