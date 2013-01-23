@@ -140,8 +140,6 @@ public class MirrorBot implements IGUICallbacks {
 
 	@Override
 	public void newOutgoingTransferStarted(ITransferProgress transfer) {
-		// TODO Auto-generated method stub
-
 	}
 
 }
