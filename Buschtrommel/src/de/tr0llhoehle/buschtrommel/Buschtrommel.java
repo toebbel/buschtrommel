@@ -184,8 +184,9 @@ public class Buschtrommel implements IMessageObserver {
 			logger.warning("Can't start download: The given filepath is null");
 			return null;
 		}
+		String cleanTarget = targetFile.replace(java.io.File.pathSeparatorChar, '-');
 		Transfer result = (Transfer) fileTransferAdapter.DownloadFile(hash, host, s.getLength(), new java.io.File(
-				targetFile));
+				cleanTarget));
 		return result;
 	}
 
