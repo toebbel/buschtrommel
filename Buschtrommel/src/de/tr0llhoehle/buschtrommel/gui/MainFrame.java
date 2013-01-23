@@ -679,29 +679,93 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		pack();
 	}// </editor-fold>//GEN-END:initComponents
 
-	private void v4CheckboxActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_v4CheckboxActionPerformed
-		if (Config.useIPv6) {
-			Config.useIPv4 = !Config.useIPv4;
+	public static String humanReadableByteCount(long bytes, boolean si) {
+		int unit = si ? 1000 : 1024;
+		if (bytes < unit)
+			return bytes + " B";
+		int exp = (int) (Math.log(bytes) / Math.log(unit));
+		String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
+		return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+	}
+
+	// End of variables declaration//GEN-END:variables
+
+	@Override
+	public void newHostDiscovered(Host host) {
+		tablemodel.newHostDiscovered(host);
+		// throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public void hostWentOffline(Host host) {
+		tablemodel.hostWentOffline(host);
+		// throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public void removeShare(ShareAvailability file) {
+		tablemodel.removeShare(file);
+		// throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public void newShareAvailable(ShareAvailability file) {
+		// filesHostsTable.setModel(filesModel);
+		tablemodel.addShare(file);
+		// throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public void updatedTTL(ShareAvailability file) {
+		// throw new UnsupportedOperationException("Not supported yet.");
+		tablemodel.updatedTTL(file);
+	}
+
+	@Override
+	public void newOutgoingTransferStarted(ITransferProgress transfer) {
+		if (transfer != null) {
+			// LoggerWrapper.logInfo("Hash = " + transfer.getExpectedHash());
+			if (Config.showFileListTransfers) {
+				outgoingItems.addElement(transfer);
+			} else if (!"filelist".equals(transfer.getExpectedHash())) {
+
+				outgoingItems.addElement(transfer);
+			} else {
+				LoggerWrapper.logInfo("skipped filelist");
+				return;
+			}
+
+			// outgoingItems.addElement(transfer);
+			if (!transferOutTimer.isRunning()) {
+				transferOutTimer.start();
+			}
+		} else {
+			LoggerWrapper.logError("Something with the outgoing transfer went wrong");
 		}
 
-		if (!(Config.useIPv4 || Config.useIPv6)) {
-			Config.useIPv4 = true;
+	}
+
+	/*
+	 * as long as a transfer is in the list, it is forced to repaint every
+	 * second
+	 */
+	private void updateTransfers() {
+		activeTransferList.repaint();
+		if (downloadItems.isEmpty()) {
+
+			transferTimer.stop();
+
 		}
+	}
 
-		v4Checkbox.setSelected(Config.useIPv4);
-	}// GEN-LAST:event_v4CheckboxActionPerformed
+	private void updateOutTransfers() {
+		outgoingTransferList.repaint();
+		if (outgoingItems.isEmpty()) {
 
-	private void v6CheckboxActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_v6CheckboxActionPerformed
-		if (Config.useIPv4) {
-			Config.useIPv6 = !Config.useIPv6;
+			transferOutTimer.stop();
+
 		}
-
-		if (!(Config.useIPv6 || Config.useIPv4)) {
-			Config.useIPv6 = true;
-		}
-
-		v6Checkbox.setSelected(Config.useIPv6);
-	}// GEN-LAST:event_v6CheckboxActionPerformed
+	}
 
 	private void viewFilelistTransfersBoxActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_viewFilelistTransfersBoxActionPerformed
 		Config.showFileListTransfers = !Config.showFileListTransfers;
@@ -772,28 +836,6 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
 		}
 	}// GEN-LAST:event_removeOutTransferActionPerformed
-
-	/*
-	 * as long as a transfer is in the list, it is forced to repaint every
-	 * second
-	 */
-	private void updateTransfers() {
-		activeTransferList.repaint();
-		if (downloadItems.isEmpty()) {
-
-			transferTimer.stop();
-
-		}
-	}
-
-	private void updateOutTransfers() {
-		outgoingTransferList.repaint();
-		if (outgoingItems.isEmpty()) {
-
-			transferOutTimer.stop();
-
-		}
-	}
 
 	private void removeTransferActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_removeTransferActionPerformed
 		int items_to_delete[] = null;
@@ -959,45 +1001,24 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
 	}// GEN-LAST:event_jButton1ActionPerformed
 
-	private void saveSettingsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_saveSettingsActionPerformed
-		try {
-			Config.getInstance().saveToFile("config.properties");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			// e.printStackTrace();
-			LoggerWrapper.logError("Could't save Config");
-		}
-
-	}// GEN-LAST:event_saveSettingsActionPerformed
-
 	private void removeShareActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_removeShareActionPerformed
 		int selected[] = localSharesTable.getSelectedRows();
 		for (int i : selected) {
 			sharesModel.getValueAt(i, 0);
 			String path = sharesModel.getValueAt(i, 2);
 			if (buschtrommel != null) {
-				
-				for(String key : buschtrommel.getLocalShares().keySet()){
-					if(path.equals(buschtrommel.getLocalShares().get(key).getPath())){
+
+				for (String key : buschtrommel.getLocalShares().keySet()) {
+					if (path.equals(buschtrommel.getLocalShares().get(key).getPath())) {
 						buschtrommel.RemoveFileFromShare(key);
 					}
 				}
 
 				sharesModel.removeShare(i);
-				
 
 			}
 		}
 	}// GEN-LAST:event_removeShareActionPerformed
-
-	public static String humanReadableByteCount(long bytes, boolean si) {
-		int unit = si ? 1000 : 1024;
-		if (bytes < unit)
-			return bytes + " B";
-		int exp = (int) (Math.log(bytes) / Math.log(unit));
-		String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp - 1) + (si ? "" : "i");
-		return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
-	}
 
 	private void addShareActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_addShareActionPerformed
 
@@ -1092,6 +1113,41 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
 	}// GEN-LAST:event_abortTransferActionPerformed
 
+	private void v4CheckboxActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_v4CheckboxActionPerformed
+		if (Config.useIPv6) {
+			Config.useIPv4 = !Config.useIPv4;
+		}
+
+		if (!(Config.useIPv4 || Config.useIPv6)) {
+			Config.useIPv4 = true;
+		}
+
+		v4Checkbox.setSelected(Config.useIPv4);
+	}// GEN-LAST:event_v4CheckboxActionPerformed
+
+	private void v6CheckboxActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_v6CheckboxActionPerformed
+		if (Config.useIPv4) {
+			Config.useIPv6 = !Config.useIPv6;
+		}
+
+		if (!(Config.useIPv6 || Config.useIPv4)) {
+			Config.useIPv6 = true;
+		}
+
+		v6Checkbox.setSelected(Config.useIPv6);
+	}// GEN-LAST:event_v6CheckboxActionPerformed
+
+	private void saveSettingsActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_saveSettingsActionPerformed
+		try {
+			Config.getInstance().saveToFile("config.properties");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			// e.printStackTrace();
+			LoggerWrapper.logError("Couldn't save Config");
+		}
+
+	}// GEN-LAST:event_saveSettingsActionPerformed
+
 	/**
 	 * @param args
 	 *            the command line arguments
@@ -1178,60 +1234,5 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	private javax.swing.JCheckBox viewFilelistTransfersBox;
 
 	// End of variables declaration//GEN-END:variables
-
-	@Override
-	public void newHostDiscovered(Host host) {
-		tablemodel.newHostDiscovered(host);
-		// throw new UnsupportedOperationException("Not supported yet.");
-	}
-
-	@Override
-	public void hostWentOffline(Host host) {
-		tablemodel.hostWentOffline(host);
-		// throw new UnsupportedOperationException("Not supported yet.");
-	}
-
-	@Override
-	public void removeShare(ShareAvailability file) {
-		tablemodel.removeShare(file);
-		// throw new UnsupportedOperationException("Not supported yet.");
-	}
-
-	@Override
-	public void newShareAvailable(ShareAvailability file) {
-		// filesHostsTable.setModel(filesModel);
-		tablemodel.addShare(file);
-		// throw new UnsupportedOperationException("Not supported yet.");
-	}
-
-	@Override
-	public void updatedTTL(ShareAvailability file) {
-		// throw new UnsupportedOperationException("Not supported yet.");
-		tablemodel.updatedTTL(file);
-	}
-
-	@Override
-	public void newOutgoingTransferStarted(ITransferProgress transfer) {
-		if (transfer != null) {
-			// LoggerWrapper.logInfo("Hash = " + transfer.getExpectedHash());
-			if (Config.showFileListTransfers) {
-				outgoingItems.addElement(transfer);
-			} else if (!"filelist".equals(transfer.getExpectedHash())) {
-
-				outgoingItems.addElement(transfer);
-			} else {
-				LoggerWrapper.logInfo("skipped filelist");
-				return;
-			}
-
-			// outgoingItems.addElement(transfer);
-			if (!transferOutTimer.isRunning()) {
-				transferOutTimer.start();
-			}
-		} else {
-			LoggerWrapper.logError("Something with the outgoing transfer went wrong");
-		}
-
-	}
 
 }
