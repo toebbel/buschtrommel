@@ -14,6 +14,7 @@ import java.util.Vector;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Logger;
 
+import de.tr0llhoehle.buschtrommel.Config;
 import de.tr0llhoehle.buschtrommel.IGUICallbacks;
 import de.tr0llhoehle.buschtrommel.LoggerWrapper;
 import de.tr0llhoehle.buschtrommel.LocalShareCache;
@@ -177,7 +178,10 @@ public class FileTransferAdapter extends MessageMonitor {
 			}
 		}
 
-		Transfer result = new IncomingDownload(new GetFileMessage(hash, 0, length), host, target, hosts);
+		IncomingDownload result = new IncomingDownload(new GetFileMessage(hash, 0, length), host, target, hosts);
+		if (!Config.hashCheckEnabled) {
+			result.DisableIntegrityCheck();
+		}
 		incomingTransfers.put(hash, result);
 		result.SetLoggerParent(logger);
 		result.start();
