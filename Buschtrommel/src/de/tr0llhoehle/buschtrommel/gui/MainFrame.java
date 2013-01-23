@@ -706,8 +706,8 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	}// </editor-fold>//GEN-END:initComponents
 
 	private void disableHashCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_disableHashCheckBoxActionPerformed
-		Config.hashCheckEnabled != Config.hashCheckEnabled
-		isableHashCheckBox.setSelected(Config.hashCheckEnabled);
+		Config.hashCheckEnabled = !Config.hashCheckEnabled;
+		disableHashCheckBox.setSelected(Config.hashCheckEnabled);
 		
 	}// GEN-LAST:event_disableHashCheckBoxActionPerformed
 
