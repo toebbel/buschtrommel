@@ -5,12 +5,25 @@
     <Component class="javax.swing.JFileChooser" name="jFileChooser1">
       <Properties>
         <Property name="dialogTitle" type="java.lang.String" value="Datei w&#xe4;hlen"/>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[640, 480]"/>
+        </Property>
+        <Property name="name" type="java.lang.String" value="" noResource="true"/>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[640, 480]"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JFileChooser" name="pathChooser">
       <Properties>
         <Property name="dialogTitle" type="java.lang.String" value="Ort w&#xe4;hlen"/>
         <Property name="fileSelectionMode" type="int" value="1"/>
+        <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[640, 480]"/>
+        </Property>
+        <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+          <Dimension value="[640, 480]"/>
+        </Property>
       </Properties>
     </Component>
   </NonVisualComponents>

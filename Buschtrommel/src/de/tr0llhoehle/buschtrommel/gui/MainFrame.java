@@ -149,6 +149,8 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	// <editor-fold defaultstate="collapsed"
 	// <editor-fold defaultstate="collapsed"
 	// <editor-fold defaultstate="collapsed"
+	// <editor-fold defaultstate="collapsed"
+	// <editor-fold defaultstate="collapsed"
 	// desc="Generated Code">//GEN-BEGIN:initComponents
 	private void initComponents() {
 
@@ -194,9 +196,14 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		jLabel6 = new javax.swing.JLabel();
 
 		jFileChooser1.setDialogTitle("Datei wählen");
+		jFileChooser1.setMinimumSize(new java.awt.Dimension(640, 480));
+		jFileChooser1.setName(""); // NOI18N
+		jFileChooser1.setPreferredSize(new java.awt.Dimension(640, 480));
 
 		pathChooser.setDialogTitle("Ort wählen");
 		pathChooser.setFileSelectionMode(javax.swing.JFileChooser.DIRECTORIES_ONLY);
+		pathChooser.setMinimumSize(new java.awt.Dimension(640, 480));
+		pathChooser.setPreferredSize(new java.awt.Dimension(640, 480));
 
 		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 		setTitle("Bongo");
@@ -688,7 +695,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
 	}
 
-	// End of variables declaration//GEN-END:variables
+	// End of variables declaration
 
 	@Override
 	public void newHostDiscovered(Host host) {
@@ -1232,7 +1239,6 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	private javax.swing.JCheckBox v4Checkbox;
 	private javax.swing.JCheckBox v6Checkbox;
 	private javax.swing.JCheckBox viewFilelistTransfersBox;
-
 	// End of variables declaration//GEN-END:variables
 
 }
