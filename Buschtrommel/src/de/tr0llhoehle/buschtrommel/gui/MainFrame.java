@@ -84,7 +84,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		viewFilelistTransfersBox.setSelected(Config.showFileListTransfers);
 		v4Checkbox.setSelected(Config.useIPv4);
 		v6Checkbox.setSelected(Config.useIPv6);
-		disableHashCheckBox.setSelected(Config.hashCheckEnabled);
+		enableHashCheckBox.setSelected(Config.hashCheckEnabled);
 
 		readOldLocalShares();
 
@@ -153,6 +153,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	// <editor-fold defaultstate="collapsed"
 	// <editor-fold defaultstate="collapsed"
 	// <editor-fold defaultstate="collapsed"
+	// <editor-fold defaultstate="collapsed"
 	// desc="Generated Code">//GEN-BEGIN:initComponents
 	private void initComponents() {
 
@@ -197,7 +198,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		v6Checkbox = new javax.swing.JCheckBox();
 		jLabel6 = new javax.swing.JLabel();
 		jLabel7 = new javax.swing.JLabel();
-		disableHashCheckBox = new javax.swing.JCheckBox();
+		enableHashCheckBox = new javax.swing.JCheckBox();
 
 		jFileChooser1.setDialogTitle("Datei wählen");
 		jFileChooser1.setMinimumSize(new java.awt.Dimension(640, 480));
@@ -568,11 +569,11 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
 		jLabel6.setText("requires restart of Bongo");
 
-		jLabel7.setText("Disable Hash-Check");
+		jLabel7.setText("Enable Hash-Check");
 
-		disableHashCheckBox.addActionListener(new java.awt.event.ActionListener() {
+		enableHashCheckBox.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				disableHashCheckBoxActionPerformed(evt);
+				enableHashCheckBoxActionPerformed(evt);
 			}
 		});
 
@@ -635,7 +636,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 																						.createParallelGroup(
 																								javax.swing.GroupLayout.Alignment.LEADING)
 																						.addComponent(
-																								disableHashCheckBox)
+																								enableHashCheckBox)
 																						.addComponent(
 																								viewFilelistTransfersBox)
 																						.addGroup(
@@ -680,8 +681,8 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 												.addComponent(v6Checkbox).addComponent(jLabel6))
 								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 								.addGroup(
-										jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-												.addComponent(jLabel7).addComponent(disableHashCheckBox))
+										jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+												.addComponent(enableHashCheckBox).addComponent(jLabel7))
 								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 								.addGroup(
 										jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -705,10 +706,10 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		pack();
 	}// </editor-fold>//GEN-END:initComponents
 
-	private void disableHashCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_disableHashCheckBoxActionPerformed
+	private void enableHashCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_disableHashCheckBoxActionPerformed
 		Config.hashCheckEnabled = !Config.hashCheckEnabled;
-		disableHashCheckBox.setSelected(Config.hashCheckEnabled);
-		
+		enableHashCheckBox.setSelected(Config.hashCheckEnabled);
+
 	}// GEN-LAST:event_disableHashCheckBoxActionPerformed
 
 	public static String humanReadableByteCount(long bytes, boolean si) {
@@ -1229,10 +1230,10 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	private javax.swing.JButton activateShare;
 	private javax.swing.JList activeTransferList;
 	private javax.swing.JButton addShare;
-	private javax.swing.JCheckBox disableHashCheckBox;
 	private javax.swing.JButton downloadFiles;
 	private javax.swing.JButton downloadFilesMultihost;
 	private javax.swing.JTextField downloadFolder;
+	private javax.swing.JCheckBox enableHashCheckBox;
 	private javax.swing.JTable filesHostsTable;
 	private javax.swing.JFileChooser jFileChooser1;
 	private javax.swing.JLabel jLabel2;

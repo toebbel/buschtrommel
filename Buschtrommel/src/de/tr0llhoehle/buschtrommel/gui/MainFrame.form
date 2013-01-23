@@ -502,7 +502,7 @@
                               </Group>
                               <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="disableHashCheckBox" min="-2" max="-2" attributes="0"/>
+                                  <Component id="enableHashCheckBox" min="-2" max="-2" attributes="0"/>
                                   <Component id="viewFilelistTransfersBox" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
                                       <Component id="v4Checkbox" min="-2" max="-2" attributes="0"/>
@@ -541,9 +541,9 @@
                           <Component id="jLabel6" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="jLabel7" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="disableHashCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="enableHashCheckBox" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="jLabel7" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
@@ -637,12 +637,12 @@
             </Component>
             <Component class="javax.swing.JLabel" name="jLabel7">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Disable Hash-Check"/>
+                <Property name="text" type="java.lang.String" value="Enable Hash-Check"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JCheckBox" name="disableHashCheckBox">
+            <Component class="javax.swing.JCheckBox" name="enableHashCheckBox">
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="disableHashCheckBoxActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="enableHashCheckBoxActionPerformed"/>
               </Events>
             </Component>
           </SubComponents>
