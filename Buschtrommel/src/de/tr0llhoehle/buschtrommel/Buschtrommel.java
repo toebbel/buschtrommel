@@ -423,7 +423,7 @@ public class Buschtrommel implements IMessageObserver {
 			return;
 		}
 		
-			PeerDiscoveryMessage rsp = new PeerDiscoveryMessage(DiscoveryMessageType.YO, host.getDisplayName(),
+			PeerDiscoveryMessage rsp = new PeerDiscoveryMessage(DiscoveryMessageType.YO, alias,
 					fileTransferAdapter.getPort());
 			try {
 				Thread.sleep((int) (Math.random() * Config.maximumYoResponseTime));
