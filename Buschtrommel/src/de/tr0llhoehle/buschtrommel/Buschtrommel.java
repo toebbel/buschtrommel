@@ -89,7 +89,7 @@ public class Buschtrommel implements IMessageObserver {
 			Config.useIPv4 = true;
 			Config.useIPv6 = true;
 			Config.FileReannounceGraceTime = 15;
-			Config.defaultDownloadFolder = System.getProperty("user.home") + "/Downloads";
+			Config.defaultDownloadFolder = System.getProperty("user.home") + java.io.File.pathSeparatorChar + "Downloads";
 			Config.showFileListTransfers = false;
 			Config.hashCheckEnabled = true;
 			try {
@@ -184,9 +184,9 @@ public class Buschtrommel implements IMessageObserver {
 			logger.warning("Can't start download: The given filepath is null");
 			return null;
 		}
-		String cleanTarget = targetFile.replace(java.io.File.pathSeparatorChar, '-').replace('/', '-');
+//		String cleanTarget = targetFile.replace(java.io.File.pathSeparatorChar, '-').replace('/', '-');
 		Transfer result = (Transfer) fileTransferAdapter.DownloadFile(hash, host, s.getLength(), new java.io.File(
-				cleanTarget));
+				targetFile));
 		return result;
 	}
 
