@@ -81,6 +81,8 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		localSharesTable.setAutoCreateRowSorter(true);
 		downloadFolder.setText(Config.defaultDownloadFolder);
 
+		viewFilelistTransfersBox.setSelected(Config.showFileListTransfers);
+		
 		readOldLocalShares();
 
 		setupTimer();
