@@ -85,7 +85,7 @@ public class MessageDeserializer {
 			int ttl = Integer.valueOf(fields[1]);
 			long length = Long.valueOf(fields[2]);
 
-			String meta = fields[4].length() > 1 ? fields[4].substring(0, fields[4].length() - 1) : ""; //if meta contains only message seperator -> "". Otherwise: cut off sperator
+			String meta = fields[4].length() > 1 ? fields[4].substring(0, fields[4].length() - 1).trim() : ""; //if meta contains only message seperator -> "". Otherwise: cut off sperator
 			String hash = fixBrokenHash(fields[0]);
 			
 			
