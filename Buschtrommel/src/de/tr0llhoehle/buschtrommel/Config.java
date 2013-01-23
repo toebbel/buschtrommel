@@ -33,6 +33,7 @@ public class Config {
 												// to buschtrommel to reannounce
 	public static String defaultDownloadFolder;
 	public static boolean showFileListTransfers;
+	public static boolean hashCheckEnabled;
 
 	private Config() {
 		this.prop = new Properties();
@@ -64,6 +65,7 @@ public class Config {
 		FileReannounceGraceTime = Integer.parseInt(prop.getProperty("FileReannounceGraceTime"));
 		defaultDownloadFolder = prop.getProperty("defaultDownloadFolder");
 		showFileListTransfers = prop.getProperty("showFileListTransfers").equals("true");
+		hashCheckEnabled = prop.getProperty("hashCheckEnabled").equals("true");
 	}
 
 	public void saveToFile(String path) throws IOException {
@@ -83,6 +85,7 @@ public class Config {
 		this.prop.setProperty("FileReannounceGraceTime", Integer.toString(FileReannounceGraceTime));
 		this.prop.setProperty("defaultDownloadFolder", defaultDownloadFolder);
 		this.prop.setProperty("showFileListTransfers", Boolean.toString(showFileListTransfers));
+		this.prop.setProperty("hashCheckEnabled", Boolean.toString(hashCheckEnabled));
 		
 		this.prop.store(new FileOutputStream(path), null);
 	}

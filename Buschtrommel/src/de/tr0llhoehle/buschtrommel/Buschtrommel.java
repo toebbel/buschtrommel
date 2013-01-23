@@ -91,6 +91,7 @@ public class Buschtrommel implements IMessageObserver {
 			Config.FileReannounceGraceTime = 15;
 			Config.defaultDownloadFolder = System.getProperty("user.home") + "/Downloads";
 			Config.showFileListTransfers = false;
+			Config.hashCheckEnabled = true;
 			try {
 				Config.getInstance().saveToFile(cfgFile);
 			} catch (IOException e) {
