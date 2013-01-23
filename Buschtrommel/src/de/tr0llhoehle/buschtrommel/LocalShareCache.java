@@ -225,12 +225,12 @@ public class LocalShareCache {
 
 				// create share from this information
 				LocalShare s = ((FileAnnouncementMessage) m).getFile();
-				if (s.getLength() != (new java.io.File(s.getPath()).length())) {
-					logger.info("Length of file " + s.getPath() + " has changed. Ignore the share");
+				if (s.getLength() != (new java.io.File(line[1]).length())) {
+					logger.info("Length of file " + s.getPath() + " has changed from " + s.getLength() + " to " + new java.io.File(line[1]).length() + ". Ignore the share");
 				} else {
 					s = new LocalShare(s.getHash(), s.getLength(), s.getTTL(), s.getDisplayName(), s.getMeta(), line[1]);
+					newShare(s);
 				}
-				newShare(s);
 			}
 			reader.close();
 		} catch (IOException e) {
