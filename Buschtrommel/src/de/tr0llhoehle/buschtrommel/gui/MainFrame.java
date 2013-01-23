@@ -84,6 +84,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		viewFilelistTransfersBox.setSelected(Config.showFileListTransfers);
 		v4Checkbox.setSelected(Config.useIPv4);
 		v6Checkbox.setSelected(Config.useIPv6);
+		disableHashCheckBox.setSelected(Config.hashCheckEnabled);
 
 		readOldLocalShares();
 
@@ -151,6 +152,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	// <editor-fold defaultstate="collapsed"
 	// <editor-fold defaultstate="collapsed"
 	// <editor-fold defaultstate="collapsed"
+	// <editor-fold defaultstate="collapsed"
 	// desc="Generated Code">//GEN-BEGIN:initComponents
 	private void initComponents() {
 
@@ -194,6 +196,8 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		v4Checkbox = new javax.swing.JCheckBox();
 		v6Checkbox = new javax.swing.JCheckBox();
 		jLabel6 = new javax.swing.JLabel();
+		jLabel7 = new javax.swing.JLabel();
+		disableHashCheckBox = new javax.swing.JCheckBox();
 
 		jFileChooser1.setDialogTitle("Datei wählen");
 		jFileChooser1.setMinimumSize(new java.awt.Dimension(640, 480));
@@ -564,6 +568,14 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
 		jLabel6.setText("requires restart of Bongo");
 
+		jLabel7.setText("Disable Hash-Check");
+
+		disableHashCheckBox.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				disableHashCheckBoxActionPerformed(evt);
+			}
+		});
+
 		javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
 		jPanel5.setLayout(jPanel5Layout);
 		jPanel5Layout
@@ -615,12 +627,15 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 																						.createParallelGroup(
 																								javax.swing.GroupLayout.Alignment.LEADING)
 																						.addComponent(jLabel4)
-																						.addComponent(jLabel5))
+																						.addComponent(jLabel5)
+																						.addComponent(jLabel7))
 																		.addGap(18, 18, 18)
 																		.addGroup(
 																				jPanel5Layout
 																						.createParallelGroup(
 																								javax.swing.GroupLayout.Alignment.LEADING)
+																						.addComponent(
+																								disableHashCheckBox)
 																						.addComponent(
 																								viewFilelistTransfersBox)
 																						.addGroup(
@@ -658,16 +673,20 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 														javax.swing.GroupLayout.DEFAULT_SIZE,
 														javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(jLabel3)
 												.addComponent(selectDownloadFolder))
-								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-								.addGroup(
-										jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-												.addComponent(jLabel4).addComponent(viewFilelistTransfersBox))
-								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 								.addGroup(
 										jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
 												.addComponent(jLabel5).addComponent(v4Checkbox)
 												.addComponent(v6Checkbox).addComponent(jLabel6))
-								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 453,
+								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+								.addGroup(
+										jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+												.addComponent(jLabel7).addComponent(disableHashCheckBox))
+								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+								.addGroup(
+										jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+												.addComponent(jLabel4).addComponent(viewFilelistTransfersBox))
+								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 435,
 										Short.MAX_VALUE).addComponent(saveSettings).addContainerGap()));
 
 		saveSettings.getAccessibleContext().setAccessibleName("save_Settings");
@@ -685,6 +704,12 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
 		pack();
 	}// </editor-fold>//GEN-END:initComponents
+
+	private void disableHashCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_disableHashCheckBoxActionPerformed
+		Config.hashCheckEnabled != Config.hashCheckEnabled
+		isableHashCheckBox.setSelected(Config.hashCheckEnabled);
+		
+	}// GEN-LAST:event_disableHashCheckBoxActionPerformed
 
 	public static String humanReadableByteCount(long bytes, boolean si) {
 		int unit = si ? 1000 : 1024;
@@ -1204,6 +1229,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	private javax.swing.JButton activateShare;
 	private javax.swing.JList activeTransferList;
 	private javax.swing.JButton addShare;
+	private javax.swing.JCheckBox disableHashCheckBox;
 	private javax.swing.JButton downloadFiles;
 	private javax.swing.JButton downloadFilesMultihost;
 	private javax.swing.JTextField downloadFolder;
@@ -1214,6 +1240,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	private javax.swing.JLabel jLabel4;
 	private javax.swing.JLabel jLabel5;
 	private javax.swing.JLabel jLabel6;
+	private javax.swing.JLabel jLabel7;
 	private javax.swing.JPanel jPanel1;
 	private javax.swing.JPanel jPanel3;
 	private javax.swing.JPanel jPanel4;
