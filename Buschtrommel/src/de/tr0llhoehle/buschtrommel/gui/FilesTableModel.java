@@ -92,6 +92,7 @@ public class FilesTableModel extends AbstractTableModel {
 
 		this.shares.add(eintragVector);
 		this.fireTableDataChanged();
+		
 	}
 
 	public void addMock(String filename, String meta, String size, String hostName, String ip, String Hash, String ttl) {

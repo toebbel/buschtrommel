@@ -967,17 +967,35 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		}
 	}// GEN-LAST:event_activateShareActionPerformed
 
+	private static String cleanName(String name) {
+		// TODO Auto-generated method stub
+		if(name == null){
+			return null;
+		}
+		String cleanTarget = name.replace(java.io.File.pathSeparatorChar, '-').replace('/', '-');
+		return cleanTarget;
+	}
+
 	private void downloadFilesActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_downloadFilesBtn1ActionPerformed
 		if (Config.defaultDownloadFolder == null) {
 			JOptionPane.showMessageDialog(null, "Please set a Download-Folder first");
 			return;
 		}
-
+		//filesHostsTable.getRowSorter().
 		int[] selected = filesHostsTable.getSelectedRows();
+//		
+//		for(int i : selected){
+//			
+//		}
+//		
+//		
+//		int[] selected = filesHostsTable.convertRowIndexToModel();
+		
 
 		for (int i : selected) {
 			// "Filename", "Meta-Information", "Size", "Host-Name","IP", "Hash",
 			// "TTL"
+			i = filesHostsTable.convertRowIndexToModel(i);
 			String hash = tablemodel.getValueAt(i, 5);
 			String ip = tablemodel.getValueAt(i, 4);
 			String name = cleanName(tablemodel.getValueAt(i, 0));
@@ -1008,15 +1026,6 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
 	}// GEN-LAST:event_downloadFilesBtn1ActionPerformed
 
-	private static String cleanName(String name) {
-		// TODO Auto-generated method stub
-		if(name == null){
-			return null;
-		}
-		String cleanTarget = name.replace(java.io.File.pathSeparatorChar, '-').replace('/', '-');
-		return cleanTarget;
-	}
-
 	private void downloadFilesMultihostActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jButton1ActionPerformed
 		if (Config.defaultDownloadFolder == null) {
 			JOptionPane.showMessageDialog(null, "Please set a Download-Folder first");
@@ -1028,9 +1037,10 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		for (int i : selected) {
 			// "Filename", "Meta-Information", "Size", "Host-Name","IP", "Hash",
 			// "TTL"
+			i = filesHostsTable.convertRowIndexToModel(i);
 			String hash = tablemodel.getValueAt(i, 5);
 
-			String name = tablemodel.getValueAt(i, 0);
+			String name = cleanName(tablemodel.getValueAt(i, 0));
 			if (buschtrommel != null) {
 
 				ITransferProgress progress = buschtrommel.DownloadFile(hash, Config.defaultDownloadFolder + "/" + name);
