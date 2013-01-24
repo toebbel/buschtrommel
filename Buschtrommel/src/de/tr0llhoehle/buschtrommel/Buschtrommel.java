@@ -302,6 +302,25 @@ public class Buschtrommel implements IMessageObserver {
 			}
 		}
 	}
+	
+	/**
+	 * Downlaods and digests the filelists from all known hosts. The non-availibility of a host is interpreted like the host went offline.
+	 * 
+	 * This method is async
+	 */
+	public void refreshFilelists() {
+		//TODO this is a stub
+	}
+	
+	/**
+	 * Downloads and digests the filelist from a specific host. The non-availibility of the filelist will be interpreted like the host went offline.
+	 * 
+	 * This method is async
+	 * @param host the host to download the filelist from
+	 */
+	public void refreshFilelist(Host host) {
+		//TODO this is a stub
+	}
 
 	/**
 	 * All currently incoming top-level transfers (active and inactive)
