@@ -20,8 +20,8 @@ public class LocalSharesTableModel extends AbstractTableModel {
 
 	private Vector<String[]> shares = new Vector<String[]>();;
 
-	private String[] names = new String[] { "Filename", "Meta-Information", "Path", "Size", "TTL" };
-	private boolean[] canEdit = new boolean[] { true, true, false, false, true };
+	private String[] names = new String[] { "Filename", "Meta-Information", "Path", "Size", "TTL", "activated" };
+	private boolean[] canEdit = new boolean[] { true, true, false, false, true, false };
 
 	public String getColumnName(int col) {
 		return names[col].toString();
@@ -77,6 +77,10 @@ public class LocalSharesTableModel extends AbstractTableModel {
 		} else
 			return null;
 	}
+	public void setActive(int index, String active){
+		shares.get(index)[5] = active;
+		this.fireTableCellUpdated(index, 5);
+	}
 
 	public synchronized void addShare(String name, String path, String size, String ttl) {
 		if (path == null) {
@@ -90,6 +94,7 @@ public class LocalSharesTableModel extends AbstractTableModel {
 		eintrag[2] = path;
 		eintrag[3] = size;
 		eintrag[4] = ttl;
+		eintrag[5] = "false";
 		if (ttl == "") {
 			ttl = "-1";
 		}
@@ -98,7 +103,7 @@ public class LocalSharesTableModel extends AbstractTableModel {
 		this.fireTableDataChanged();
 	}
 	
-	public synchronized void addShareMeta(String name, String meta, String path, String size, String ttl) {
+	public synchronized void addShareMeta(String name, String meta, String path, String size, String ttl, String active) {
 		if (path == null) {
 			System.out.print("path is null");
 			return;
@@ -110,6 +115,7 @@ public class LocalSharesTableModel extends AbstractTableModel {
 		eintrag[2] = path;
 		eintrag[3] = size;
 		eintrag[4] = ttl;
+		eintrag[5] = active;
 		if (ttl == "") {
 			ttl = "-1";
 		}
@@ -120,6 +126,7 @@ public class LocalSharesTableModel extends AbstractTableModel {
 
 	public synchronized void addMeta(int index, String meta) {
 		shares.get(index)[1] = meta;
+		shares.get(index)[5] = "meta outdated";
 		this.fireTableDataChanged();
 	}
 

@@ -74,6 +74,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 			buschtrommel.start();
 		} catch (IOException ex) {
 			Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+			JOptionPane.showMessageDialog(null, ex);
 		}
 		filesHostsTable.setAutoCreateRowSorter(true);
 
@@ -127,7 +128,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 			LocalShare share = temp_shares.get(hash);
 			String size = humanReadableByteCount(share.getLength(), true);
 			sharesModel.addShareMeta(share.getDisplayName(), share.getMeta(), share.getPath(), size,
-					String.valueOf(share.getTTL()));
+					String.valueOf(share.getTTL()), "true");
 		}
 	}
 
@@ -941,27 +942,29 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	private void activateShareActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_activateShareActionPerformed
 		int selected[] = localSharesTable.getSelectedRows();
 		for (int i : selected) {
-			sharesModel.getValueAt(i, 0);
+			int index = localSharesTable.convertRowIndexToModel(i);
+			//sharesModel.getValueAt(index, 0);
 
 			if (buschtrommel != null) {
 				// "Filename", "Meta-Information", "Path", "Size","TTL"
-				String name = sharesModel.getValueAt(i, 0);
-				String meta = sharesModel.getValueAt(i, 1);
-				String path = sharesModel.getValueAt(i, 2);
-				int ttl = Integer.parseInt(sharesModel.getValueAt(i, 4));
+				String name = sharesModel.getValueAt(index, 0);
+				String meta = sharesModel.getValueAt(index, 1);
+				String path = sharesModel.getValueAt(index, 2);
+				int ttl = Integer.parseInt(sharesModel.getValueAt(index, 4));
 
 				try {
 					LoggerWrapper.logInfo("Trying to add new share: " + " name: " + name + " meta: " + meta + " path: "
 							+ path + " ttl: " + ttl);
 					buschtrommel.AddFileToShare(path, name, meta, ttl);
+					sharesModel.setActive(index, "true");
 				} catch (IllegalArgumentException e) {
 					// TODO Auto-generated catch block
 					JOptionPane.showMessageDialog(null, "Woops, something went terribly wrong");
-					sharesModel.removeShare(i);
+					sharesModel.removeShare(index);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					JOptionPane.showMessageDialog(null, "Woops, something went terribly wrong");
-					sharesModel.removeShare(i);
+					sharesModel.removeShare(index);
 				}
 			}
 		}
@@ -995,10 +998,10 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		for (int i : selected) {
 			// "Filename", "Meta-Information", "Size", "Host-Name","IP", "Hash",
 			// "TTL"
-			i = filesHostsTable.convertRowIndexToModel(i);
-			String hash = tablemodel.getValueAt(i, 5);
-			String ip = tablemodel.getValueAt(i, 4);
-			String name = cleanName(tablemodel.getValueAt(i, 0));
+			int index = filesHostsTable.convertRowIndexToModel(i);
+			String hash = tablemodel.getValueAt(index, 5);
+			String ip = tablemodel.getValueAt(index, 4);
+			String name = cleanName(tablemodel.getValueAt(index, 0));
 			if (buschtrommel != null) {
 				Host host = null;
 				try {
@@ -1010,7 +1013,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 					LoggerWrapper.logError("Can't start download - the host is unknown");
 					return;
 				}
-				ITransferProgress progress = buschtrommel.DownloadFile(hash, Config.defaultDownloadFolder + "/" + name,
+				ITransferProgress progress = buschtrommel.DownloadFile(hash, Config.defaultDownloadFolder + java.io.File.pathSeparatorChar + name,
 						host);
 
 				if (progress != null) {
@@ -1037,13 +1040,13 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		for (int i : selected) {
 			// "Filename", "Meta-Information", "Size", "Host-Name","IP", "Hash",
 			// "TTL"
-			i = filesHostsTable.convertRowIndexToModel(i);
-			String hash = tablemodel.getValueAt(i, 5);
+			int index = filesHostsTable.convertRowIndexToModel(i);
+			String hash = tablemodel.getValueAt(index, 5);
 
-			String name = cleanName(tablemodel.getValueAt(i, 0));
+			String name = cleanName(tablemodel.getValueAt(index, 0));
 			if (buschtrommel != null) {
 
-				ITransferProgress progress = buschtrommel.DownloadFile(hash, Config.defaultDownloadFolder + "/" + name);
+				ITransferProgress progress = buschtrommel.DownloadFile(hash, Config.defaultDownloadFolder + java.io.File.pathSeparatorChar + name);
 				downloadItems.addElement(progress);
 				if (!transferTimer.isRunning()) {
 					transferTimer.start();
@@ -1056,8 +1059,9 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	private void removeShareActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_removeShareActionPerformed
 		int selected[] = localSharesTable.getSelectedRows();
 		for (int i : selected) {
-			sharesModel.getValueAt(i, 0);
-			String path = sharesModel.getValueAt(i, 2);
+			int index = localSharesTable.convertRowIndexToModel(i);
+			sharesModel.getValueAt(index, 0);
+			String path = sharesModel.getValueAt(index, 2);
 			if (buschtrommel != null) {
 
 				for (String key : buschtrommel.getLocalShares().keySet()) {
@@ -1066,7 +1070,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 					}
 				}
 
-				sharesModel.removeShare(i);
+				sharesModel.removeShare(index);
 
 			}
 		}
