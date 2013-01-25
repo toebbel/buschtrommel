@@ -30,6 +30,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Hashtable;
+import java.util.Set;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -1084,12 +1086,20 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 			String path = sharesModel.getValueAt(index, 2);
 			if (buschtrommel != null) {
 
+				Vector<String> toBeRemoved = new Vector<>();
 				for (String key : buschtrommel.getLocalShares().keySet()) {
+
 					if (path.equals(buschtrommel.getLocalShares().get(key).getPath())) {
-						buschtrommel.RemoveFileFromShare(key);
+						toBeRemoved.add(key);
+
 					}
 				}
+				for (String bla : toBeRemoved) {
+					if (path.equals(buschtrommel.getLocalShares().get(bla).getPath())) {
 
+						buschtrommel.RemoveFileFromShare(bla);
+					}
+				}
 				sharesModel.removeShare(index);
 
 			}

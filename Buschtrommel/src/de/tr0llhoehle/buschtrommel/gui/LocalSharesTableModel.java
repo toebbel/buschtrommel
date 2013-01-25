@@ -133,7 +133,8 @@ public class LocalSharesTableModel extends AbstractTableModel {
 	synchronized void removeShare(int index) {
 		if (index < shares.size()) {
 			shares.remove(index);
-			this.fireTableDataChanged();
+			this.fireTableRowsDeleted(index, index);
+			//this.fireTableDataChanged();
 		}
 	}
 
