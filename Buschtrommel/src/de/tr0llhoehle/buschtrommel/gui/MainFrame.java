@@ -1023,6 +1023,14 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 			String hash = tablemodel.getValueAt(index, 5);
 			String ip = tablemodel.getValueAt(index, 4);
 			String name = cleanName(tablemodel.getValueAt(index, 0));
+
+			if (new File(Config.defaultDownloadFolder + java.io.File.pathSeparatorChar + name).isFile()) {
+				// return, if file exists
+				JOptionPane.showMessageDialog(null, "file exists: " + name);
+				LoggerWrapper.logInfo("file exists: " + name);
+				return;
+			}
+
 			if (buschtrommel != null) {
 				Host host = null;
 				try {
@@ -1059,12 +1067,21 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		int[] selected = filesHostsTable.getSelectedRows();
 
 		for (int i : selected) {
+			
+
 			// "Filename", "Meta-Information", "Size", "Host-Name","IP", "Hash",
 			// "TTL"
 			int index = filesHostsTable.convertRowIndexToModel(i);
 			String hash = tablemodel.getValueAt(index, 5);
 
 			String name = cleanName(tablemodel.getValueAt(index, 0));
+			
+			if (new File(Config.defaultDownloadFolder + java.io.File.pathSeparatorChar + name).isFile()) {
+				// return, if file exists
+				JOptionPane.showMessageDialog(null, "file exists: " + name);
+				LoggerWrapper.logInfo("file exists: " + name);
+				return;
+			}
 			if (buschtrommel != null) {
 
 				ITransferProgress progress = buschtrommel.DownloadFile(hash, Config.defaultDownloadFolder
