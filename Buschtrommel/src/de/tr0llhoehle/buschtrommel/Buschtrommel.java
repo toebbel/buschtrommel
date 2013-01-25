@@ -89,7 +89,7 @@ public class Buschtrommel implements IMessageObserver {
 			Config.useIPv4 = true;
 			Config.useIPv6 = true;
 			Config.FileReannounceGraceTime = 15;
-			Config.defaultDownloadFolder = System.getProperty("user.home") + java.io.File.pathSeparatorChar + "Downloads";
+			Config.defaultDownloadFolder = System.getProperty("user.home") + java.io.File.separatorChar + "Downloads";
 			Config.showFileListTransfers = false;
 			Config.hashCheckEnabled = true;
 			try {

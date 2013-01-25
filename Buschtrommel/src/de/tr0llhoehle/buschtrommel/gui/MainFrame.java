@@ -1001,7 +1001,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		return cleanTarget;
 	}
 
-	private void downloadFilesActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_downloadFilesBtn1ActionPerformed
+	private void downloadFiles(boolean multihost) {
 		if (Config.defaultDownloadFolder == null) {
 			JOptionPane.showMessageDialog(null, "Please set a Download-Folder first");
 			return;
@@ -1023,11 +1023,13 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 			String hash = tablemodel.getValueAt(index, 5);
 			String ip = tablemodel.getValueAt(index, 4);
 			String name = cleanName(tablemodel.getValueAt(index, 0));
+			
+			String downloadPath = Config.defaultDownloadFolder + java.io.File.separatorChar + name;
 
-			if (new File(Config.defaultDownloadFolder + java.io.File.pathSeparatorChar + name).isFile()) {
+			if (new File(downloadPath).isFile()) {
 				// return, if file exists
-				JOptionPane.showMessageDialog(null, "file exists: " + name);
-				LoggerWrapper.logInfo("file exists: " + name);
+				JOptionPane.showMessageDialog(null, "file exists: " + downloadPath);
+				LoggerWrapper.logInfo("file exists: " + downloadPath);
 				return;
 			}
 
@@ -1042,8 +1044,14 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 					LoggerWrapper.logError("Can't start download - the host is unknown");
 					return;
 				}
-				ITransferProgress progress = buschtrommel.DownloadFile(hash, Config.defaultDownloadFolder
-						+ java.io.File.pathSeparatorChar + name, host);
+				ITransferProgress progress;
+				if (multihost) {
+					progress = buschtrommel.DownloadFile(hash, downloadPath);
+
+				} else {
+
+					progress = buschtrommel.DownloadFile(hash, downloadPath, host);
+				}
 
 				if (progress != null) {
 					downloadItems.addElement(progress);
@@ -1053,45 +1061,54 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 				} else {
 					LoggerWrapper.logError("Something with the download went wrong");
 				}
+
 			}
 		}
+	}
+
+	private void downloadFilesActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_downloadFilesBtn1ActionPerformed
+		downloadFiles(false);
 
 	}// GEN-LAST:event_downloadFilesBtn1ActionPerformed
 
 	private void downloadFilesMultihostActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jButton1ActionPerformed
-		if (Config.defaultDownloadFolder == null) {
-			JOptionPane.showMessageDialog(null, "Please set a Download-Folder first");
-			return;
-		}
 
-		int[] selected = filesHostsTable.getSelectedRows();
-
-		for (int i : selected) {
-			
-
-			// "Filename", "Meta-Information", "Size", "Host-Name","IP", "Hash",
-			// "TTL"
-			int index = filesHostsTable.convertRowIndexToModel(i);
-			String hash = tablemodel.getValueAt(index, 5);
-
-			String name = cleanName(tablemodel.getValueAt(index, 0));
-			
-			if (new File(Config.defaultDownloadFolder + java.io.File.pathSeparatorChar + name).isFile()) {
-				// return, if file exists
-				JOptionPane.showMessageDialog(null, "file exists: " + name);
-				LoggerWrapper.logInfo("file exists: " + name);
-				return;
-			}
-			if (buschtrommel != null) {
-
-				ITransferProgress progress = buschtrommel.DownloadFile(hash, Config.defaultDownloadFolder
-						+ java.io.File.pathSeparatorChar + name);
-				downloadItems.addElement(progress);
-				if (!transferTimer.isRunning()) {
-					transferTimer.start();
-				}
-			}
-		}
+		downloadFiles(true);
+		// if (Config.defaultDownloadFolder == null) {
+		// JOptionPane.showMessageDialog(null,
+		// "Please set a Download-Folder first");
+		// return;
+		// }
+		//
+		// int[] selected = filesHostsTable.getSelectedRows();
+		//
+		// for (int i : selected) {
+		//
+		// // "Filename", "Meta-Information", "Size", "Host-Name","IP", "Hash",
+		// // "TTL"
+		// int index = filesHostsTable.convertRowIndexToModel(i);
+		// String hash = tablemodel.getValueAt(index, 5);
+		//
+		// String name = cleanName(tablemodel.getValueAt(index, 0));
+		//
+		// if (new File(Config.defaultDownloadFolder +
+		// java.io.File.pathSeparatorChar + name).isFile()) {
+		// // return, if file exists
+		// JOptionPane.showMessageDialog(null, "file exists: " + name);
+		// LoggerWrapper.logInfo("file exists: " + name);
+		// return;
+		// }
+		// if (buschtrommel != null) {
+		//
+		// ITransferProgress progress = buschtrommel.DownloadFile(hash,
+		// Config.defaultDownloadFolder
+		// + java.io.File.pathSeparatorChar + name);
+		// downloadItems.addElement(progress);
+		// if (!transferTimer.isRunning()) {
+		// transferTimer.start();
+		// }
+		// }
+		// }
 
 	}// GEN-LAST:event_jButton1ActionPerformed
 
