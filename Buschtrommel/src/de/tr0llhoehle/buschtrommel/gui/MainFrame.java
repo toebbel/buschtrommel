@@ -155,6 +155,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	// <editor-fold defaultstate="collapsed"
 	// <editor-fold defaultstate="collapsed"
 	// <editor-fold defaultstate="collapsed"
+	// <editor-fold defaultstate="collapsed"
 	// desc="Generated Code">//GEN-BEGIN:initComponents
 	private void initComponents() {
 
@@ -166,6 +167,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		filesHostsTable = new javax.swing.JTable();
 		downloadFiles = new javax.swing.JButton();
 		downloadFilesMultihost = new javax.swing.JButton();
+		refreshFilelist = new javax.swing.JButton();
 		jPanel4 = new javax.swing.JPanel();
 		jScrollPane1 = new javax.swing.JScrollPane();
 		activeTransferList = new javax.swing.JList(downloadItems);
@@ -241,6 +243,13 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 			}
 		});
 
+		refreshFilelist.setText("refresh Filelist");
+		refreshFilelist.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				refreshFilelistActionPerformed(evt);
+			}
+		});
+
 		javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
 		jPanel1.setLayout(jPanel1Layout);
 		jPanel1Layout
@@ -252,6 +261,9 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 										.addGroup(
 												jPanel1Layout
 														.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+														.addComponent(jScrollPane3,
+																javax.swing.GroupLayout.DEFAULT_SIZE, 780,
+																Short.MAX_VALUE)
 														.addGroup(
 																jPanel1Layout
 																		.createSequentialGroup()
@@ -260,11 +272,12 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 																		.addPreferredGap(
 																				javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 																		.addComponent(downloadFilesMultihost)
-																		.addGap(0, 0, Short.MAX_VALUE))
-														.addComponent(jScrollPane3,
-																javax.swing.GroupLayout.Alignment.TRAILING,
-																javax.swing.GroupLayout.DEFAULT_SIZE, 780,
-																Short.MAX_VALUE)).addContainerGap()));
+																		.addPreferredGap(
+																				javax.swing.LayoutStyle.ComponentPlacement.RELATED,
+																				javax.swing.GroupLayout.DEFAULT_SIZE,
+																				Short.MAX_VALUE)
+																		.addComponent(refreshFilelist)))
+										.addContainerGap()));
 		jPanel1Layout.setVerticalGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 				.addGroup(
 						javax.swing.GroupLayout.Alignment.TRAILING,
@@ -275,8 +288,8 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 								.addGroup(
 										jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-												.addComponent(downloadFiles).addComponent(downloadFilesMultihost))
-								.addContainerGap()));
+												.addComponent(downloadFiles).addComponent(downloadFilesMultihost)
+												.addComponent(refreshFilelist)).addContainerGap()));
 
 		jTabbedPane1.addTab("Hosts & Files", jPanel1);
 
@@ -707,6 +720,13 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		pack();
 	}// </editor-fold>//GEN-END:initComponents
 
+	private void refreshFilelistActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_refreshFilelistActionPerformed
+		if (buschtrommel != null) {
+			buschtrommel.refreshFilelists();
+		}
+
+	}// GEN-LAST:event_refreshFilelistActionPerformed
+
 	private void enableHashCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_disableHashCheckBoxActionPerformed
 		Config.hashCheckEnabled = !Config.hashCheckEnabled;
 		enableHashCheckBox.setSelected(Config.hashCheckEnabled);
@@ -943,7 +963,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 		int selected[] = localSharesTable.getSelectedRows();
 		for (int i : selected) {
 			int index = localSharesTable.convertRowIndexToModel(i);
-			//sharesModel.getValueAt(index, 0);
+			// sharesModel.getValueAt(index, 0);
 
 			if (buschtrommel != null) {
 				// "Filename", "Meta-Information", "Path", "Size","TTL"
@@ -972,7 +992,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 
 	private static String cleanName(String name) {
 		// TODO Auto-generated method stub
-		if(name == null){
+		if (name == null) {
 			return null;
 		}
 		String cleanTarget = name.replace(java.io.File.pathSeparatorChar, '-').replace('/', '-');
@@ -984,16 +1004,15 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 			JOptionPane.showMessageDialog(null, "Please set a Download-Folder first");
 			return;
 		}
-		//filesHostsTable.getRowSorter().
+		// filesHostsTable.getRowSorter().
 		int[] selected = filesHostsTable.getSelectedRows();
-//		
-//		for(int i : selected){
-//			
-//		}
-//		
-//		
-//		int[] selected = filesHostsTable.convertRowIndexToModel();
-		
+		//
+		// for(int i : selected){
+		//
+		// }
+		//
+		//
+		// int[] selected = filesHostsTable.convertRowIndexToModel();
 
 		for (int i : selected) {
 			// "Filename", "Meta-Information", "Size", "Host-Name","IP", "Hash",
@@ -1013,8 +1032,8 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 					LoggerWrapper.logError("Can't start download - the host is unknown");
 					return;
 				}
-				ITransferProgress progress = buschtrommel.DownloadFile(hash, Config.defaultDownloadFolder + java.io.File.pathSeparatorChar + name,
-						host);
+				ITransferProgress progress = buschtrommel.DownloadFile(hash, Config.defaultDownloadFolder
+						+ java.io.File.pathSeparatorChar + name, host);
 
 				if (progress != null) {
 					downloadItems.addElement(progress);
@@ -1046,7 +1065,8 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 			String name = cleanName(tablemodel.getValueAt(index, 0));
 			if (buschtrommel != null) {
 
-				ITransferProgress progress = buschtrommel.DownloadFile(hash, Config.defaultDownloadFolder + java.io.File.pathSeparatorChar + name);
+				ITransferProgress progress = buschtrommel.DownloadFile(hash, Config.defaultDownloadFolder
+						+ java.io.File.pathSeparatorChar + name);
 				downloadItems.addElement(progress);
 				if (!transferTimer.isRunning()) {
 					transferTimer.start();
@@ -1279,6 +1299,7 @@ public class MainFrame extends javax.swing.JFrame implements IGUICallbacks {
 	private javax.swing.JTable localSharesTable;
 	private javax.swing.JList outgoingTransferList;
 	private javax.swing.JFileChooser pathChooser;
+	private javax.swing.JButton refreshFilelist;
 	private javax.swing.JButton removeOutTransfer;
 	private javax.swing.JButton removeShare;
 	private javax.swing.JButton removeTransfer;
