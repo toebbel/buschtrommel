@@ -81,7 +81,7 @@ public class Buschtrommel implements IMessageObserver {
 		} else {
 			logger.info("Config file not existing. Create new one.");
 			Config.alias = alias;
-			Config.defaultTTL = -1; //TODO: set to infinity value
+			Config.defaultTTL = Share.TTL_INFINITY;
 			Config.maximumYoResponseTime = 3000;
 			Config.minDiscoveryMulticastIddle = 5000;
 			Config.shareCachePath = "shares.ht";
