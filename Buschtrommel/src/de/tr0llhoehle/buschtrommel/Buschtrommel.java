@@ -309,7 +309,8 @@ public class Buschtrommel implements IMessageObserver {
 	 * This method is async
 	 */
 	public void refreshFilelists() {
-		//TODO this is a stub
+		for(Host h : getHosts().values())
+			refreshFilelist(h);
 	}
 	
 	/**
@@ -319,7 +320,7 @@ public class Buschtrommel implements IMessageObserver {
 	 * @param host the host to download the filelist from
 	 */
 	public void refreshFilelist(Host host) {
-		//TODO this is a stub
+		fileTransferAdapter.downloadFilelist(host);
 	}
 
 	/**
