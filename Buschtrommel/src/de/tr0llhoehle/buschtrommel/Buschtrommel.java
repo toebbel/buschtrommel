@@ -81,7 +81,7 @@ public class Buschtrommel implements IMessageObserver {
 		} else {
 			logger.info("Config file not existing. Create new one.");
 			Config.alias = alias;
-			Config.defaultTTL = Share.TTL_INFINITY;
+			Config.defaultTTL = -1; //TODO: set to infinity value
 			Config.maximumYoResponseTime = 3000;
 			Config.minDiscoveryMulticastIddle = 5000;
 			Config.shareCachePath = "shares.ht";
@@ -89,7 +89,7 @@ public class Buschtrommel implements IMessageObserver {
 			Config.useIPv4 = true;
 			Config.useIPv6 = true;
 			Config.FileReannounceGraceTime = 15;
-			Config.defaultDownloadFolder = System.getProperty("user.home") + java.io.File.separatorChar + "Downloads";
+			Config.defaultDownloadFolder = System.getProperty("user.home") + java.io.File.pathSeparatorChar + "Downloads";
 			Config.showFileListTransfers = false;
 			Config.hashCheckEnabled = true;
 			try {
@@ -309,8 +309,7 @@ public class Buschtrommel implements IMessageObserver {
 	 * This method is async
 	 */
 	public void refreshFilelists() {
-		for(Host h : getHosts().values())
-			refreshFilelist(h);
+		//TODO this is a stub
 	}
 	
 	/**
@@ -320,7 +319,7 @@ public class Buschtrommel implements IMessageObserver {
 	 * @param host the host to download the filelist from
 	 */
 	public void refreshFilelist(Host host) {
-		fileTransferAdapter.downloadFilelist(host);
+		//TODO this is a stub
 	}
 
 	/**
