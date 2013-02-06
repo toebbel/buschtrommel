@@ -233,8 +233,11 @@ public class FileTransferAdapter extends MessageMonitor {
 	 */
 	public Transfer DownloadFile(String hash, List<Host> hosts, long length, java.io.File target) {
 		assert hosts.size() > 0;
-		// TODO implement multisource
-		return DownloadFile(hash, hosts.get(0), length, target);
+		ArrayList<InetAddress> partners = new ArrayList<>();
+		for(Host h : hosts) {
+			partners.add(h.getAddress());
+		}
+		return new MultisourceDownload(partners, new GetFileMessage(hash, 0, length), target, this.hosts);
 	}
 
 	/**

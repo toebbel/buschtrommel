@@ -22,10 +22,11 @@ public class MultisourceDownload extends Transfer {
 	IHostPortResolver hostResolver;
 	java.io.File targetFile;
 	HashMap<InetAddress, Host> hosts;
+	HashMap<InetAddress, Integer> host_rank;
 	boolean checkIntegrity;
 	Timer watchDog;
 
-	public MultisourceDownload(ArrayList<InetSocketAddress> partners,
+	public MultisourceDownload(ArrayList<InetAddress> partners,
 			GetFileMessage file, java.io.File targetFile,
 			IHostPortResolver hostResolver) {
 		super(null);
@@ -39,16 +40,20 @@ public class MultisourceDownload extends Transfer {
 		logger = java.util.logging.Logger.getLogger("incoming multi " + hash);
 
 		// check if ports for all hosts are known
-		for (InetSocketAddress i : partners) {
-			Host tmp = hostResolver.getOrCreateHost(i.getAddress());
-			if (tmp.getPort() != Host.UNKNOWN_PORT)
-				hosts.put(i.getAddress(), tmp);
+		for (InetAddress i : partners) {
+			Host tmp = hostResolver.getOrCreateHost(i);
+			if (tmp.getPort() != Host.UNKNOWN_PORT) {
+				hosts.put(i, tmp);
+				host_rank.put(i, 0);
+			}
 		}
+
 
 		// spawn subThreads
 		subTransfers = spawnDownloads(hosts.size(), hash, file.getOffset(),
 				file.getLength(), new ArrayList<Host>(hosts.values()),
 				hostResolver);
+		
 		transferState = TransferStatus.Initialized;
 	}
 
@@ -113,6 +118,10 @@ public class MultisourceDownload extends Transfer {
 			if (t.getStatus() != TransferStatus.Initialized)
 				throw new IllegalStateException(
 						"can't start because a sub-transfer is not initialized");
+			
+			//update rank
+			int new_rank = host_rank.get(t.getTransferPartner().getAddress()) - 1;
+			host_rank.put(t.getTransferPartner().getAddress(), new_rank);
 			t.start();
 		}
 		scheduleWatchDog();
@@ -126,12 +135,47 @@ public class MultisourceDownload extends Transfer {
 				for (IncomingDownload t : subTransfers) {
 					if (t.getStatus() != TransferStatus.Finished)
 						allTransferFinished = false;
+					if(t.getStatus() == TransferStatus.PermanentlyNotAvailable) {
+						logger.info("One host said 'perm. not ava.' -> remove " + t.getTransferPartner());
+						hosts.remove(t.getTransferPartner());
+						host_rank.remove(t.getTransferPartner());
+					}
+					if(t.getStatus() == TransferStatus.ConnectionFailed || 
+							t.getStatus() == TransferStatus.InvalidContent || 
+							t.getStatus() == TransferStatus.LocalIOError || 
+							t.getStatus() == TransferStatus.LostConnection || 
+							t.getStatus() == TransferStatus.TemporaryNotAvailable || 
+							t.getStatus() == TransferStatus.PermanentlyNotAvailable) {
+						restartSegment(t);
+					}
 				}
 
 				if (allTransferFinished)
 					assembleParts();
 			}
-		}, 5000, 500);
+		}, 5000, 1000);
+	}
+	
+	private ITransferProgress restartSegment(ITransferProgress t) {
+		logger.info("restart setgment " + t);
+		t.cancel();
+		t.cleanup();
+		Host host = null;
+		int rank = Integer.MIN_VALUE;
+		
+		for(InetAddress a : hosts.keySet()) {
+			if(host_rank.get(a) < rank) {
+				rank = host_rank.get(a);
+				host = hosts.get(a);
+			}
+		}
+		
+		if(host == null) {
+			logger.info("No host available any more!");
+			return null;
+		}
+		
+		return new IncomingDownload(new GetFileMessage(t.getExpectedHash(), t.getOffset(), t.getLength()), host, new java.io.File(t.getTargetFile()), hostResolver);
 	}
 
 	private void assembleParts() {
