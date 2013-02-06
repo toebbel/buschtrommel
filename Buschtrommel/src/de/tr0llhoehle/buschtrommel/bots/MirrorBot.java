@@ -12,6 +12,7 @@ import de.tr0llhoehle.buschtrommel.IGUICallbacks;
 import de.tr0llhoehle.buschtrommel.models.Host;
 import de.tr0llhoehle.buschtrommel.models.ShareAvailability;
 import de.tr0llhoehle.buschtrommel.network.ITransferProgress;
+import de.tr0llhoehle.buschtrommel.network.UDPAdapter;
 import de.tr0llhoehle.buschtrommel.network.ITransferProgress.TransferStatus;
 
 public class MirrorBot implements IGUICallbacks {
@@ -29,7 +30,7 @@ public class MirrorBot implements IGUICallbacks {
 		downloading = new Hashtable<String, ITransferProgress>();
 		queue = new Vector<String>();
 		downloaded = new Vector<String>();
-		buschtrommel.start();
+		buschtrommel.start(UDPAdapter.DEFAULT_PORT, UDPAdapter.DEFAULT_PORT, true, true);
 		downloadStarter = new Timer("download starter");
 		downloadStarter.scheduleAtFixedRate(new DownloadStarter(), 5000, 5000);
 		statusChecker = new Timer("download status checker");
